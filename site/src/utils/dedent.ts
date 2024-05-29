@@ -2,7 +2,7 @@
  * Trims a multiline string by an amount equal to the least indented line.
  * Leading and trailing newlines are removed.
  *
- * If the first line is _not_ empty, it will will be _indented_ bythe
+ * If the first line is _not_ empty, it will be _indented_ by the
  * same amount as the rest is _un-indented_.
  *
  * @returns The dedented string.
@@ -29,16 +29,17 @@ export function dedent(
 			}
 			return line.trim()
 		})
-		.map((line) => line.match(/^\s*/)?.[0].length)
-		.filter((indent) => indent !== undefined)
+		.map(line => line.match(/^\s*/)?.[0].length)
+		.filter(indent => indent !== undefined)
+		// @ts-ignore - Astro is hallucinating errors here and throwing on build
 		.reduce((a, b) => Math.min(a, b), Infinity)
 
 	if (leadingNewline) {
+		// @ts-ignore - Astro is hallucinating errors here and throwing on build
 		lines[0] = ' '.repeat(indent) + lines[0]
 	} else {
 		lines.shift()
 	}
-	console.log(lines)
 
 	if (options.trimEndingNewline) {
 		if (lines.at(-1) === '') {
@@ -46,5 +47,5 @@ export function dedent(
 		}
 	}
 
-	return lines.map((line) => line.slice(indent)).join('\n')
+	return lines.map(line => line.slice(indent)).join('\n')
 }
