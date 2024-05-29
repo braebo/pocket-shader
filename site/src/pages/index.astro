@@ -3,12 +3,14 @@ import HeroText from '../components/HeroSection.astro'
 import Card from '../components/Shaders.astro'
 import Layout from '../layouts/Layout.astro'
 import Code from '../components/Code.astro'
+
+import Playback from '../components/sections/Playback.svelte'
 ---
 
 <script>
 	import { PocketShader } from 'pocket-shader'
 
-	let ps1 = null as PocketShader | null
+	let ps1: PocketShader | null = null
 	document.querySelector('#run1')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
@@ -23,7 +25,7 @@ import Code from '../components/Code.astro'
 		}
 	})
 
-	let ps2 = null as PocketShader | null
+	let ps2: PocketShader | null = null
 	document.querySelector('#run2')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
@@ -38,7 +40,7 @@ import Code from '../components/Code.astro'
 		}
 	})
 
-	let ps3 = null as PocketShader | null
+	let ps3: PocketShader | null = null
 	document.querySelector('#run3')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
@@ -55,52 +57,56 @@ import Code from '../components/Code.astro'
 		}
 	})
 
-	let ps4 = null as PocketShader | null
-	const ps4StartBtn = document.querySelector('#start4') as HTMLButtonElement
-	function ps4Start() {
-		ps4?.start()
-		ps4State.textContent = ps4?.state ?? ''
-	}
-	const ps4PauseBtn = document.querySelector('#pause4') as HTMLButtonElement
-	function ps4Pause() {
-		ps4?.pause()
-		ps4State.textContent = ps4?.state ?? ''
-	}
-	const ps4StopBtn = document.querySelector('#stop4') as HTMLButtonElement
-	function ps4Stop() {
-		ps4?.stop()
-		ps4State.textContent = ps4?.state ?? ''
-	}
-	const ps4State = document.querySelector('#p4-state .value') as HTMLDivElement
-	document.querySelector('#run4')?.addEventListener('click', e => {
-		const target = e.target as HTMLButtonElement
-		if (target.textContent === 'Run') {
-			target.classList.add('active')
-			target.textContent = 'Dispose'
-			ps4 = new PocketShader('#codeblock4', {
-				speed: 4,
-			})
-			ps4StartBtn.addEventListener('click', ps4Start)
-			ps4PauseBtn.addEventListener('click', ps4Pause)
-			ps4StopBtn.addEventListener('click', ps4Stop)
-			document.querySelectorAll('#buttons4 button').forEach(btn => {
-				btn.removeAttribute('disabled')
-			})
-			ps4State.textContent = ps4.state
-		} else {
-			target.classList.remove('active')
-			ps4StartBtn?.removeEventListener('start', ps4Start)
-			ps4PauseBtn?.removeEventListener('pause', ps4Pause)
-			ps4StopBtn?.removeEventListener('stop', ps4Stop)
-			ps4?.stop().dispose()
-			ps4State.textContent = ps4?.state ?? ''
-			ps4 = null
-			target.textContent = 'Run'
-			document.querySelectorAll('#buttons4 button').forEach(btn => {
-				btn.setAttribute('disabled', 'true')
-			})
-		}
-	})
+	// let ps4: PocketShader | null = null
+	// const ps4StartBtn = document.querySelector('#start4') as HTMLButtonElement
+	// function ps4Start() {
+	// 	ps4?.start()
+	// 	ps4StateValue.textContent = ps4?.state ?? ''
+	// }
+	// const ps4PauseBtn = document.querySelector('#pause4') as HTMLButtonElement
+	// function ps4Pause() {
+	// 	ps4?.pause()
+	// 	ps4StateValue.textContent = ps4?.state ?? ''
+	// }
+	// const ps4StopBtn = document.querySelector('#stop4') as HTMLButtonElement
+	// function ps4Stop() {
+	// 	ps4?.stop()
+	// 	ps4StateValue.textContent = ps4?.state ?? ''
+	// }
+	// const ps4StateValue = document.querySelector('#p4-state .value') as HTMLDivElement
+	// const ps4TimeValue = document.querySelector('#p4-time .value') as HTMLDivElement
+	// document.querySelector('#run4')?.addEventListener('click', e => {
+	// 	const target = e.target as HTMLButtonElement
+	// 	target.classList.toggle('active')
+	// 	ps4StateValue.classList.remove('disabled')
+	// 	ps4TimeValue.classList.remove('disabled')
+
+	// 	ps4StartBtn.toggleAttribute('disabled')
+	// 	ps4PauseBtn.toggleAttribute('disabled')
+	// 	ps4StopBtn.toggleAttribute('disabled')
+
+	// 	if (target.textContent === 'Run') {
+	// 		target.textContent = 'Dispose'
+	// 		ps4 = new PocketShader('#codeblock4', {
+	// 			speed: 4,
+	// 		})
+	// 		ps4.on('render', ({ time }) => {
+	// 			ps4TimeValue.textContent = time.toFixed(2)
+	// 		})
+	// 		ps4StartBtn.addEventListener('click', ps4Start)
+	// 		ps4PauseBtn.addEventListener('click', ps4Pause)
+	// 		ps4StopBtn.addEventListener('click', ps4Stop)
+	// 		ps4StateValue.textContent = ps4.state
+	// 	} else {
+	// 		ps4StartBtn?.removeEventListener('start', ps4Start)
+	// 		ps4PauseBtn?.removeEventListener('pause', ps4Pause)
+	// 		ps4StopBtn?.removeEventListener('stop', ps4Stop)
+	// 		ps4?.stop().dispose()
+	// 		ps4StateValue.textContent = ps4?.state ?? ''
+	// 		ps4 = null
+	// 		target.textContent = 'Run'
+	// 	}
+	// })
 </script>
 
 <Layout title="pocket-shader">
@@ -129,13 +135,13 @@ import Code from '../components/Code.astro'
 	<section>
 		<h2 id="usage">Usage</h2>
 		<p>
-			By default, the shader will create a fullscreen canvas element and append it to the
-			body.
+			By default, <code>PocketShader</code> will create a fullscreen canvas element and append
+			it to the body.
 		</p>
 
 		<Code
 			id="eg1"
-			code={`
+			code={/*js*/ `
 				import { PocketShader } from 'pocket-shader'
 
 				new PocketShader()
@@ -150,7 +156,7 @@ import Code from '../components/Code.astro'
 
 		<Code
 			id="codeblock2"
-			code={`
+			code={/*js*/ `
 				import { PocketShader } from 'pocket-shader'
 
 				new PocketShader('#codeblock2')
@@ -167,7 +173,7 @@ import Code from '../components/Code.astro'
 
 		<Code
 			id="codeblock3"
-			code={`
+			code={/*js*/ `
 				import { PocketShader } from 'pocket-shader'
 
 				new PocketShader('#codeblock3', {
@@ -184,28 +190,52 @@ import Code from '../components/Code.astro'
 			The animation loop can be controlled with methods like <code>start()</code>
 			and <code>stop()</code>.
 		</p>
+		<Playback client:load>
+			<Code
+				slot="code"
+				id="codeblock4"
+				code={/*js*/ `
+				import { PocketShader } from 'pocket-shader'
+
+				const ps = new PocketShader('#codeblock4')
+			`}
+			/>
+		</Playback>
+	</section>
+
+	<!-- <section>
+		<p>
+			The animation loop can be controlled with methods like <code>start()</code>
+			and <code>stop()</code>.
+		</p>
 
 		<Code
 			id="codeblock4"
-			code={`
+			code={/*js*/ `
 				import { PocketShader } from 'pocket-shader'
 
 				const ps = new PocketShader('#codeblock4')
 			`}
 		/>
 
-		<div id="p4-state">
+		<button class="btn" id="run4">Run</button>
+
+		<div id="p4-state" class="kv disabled">
 			<div class="key"><code>ps.state</code></div>
 			<div class="value"></div>
 		</div>
 
-		<button class="btn" id="run4">Run</button>
+		<div id="p4-time" class="kv disabled">
+			<div class="key"><code>ps.time</code></div>
+			<div class="value"></div>
+		</div>
+
 		<div id="buttons4" class="flex">
 			<button class="code gradient-outline" id="start4" disabled>ps.start()</button>
 			<button class="code gradient-outline" id="pause4" disabled>ps.pause()</button>
 			<button class="code gradient-outline" id="stop4" disabled>ps.stop()</button>
 		</div>
-	</section>
+	</section> -->
 
 	<br />
 
@@ -233,11 +263,11 @@ import Code from '../components/Code.astro'
 		padding: 0;
 	}
 
-	#p4-state {
+	/* .kv {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		width: 12.5rem;
+		width: 11rem;
 		margin: auto;
 		outline: var(--outline);
 		border-radius: var(--radius);
@@ -267,15 +297,14 @@ import Code from '../components/Code.astro'
 
 	button.code {
 		color: var(--fg-a);
-		/* font-family: var(--font-mono); */
 		font-variation-settings: 'wght' 300;
 		font-size: var(--font-sm);
 		position: relative;
-		/* z-index: 1; */
 
 		padding: 0.25rem 0.5rem;
 	}
 
+	.disabled,
 	button:disabled {
 		opacity: 0.5;
 		filter: grayscale(1) brightness(0.5);
@@ -284,5 +313,5 @@ import Code from '../components/Code.astro'
 		&::before {
 			display: none;
 		}
-	}
+	} */
 </style>

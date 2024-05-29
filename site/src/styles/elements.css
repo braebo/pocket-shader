@@ -142,7 +142,8 @@ code,
 	align-items: center;
 	width: fit-content;
 
-	font-size: var(--font-xs);
+	font-size: var(--font-sm);
+	line-height: var(--line-height-sm);
 }
 
 br {
