@@ -1,10 +1,17 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "compilerOptions": {
-    "lib": ["DOM", "ESNext"],
-    "module": "ESNext",
-    "types": ["svelte", "./global.d.ts"],
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js"
-  }
+	"extends": "astro/tsconfigs/strict",
+	"compilerOptions": {
+		"strict": true,
+		"lib": ["DOM", "ESNext"],
+		"target": "ESNext",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"skipLibCheck": true,
+		"allowJs": true,
+		"checkJs": false,
+		"noEmit": true
+	},
+	"exclude": ["node_modules", "dist"]
 }
