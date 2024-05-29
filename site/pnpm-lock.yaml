@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   astro@4.9.1:
-    hash: 7wifzpub5agusitk7b7t7r4e54
+    hash: lqjskr46psuxxxue2mnwh2fe54
     path: patches/astro@4.9.1.patch
 
 importers:
@@ -21,10 +21,10 @@ importers:
         version: 4.2.0(solid-js@1.8.17)(vite@5.2.11(sass@1.77.2))
       '@astrojs/svelte':
         specifier: ^5.4.0
-        version: 5.4.0(astro@4.9.1(patch_hash=7wifzpub5agusitk7b7t7r4e54)(sass@1.77.2)(typescript@5.4.5))(svelte@4.2.17)(typescript@5.4.5)(vite@5.2.11(sass@1.77.2))
+        version: 5.4.0(astro@4.9.1(patch_hash=lqjskr46psuxxxue2mnwh2fe54)(sass@1.77.2)(typescript@5.4.5))(svelte@4.2.17)(typescript@5.4.5)(vite@5.2.11(sass@1.77.2))
       astro:
         specifier: ^4.9.1
-        version: 4.9.1(patch_hash=7wifzpub5agusitk7b7t7r4e54)(sass@1.77.2)(typescript@5.4.5)
+        version: 4.9.1(patch_hash=lqjskr46psuxxxue2mnwh2fe54)(sass@1.77.2)(typescript@5.4.5)
       solid-js:
         specifier: ^1.8.17
         version: 1.8.17
@@ -2528,10 +2528,10 @@ snapshots:
       - supports-color
       - vite
 
-  '@astrojs/svelte@5.4.0(astro@4.9.1(patch_hash=7wifzpub5agusitk7b7t7r4e54)(sass@1.77.2)(typescript@5.4.5))(svelte@4.2.17)(typescript@5.4.5)(vite@5.2.11(sass@1.77.2))':
+  '@astrojs/svelte@5.4.0(astro@4.9.1(patch_hash=lqjskr46psuxxxue2mnwh2fe54)(sass@1.77.2)(typescript@5.4.5))(svelte@4.2.17)(typescript@5.4.5)(vite@5.2.11(sass@1.77.2))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 3.1.0(svelte@4.2.17)(vite@5.2.11(sass@1.77.2))
-      astro: 4.9.1(patch_hash=7wifzpub5agusitk7b7t7r4e54)(sass@1.77.2)(typescript@5.4.5)
+      astro: 4.9.1(patch_hash=lqjskr46psuxxxue2mnwh2fe54)(sass@1.77.2)(typescript@5.4.5)
       svelte: 4.2.17
       svelte2tsx: 0.6.27(svelte@4.2.17)(typescript@5.4.5)
       typescript: 5.4.5
@@ -3252,7 +3252,7 @@ snapshots:
 
   assertion-error@1.1.0: {}
 
-  astro@4.9.1(patch_hash=7wifzpub5agusitk7b7t7r4e54)(sass@1.77.2)(typescript@5.4.5):
+  astro@4.9.1(patch_hash=lqjskr46psuxxxue2mnwh2fe54)(sass@1.77.2)(typescript@5.4.5):
     dependencies:
       '@astrojs/compiler': 2.8.0
       '@astrojs/internal-helpers': 0.4.0
