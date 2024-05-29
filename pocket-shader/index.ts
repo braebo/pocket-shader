@@ -64,35 +64,6 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	 * @defaultValue `false`
 	 */
 	shadertoy?: boolean
-
-	// todo - is it even worth exposing / implementing disabling?  If so, whats the best way?
-	// /**
-	//  * By default, {@link PocketShader} generates uniforms for `time`, `resolution`, and `mouse`,
-	//  * and their values are calculated and passed to the shader every frame. Set this to `false`
-	//  * to disable all built-in uniforms, or pass an object to disable specific ones.
-	//  */
-	// builtinUniforms?:
-	// 	| false
-	// 	| {
-	// 			time: boolean
-	// 			resolution: boolean
-	// 			mouse: boolean
-	// 	  }
-	// /**
-	//  * Whether to track time and pass it to the shader.
-	//  * @defaultValue `true`
-	//  */
-	// useTime?: boolean
-	// /**
-	//  * Whether to track the canvas resolution and pass it to the shader.
-	//  * @defaultValue `true`
-	//  */
-	// useResolution?: boolean
-	// /**
-	//  * Whether to track the mouse position and pass it to the shader.
-	//  * @defaultValue `true`
-	//  */
-	// useMouse?: boolean
 }
 
 const DEFAULT_UNIFORMS = {
@@ -196,6 +167,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	set uniforms(value: T) {
 		this._uniforms = value
+		//- This runs in the proxy now.
 		// // Only manually re-render if the animation loop is paused.
 		// if (this.state === 'paused') {
 		// 	this.render()
@@ -292,7 +264,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		if (options?.autoStart === true) {
 			this.start()
 		} else {
-			this.start().pause()
+			this.resize()
 		}
 	}
 
@@ -330,11 +302,13 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	}
 
 	start() {
+		this._l('start()')
 		switch (this.state) {
 			case 'stopped':
 			case 'paused':
 				this.state = 'running'
 				this.resize()
+				this.render()
 				break
 			case 'running':
 				break
@@ -346,8 +320,8 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	}
 
 	pause() {
+		this._l('pause()')
 		this.state = 'paused'
-
 		return this
 	}
 
@@ -359,9 +333,11 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	}
 
 	restart() {
+		this._l('restart()')
 		switch (this.state) {
 			case 'running':
 				break
+			case 'stopped':
 			case 'paused':
 				this.start()
 				break
@@ -510,8 +486,6 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			this._extractUniforms(this.opts.fragmentShader)
 		}
 
-		console.log(this.uniforms)
-
 		for (const key in this.uniforms) {
 			this._uniformLocations.set(key, this.ctx.getUniformLocation(this.program, key)!)
 		}
@@ -551,8 +525,8 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			// Tell it to use our program (pair of shaders).
 			this.ctx.useProgram(this.program)
 
-			// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'iPosition')
 			const positionAttributeLocation = this._builtinUniformLocations.get('iPosition')!
+			// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'iPosition')
 			const resolutionLocation = this._builtinUniformLocations.get('iResolution')!
 			const mouseLocation = this._builtinUniformLocations.get('iMouse')!
 			const timeLocation = this._builtinUniformLocations.get('iTime')!
@@ -599,6 +573,8 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 			if (this.state === 'running') {
 				requestAnimationFrame(render)
+			} else {
+				this._l('render() - paused')
 			}
 		}
 
