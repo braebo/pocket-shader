@@ -136,6 +136,18 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		iMouse: [0, 0] as [number, number],
 	}
 
+	_time = 0
+	get time() {
+		return this._time
+	}
+	set time(value) {
+		this._time = value
+		this.builtinUniforms.iTime = value
+		// if (this.state.match(/paused|stopped/)) {
+		// 	this.render()
+		// }
+	}
+
 	/**
 	 * The position buffer used to render the shader.
 	 */
@@ -156,9 +168,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			set: (target, property, value) => {
 				// @ts-expect-error
 				target[property] = value
-				// Only manually re-render if the animation loop is paused.
-				if (this.state === 'paused') {
-					this.render()
+				// Only manually re-render if the animation loop isn't running.
+				if (this.state.match(/paused|stopped/)) {
+					this._render()
 				}
 				return true
 			},
@@ -240,22 +252,22 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this._l = (fn: string, ...args: any[]) => {
 			const id = this.container?.id ?? ''
 			const color = getColorFromId(id)
-			console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:cyan', ...args)
+			console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:gray', ...args)
 		}
 
 		if (!this.container) {
 			this.container = document.body
-			this.canvas.style.width = this.container.offsetHeight + 'px'
-			this.canvas.style.height = this.container.offsetHeight + 'px'
-			this.canvas.style.position = 'fixed'
-			this.canvas.style.inset = '0'
-			this.canvas.style.zIndex = '0'
+			this.canvas.style.setProperty('width', this.container.offsetHeight + 'px')
+			this.canvas.style.setProperty('height', this.container.offsetHeight + 'px')
+			this.canvas.style.setProperty('position', 'fixed')
+			this.canvas.style.setProperty('inset', '0')
+			this.canvas.style.setProperty('zIndex', '0')
 		} else {
-			this.canvas.style.width = this.container.offsetWidth + 'px'
-			this.canvas.style.height = this.container.offsetHeight + 'px'
-			this.canvas.style.position = 'absolute'
-			this.canvas.style.inset = '0'
-			this.canvas.style.zIndex = '0'
+			this.canvas.style.setProperty('width', this.container.offsetWidth + 'px')
+			this.canvas.style.setProperty('height', this.container.offsetHeight + 'px')
+			this.canvas.style.setProperty('position', 'absolute')
+			this.canvas.style.setProperty('inset', '0')
+			this.canvas.style.setProperty('zIndex', '0')
 		}
 
 		this._setupCanvas()
@@ -308,7 +320,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			case 'paused':
 				this.state = 'running'
 				this.resize()
-				this.render()
+				this._render()
 				break
 			case 'running':
 				break
@@ -328,6 +340,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	stop() {
 		this._l('stop()')
 		this.state = 'stopped'
+		this.time = 0
 
 		return this
 	}
@@ -378,7 +391,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		}
 
 		if (this.state.match(/paused|stopped/)) {
-			this.render()
+			this._render()
 		}
 
 		return this
@@ -433,17 +446,16 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		return false
 	}
 
-	_listeners = new Map<string, (data: { time: number }) => void>()
-	on = (event: 'render', listener: (data: { time: number }) => void) => {
+	_listeners = new Map<string, (data: { time: number; delta: number }) => void>()
+	on = (event: 'render', listener: (data: { time: number; delta: number }) => void) => {
 		this._listeners.set(event, listener)
 	}
 
-	emit = (t: number) => {
+	emit = (time: number, delta: number) => {
 		for (const [event, listener] of this._listeners) {
-			this._l('emit()')
 			switch (event) {
 				case 'render':
-					listener({ time: t })
+					listener({ time, delta })
 					break
 			}
 		}
@@ -502,7 +514,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		)
 	}
 
-	render() {
+	private _render() {
 		this._l('render()')
 		let then = 0
 
@@ -512,12 +524,13 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 			now *= 0.001 // convert to seconds
 			const elapsedTime = Math.min(now - then, 0.1)
-			this.builtinUniforms.iTime += elapsedTime * this.speed
-			then = now
 
 			if (this._listeners.size) {
-				this.emit(elapsedTime)
+				this.emit(this.time, elapsedTime)
 			}
+
+			this.time += elapsedTime * this.speed
+			then = now
 
 			// Tell WebGL how to convert from clip space to pixels.
 			this.ctx.viewport(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
@@ -526,7 +539,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			this.ctx.useProgram(this.program)
 
 			const positionAttributeLocation = this._builtinUniformLocations.get('iPosition')!
-			// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'iPosition')
+			//// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'iPosition')
 			const resolutionLocation = this._builtinUniformLocations.get('iResolution')!
 			const mouseLocation = this._builtinUniformLocations.get('iMouse')!
 			const timeLocation = this._builtinUniformLocations.get('iTime')!
