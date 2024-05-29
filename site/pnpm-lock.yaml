@@ -769,6 +769,9 @@ packages:
   '@shikijs/core@1.6.0':
     resolution: {integrity: sha512-NIEAi5U5R7BLkbW1pG/ZKu3eb1lzc3/+jD0lFsuxMT7zjaf9bbNwdNyMr7zh/Zl8EXQtQ+MYBAt5G+JLu+5DlA==}
 
+  '@shikijs/core@1.6.1':
+    resolution: {integrity: sha512-CqYyepN4SnBopaoXYwng4NO8riB5ask/LTCkhOFq+GNGtr2X+aKeD767eYdqYukeixEUvv4bXdyTYVaogj7KBw==}
+
   '@shikijs/transformers@1.6.0':
     resolution: {integrity: sha512-qGfHe1ECiqfE2STPWvfogIj/9Q0SK+MCRJdoITkW7AmFuB7DmbFnBT2US84+zklJOB51MzNO8RUXZiauWssJlQ==}
 
@@ -1964,6 +1967,9 @@ packages:
   shiki@1.6.0:
     resolution: {integrity: sha512-P31ROeXcVgW/k3Z+vUUErcxoTah7ZRaimctOpzGuqAntqnnSmx1HOsvnbAB8Z2qfXPRhw61yptAzCsuKOhTHwQ==}
 
+  shiki@1.6.1:
+    resolution: {integrity: sha512-1Pu/A1rtsG6HZvQm4W0NExQ45e02og+rPog7PDaFDiMumZgOYnZIu4JtGQeAIfMwdbKSjJQoCUr79vDLKUUxWA==}
+
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
@@ -2506,7 +2512,7 @@ snapshots:
       remark-parse: 11.0.0
       remark-rehype: 11.1.0
       remark-smartypants: 2.1.0
-      shiki: 1.6.0
+      shiki: 1.6.1
       unified: 11.0.4
       unist-util-remove-position: 5.0.0
       unist-util-visit: 5.0.0
@@ -3031,6 +3037,8 @@ snapshots:
 
   '@shikijs/core@1.6.0': {}
 
+  '@shikijs/core@1.6.1': {}
+
   '@shikijs/transformers@1.6.0':
     dependencies:
       shiki: 1.6.0
@@ -3305,7 +3313,7 @@ snapshots:
       rehype: 13.0.1
       resolve: 1.22.8
       semver: 7.6.2
-      shiki: 1.6.0
+      shiki: 1.6.1
       string-width: 7.1.0
       strip-ansi: 7.1.0
       tsconfck: 3.0.3(typescript@5.4.5)
@@ -4648,6 +4656,10 @@ snapshots:
   shiki@1.6.0:
     dependencies:
       '@shikijs/core': 1.6.0
+
+  shiki@1.6.1:
+    dependencies:
+      '@shikijs/core': 1.6.1
 
   siginfo@2.0.0: {}
 
