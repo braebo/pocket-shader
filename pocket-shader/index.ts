@@ -147,7 +147,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	/**
 	 * The current state of the renderer.
 	 */
-	state: 'running' | 'paused' | 'disposed' = 'paused'
+	state: 'running' | 'paused' | 'stopped' | 'disposed' = 'stopped'
 
 	/**
 	 * The options used to create this instance.
@@ -174,6 +174,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	// private _uniforms: T
 	private _uniforms: { [K in keyof T]: T[K] }
+	private _uniformLocations = new Map<string, WebGLUniformLocation>()
 
 	/**
 	 * A record of uniform values to pass to the shader.
@@ -291,7 +292,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		if (options?.autoStart === true) {
 			this.start()
 		} else {
-			this.start().stop()
+			this.start().pause()
 		}
 	}
 
@@ -330,12 +331,12 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	start() {
 		switch (this.state) {
-			case 'running':
-				break
+			case 'stopped':
 			case 'paused':
 				this.state = 'running'
 				this.resize()
-				// this.render()
+				break
+			case 'running':
 				break
 			case 'disposed':
 				throw new Error('Cannot start a disposed PocketShader.  Call restart() instead.')
@@ -344,16 +345,15 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		return this
 	}
 
+	pause() {
+		this.state = 'paused'
+
+		return this
+	}
+
 	stop() {
-		switch (this.state) {
-			case 'running':
-				this.state = 'paused'
-				break
-			case 'paused':
-				break
-			case 'disposed':
-				throw new Error('Cannot stop a disposed PocketShader.')
-		}
+		this._l('stop()')
+		this.state = 'stopped'
 
 		return this
 	}
@@ -374,7 +374,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	reload() {
 		this._l('reload()')
-		this.stop()
+		this.pause()
 		this.state = 'disposed'
 		this.canvas = this.canvas.cloneNode() as HTMLCanvasElement
 		this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
@@ -401,7 +401,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			this.builtinUniforms.iResolution[1] = height
 		}
 
-		this.render()
+		if (this.state.match(/paused|stopped/)) {
+			this.render()
+		}
 
 		return this
 	}
@@ -454,8 +456,6 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 		return false
 	}
-
-	_uniformLocations = new Map<string, any>()
 
 	_listeners = new Map<string, (data: { time: number }) => void>()
 	on = (event: 'render', listener: (data: { time: number }) => void) => {
@@ -513,7 +513,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		console.log(this.uniforms)
 
 		for (const key in this.uniforms) {
-			this._uniformLocations.set(key, this.ctx.getUniformLocation(this.program, key))
+			this._uniformLocations.set(key, this.ctx.getUniformLocation(this.program, key)!)
 		}
 
 		// Create a buffer to put three 2d clip space points in.
@@ -644,7 +644,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 			if (
 				[...this._builtinUniformLocations.keys(), ...Object.keys(this.uniforms)].some(
-					(k) => k === name,
+					k => k === name,
 				)
 			) {
 				console.log('%cSkipping', 'color:orange', name)
