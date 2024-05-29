@@ -1,0 +1,37 @@
+.text-gradient {
+	background-image: var(--gradient);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
+.text-gradient-animated {
+	background-image: linear-gradient(
+		var(--angle, 0deg),
+		var(--theme-a, #33c5f4),
+		var(--theme-b, #69cb81) 100%
+	);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+
+	animation: gradient-animation 5s infinite alternate;
+
+	/*
+        Firefox _still_ doesn't support `@property`
+        https://bugzilla.mozilla.org/show_bug.cgi?id=1273706
+    */
+	@-moz-document url-prefix() {
+		animation: none;
+	}
+}
+
+.card {
+	width: fit-content;
+	margin: auto;
+	padding: 0.75rem 1rem;
+
+	background: var(--bg-a);
+	outline: var(--outline);
+	border-radius: var(--radius);
+}

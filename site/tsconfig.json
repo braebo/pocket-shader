@@ -1,0 +1,10 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "lib": ["DOM", "ESNext"],
+    "module": "ESNext",
+    "types": ["svelte", "./global.d.ts"],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  }
+}

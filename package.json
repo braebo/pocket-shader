@@ -1,0 +1,24 @@
+{
+  "name": "pocket-shader",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd site && pnpm dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "client": "link:@types/vite/client"
+  },
+  "exports": {
+    ".": {
+      "default": "./pocket-shader/index.ts",
+      "types": "./pocket-shader/index.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}

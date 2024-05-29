@@ -1,0 +1,288 @@
+---
+import HeroText from '../components/HeroSection.astro'
+import Card from '../components/Shaders.astro'
+import Layout from '../layouts/Layout.astro'
+import Code from '../components/Code.astro'
+---
+
+<script>
+	import { PocketShader } from 'pocket-shader'
+
+	let ps1 = null as PocketShader | null
+	document.querySelector('#run1')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		if (target.textContent === 'Run') {
+			target.classList.add('active')
+			target.textContent = 'Dispose'
+			ps1 = new PocketShader()
+		} else {
+			target.classList.remove('active')
+			ps1?.dispose()
+			ps1 = null
+			target.textContent = 'Run'
+		}
+	})
+
+	let ps2 = null as PocketShader | null
+	document.querySelector('#run2')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		if (target.textContent === 'Run') {
+			target.classList.add('active')
+			target.textContent = 'Dispose'
+			ps2 = new PocketShader('#codeblock2')
+		} else {
+			target.classList.remove('active')
+			ps2?.dispose()
+			ps2 = null
+			target.textContent = 'Run'
+		}
+	})
+
+	let ps3 = null as PocketShader | null
+	document.querySelector('#run3')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		if (target.textContent === 'Run') {
+			target.classList.add('active')
+			target.textContent = 'Dispose'
+			ps3 = new PocketShader('#codeblock3', {
+				autoStart: true,
+			})
+		} else {
+			target.classList.remove('active')
+			ps3?.dispose()
+			ps3 = null
+			target.textContent = 'Run'
+		}
+	})
+
+	let ps4 = null as PocketShader | null
+	const ps4StartBtn = document.querySelector('#start4') as HTMLButtonElement
+	function ps4Start() {
+		ps4?.start()
+		ps4State.textContent = ps4?.state ?? ''
+	}
+	const ps4PauseBtn = document.querySelector('#pause4') as HTMLButtonElement
+	function ps4Pause() {
+		ps4?.pause()
+		ps4State.textContent = ps4?.state ?? ''
+	}
+	const ps4StopBtn = document.querySelector('#stop4') as HTMLButtonElement
+	function ps4Stop() {
+		ps4?.stop()
+		ps4State.textContent = ps4?.state ?? ''
+	}
+	const ps4State = document.querySelector('#p4-state .value') as HTMLDivElement
+	document.querySelector('#run4')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		if (target.textContent === 'Run') {
+			target.classList.add('active')
+			target.textContent = 'Dispose'
+			ps4 = new PocketShader('#codeblock4', {
+				speed: 4,
+			})
+			ps4StartBtn.addEventListener('click', ps4Start)
+			ps4PauseBtn.addEventListener('click', ps4Pause)
+			ps4StopBtn.addEventListener('click', ps4Stop)
+			document.querySelectorAll('#buttons4 button').forEach(btn => {
+				btn.removeAttribute('disabled')
+			})
+			ps4State.textContent = ps4.state
+		} else {
+			target.classList.remove('active')
+			ps4StartBtn?.removeEventListener('start', ps4Start)
+			ps4PauseBtn?.removeEventListener('pause', ps4Pause)
+			ps4StopBtn?.removeEventListener('stop', ps4Stop)
+			ps4?.stop().dispose()
+			ps4State.textContent = ps4?.state ?? ''
+			ps4 = null
+			target.textContent = 'Run'
+			document.querySelectorAll('#buttons4 button').forEach(btn => {
+				btn.setAttribute('disabled', 'true')
+			})
+		}
+	})
+</script>
+
+<Layout title="pocket-shader">
+	<main>
+		<br />
+
+		<HeroText />
+
+		<br-xl></br-xl>
+
+		<p class="description">
+			<code class="text-gradient">pocket-shader</code> is a typescript package that makes it easy
+			to render WebGL shaders.
+		</p>
+	</main>
+
+	<!-- <ul class="toc">
+		<li class="toc-item">
+			<a href="#usage">Usage</a>
+		</li>
+		<li class="toc-item">
+			<a href="#usage">ShaderToy</a>
+		</li>
+	</ul> -->
+
+	<section>
+		<h2 id="usage">Usage</h2>
+		<p>
+			By default, the shader will create a fullscreen canvas element and append it to the
+			body.
+		</p>
+
+		<Code
+			id="eg1"
+			code={`
+				import { PocketShader } from 'pocket-shader'
+
+				new PocketShader()
+			`}
+		/>
+
+		<button class="btn" id="run1">Run</button>
+	</section>
+
+	<section>
+		<p>To render to a specific container, pass an element or selector.</p>
+
+		<Code
+			id="codeblock2"
+			code={`
+				import { PocketShader } from 'pocket-shader'
+
+				new PocketShader('#codeblock2')
+			`}
+		/>
+
+		<button class="btn" id="run2">Run</button>
+	</section>
+
+	<h2 id="animation">Animation</h2>
+
+	<section>
+		<p>The <code>autoStart</code> option will automatically start an animation loop.</p>
+
+		<Code
+			id="codeblock3"
+			code={`
+				import { PocketShader } from 'pocket-shader'
+
+				new PocketShader('#codeblock3', {
+				    autoStart: true // [!code highlight]
+				})
+			`}
+		/>
+
+		<button class="btn" id="run3">Run</button>
+	</section>
+
+	<section>
+		<p>
+			The animation loop can be controlled with methods like <code>start()</code>
+			and <code>stop()</code>.
+		</p>
+
+		<Code
+			id="codeblock4"
+			code={`
+				import { PocketShader } from 'pocket-shader'
+
+				const ps = new PocketShader('#codeblock4')
+			`}
+		/>
+
+		<div id="p4-state">
+			<div class="key"><code>ps.state</code></div>
+			<div class="value"></div>
+		</div>
+
+		<button class="btn" id="run4">Run</button>
+		<div id="buttons4" class="flex">
+			<button class="code gradient-outline" id="start4" disabled>ps.start()</button>
+			<button class="code gradient-outline" id="pause4" disabled>ps.pause()</button>
+			<button class="code gradient-outline" id="stop4" disabled>ps.stop()</button>
+		</div>
+	</section>
+
+	<br />
+
+	<ul role="list" class="link-card-grid">
+		<Card />
+	</ul>
+</Layout>
+
+<style>
+	.description {
+		box-sizing: border-box;
+		padding: 1rem;
+
+		outline: var(--outline);
+		background: var(--bg-a);
+		border-radius: var(--radius);
+
+		text-wrap: balance;
+	}
+
+	.link-card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+		gap: 2rem;
+		padding: 0;
+	}
+
+	#p4-state {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 12.5rem;
+		margin: auto;
+		outline: var(--outline);
+		border-radius: var(--radius);
+		overflow: hidden;
+		height: 1.75rem;
+
+		div {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex: 1fr;
+
+			line-height: 1.75rem;
+		}
+
+		.value {
+			margin: auto;
+		}
+	}
+
+	.flex {
+		display: flex;
+		gap: 1rem;
+		width: fit-content;
+		margin: auto;
+	}
+
+	button.code {
+		color: var(--fg-a);
+		/* font-family: var(--font-mono); */
+		font-variation-settings: 'wght' 300;
+		font-size: var(--font-sm);
+		position: relative;
+		/* z-index: 1; */
+
+		padding: 0.25rem 0.5rem;
+	}
+
+	button:disabled {
+		opacity: 0.5;
+		filter: grayscale(1) brightness(0.5);
+		cursor: not-allowed;
+
+		&::before {
+			display: none;
+		}
+	}
+</style>

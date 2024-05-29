@@ -1,0 +1,136 @@
+---
+import {
+	transformerNotationHighlight,
+	transformerNotationFocus,
+	transformerNotationDiff,
+} from '@shikijs/transformers'
+import { Code as AstroCode } from 'astro:components'
+import { dedent } from '../utils/dedent'
+import {} from '@shikijs/transformers'
+import {} from '@shikijs/transformers'
+import Copy from './Copy.svelte'
+
+interface Props {
+	id: string
+	code: string
+}
+
+const { id, code } = Astro.props
+---
+
+<div class="code-container" id={id}>
+	<div class="code-padding"></div>
+	<div class="code-container-inner">
+		<div class="copy-button-container">
+			<Copy text={code} client:load />
+		</div>
+		<AstroCode
+			lang="ts"
+			theme="poimandres"
+			transformers={[
+				transformerNotationFocus(),
+				transformerNotationDiff(),
+				transformerNotationHighlight(),
+			]}
+			code={dedent(code)}
+		/>
+	</div>
+	<div class="code-padding"></div>
+</div>
+
+<style is:global>
+	div.code-container {
+		--bg: #1b1e28;
+
+		position: relative;
+		display: flex;
+
+		width: fit-content;
+		max-width: 100%;
+		margin: auto;
+
+		overflow-x: auto;
+
+		background-color: var(--bg);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow);
+
+		line-height: var(--line-height-sm);
+		/* line-height: 14px; */
+
+		font-family: var(--font-mono);
+		font-size: var(--font-sm);
+
+		div.code-container-inner {}
+	}
+	.code-padding {
+		min-width: 1rem;
+		min-height: 100%;
+		background-color: var(--bg);
+	}
+
+	.has-focused .line {
+		filter: blur(0.095rem);
+	}
+	.has-focused .focused {
+		filter: blur(0);
+	}
+
+	.has-highlighted .line {
+		opacity: 0.75;
+		filter: brightness(0.7) saturate(0.7) contrast(0.9);
+	}
+	.has-highlighted .highlighted {
+		opacity: 1;
+		filter: brightness(1.2) saturate(1.2) contrast(1.1);
+	}
+
+	pre.astro-code code {
+		position: relative;
+
+		width: fit-content;
+		/* margin: 1rem; */
+		/* max-width: 100%; */
+		/* margin: 0 auto; */
+		/* padding: 1rem; */
+		/* margin: 1rem; */
+		/* box-sizing: border-box; */
+		/* box-sizing: content-box; */
+
+		/* overflow-x: auto; */
+		overflow: visible;
+
+		/* font-family: var(--font-mono); */
+		/* font-size: var(--font-sm); */
+		/* line-height: var(--line-height-sm); */
+
+		/* .line:empty {
+			max-height: 1px;
+		} */
+	}
+
+	.copy-button-container {
+		position: absolute;
+		right: 0;
+		top: 0;
+		z-index: 1;
+		/* opacity: 0; */
+		/* scale: 0; */
+		/* transform: translate(0); */
+		transform: scale(0.01) translate3d(0, 0, 1px);
+		transition: 0.2s;
+	}
+	
+	div.code-container:hover .copy-button-container {
+		transition: 0.2s;
+		/* opacity: 1; */
+		/* scale: 1; */
+		/* transform: translate(1); */
+		transform: scale(1) translate3d(0, 0, 1px);
+	}
+
+	code,
+	pre {
+		overflow: visible;
+	}
+</style>

@@ -1,0 +1,5 @@
+{
+    "name": "@fractal/greet",
+    "version": "0.1.0",
+    "exports": "./pocket-shader/index.ts"
+}

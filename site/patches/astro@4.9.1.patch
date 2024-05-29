@@ -1,0 +1,52 @@
+diff --git a/components/Code.astro b/components/Code.astro
+index f0cb26326516686554a6136da4ab84b6dc70184f..d8e788b503d4724b7c577981dca2508577a9f95d 100644
+--- a/components/Code.astro
++++ b/components/Code.astro
+@@ -1,15 +1,16 @@
+ ---
+ import type { ThemePresets } from '@astrojs/markdown-remark';
++import type { HTMLAttributes } from '../types';
+ import type {
+ 	BuiltinLanguage,
+ 	LanguageRegistration,
+ 	SpecialLanguage,
+ 	ThemeRegistration,
+ 	ThemeRegistrationRaw,
++	ShikiTransformer
+ } from 'shiki';
+ import { bundledLanguages } from 'shiki/langs';
+ import { getCachedHighlighter } from '../dist/core/shiki.js';
+-import type { HTMLAttributes } from '../types';
+ 
+ interface Props extends Omit<HTMLAttributes<'pre'>, 'lang'> {
+ 	/** The code to highlight. Required. */
+@@ -50,6 +51,7 @@ interface Props extends Omit<HTMLAttributes<'pre'>, 'lang'> {
+ 	 * @default false
+ 	 */
+ 	inline?: boolean;
++	transformers?: ShikiTransformer[];
+ }
+ 
+ const {
+@@ -59,6 +61,7 @@ const {
+ 	themes = {},
+ 	wrap = false,
+ 	inline = false,
++	transformers = [],
+ 	...rest
+ } = Astro.props;
+ 
+@@ -85,11 +88,13 @@ const highlighter = await getCachedHighlighter({
+ 	theme,
+ 	themes,
+ 	wrap,
++	transformers
+ });
+ 
+ const html = await highlighter.highlight(code, typeof lang === 'string' ? lang : lang.name, {
+ 	inline,
+ 	attributes: rest as any,
++	transformers
+ });
+ ---
+ 

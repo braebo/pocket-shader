@@ -1,0 +1,164 @@
+html {
+	font-family: var(--font-a);
+	background: var(--bg-b);
+	color: var(--fg-a);
+	font-size: 1rem;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100dvh;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	max-width: 100vw;
+	overflow-x: hidden;
+}
+
+p {
+	width: clamp(20ch, 26rem, 100%);
+	margin: auto;
+
+	font-variation-settings: 'wght' 300;
+	letter-spacing: 0.4px;
+	text-align: center;
+	line-height: 1.5;
+	text-wrap: balance;
+}
+
+main,
+section {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	width: 800px;
+	max-width: calc(100vw - 2rem);
+	margin: auto;
+	margin-bottom: 6rem;
+
+	color: white;
+
+	z-index: 1;
+}
+
+section {
+	gap: 1.5rem;
+}
+
+h1 {
+	font-size: 4rem;
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+	margin-bottom: 1em;
+}
+
+h2 {
+	font-size: 3rem;
+	/* font-weight: 700; */
+	/* line-height: 1; */
+	text-align: center;
+	/* margin-bottom: 1rem; */
+	/* margin-bottom: 1rem; */
+}
+
+button,
+.btn {
+	min-width: 6rem;
+	width: fit-content;
+	margin: auto;
+	padding: 0.5rem 1rem;
+
+	font-family: var(--font-a);
+	font-variation-settings: 'wght' 500;
+	font-size: 1rem;
+
+	border: none;
+	border-radius: 0.5rem;
+	background: var(--gradient);
+
+	cursor: pointer;
+}
+
+.btn {
+	color: var(--bg-a);
+	background: radial-gradient(
+			circle at -25% 50%,
+			white -20%,
+			var(--theme-b, #69cb81),
+			var(--theme-a, #33c5f4) 80%,
+			white 120%
+		)
+		top right / 200% 200%;
+
+	transition:
+		background 2s cubic-bezier(0.23, 1, 0.32, 1),
+		--theme-a 0.5s,
+		--theme-b 0.5s,
+		opacity 0.15s,
+		filter 0.15s;
+
+	font-weight: 900;
+
+	&.active {
+		--theme-a: #69cb81;
+		--theme-b: #ff0000;
+		background-position: 50% 50%;
+	}
+
+	&:hover {
+		background-position: 25% 50%;
+	}
+}
+
+code,
+.code {
+	font-family:
+		Monaspace,
+		Menlo,
+		Monaco,
+		Lucida Console,
+		Liberation Mono,
+		DejaVu Sans Mono,
+		Bitstream Vera Sans Mono,
+		Courier New,
+		monospace;
+}
+
+:not(pre) > code,
+.code {
+	padding: 0.2rem 0.4rem;
+
+	background: #1b1e28;
+	border-radius: 0.2rem;
+	outline: var(--outline);
+
+	line-height: 1.25;
+	vertical-align: middle;
+
+	display: inline-flex;
+	align-items: center;
+	width: fit-content;
+
+	font-size: var(--font-xs);
+}
+
+br {
+	user-select: none;
+	pointer-events: none;
+}
+
+br {
+	height: 1rem;
+}
+br-md {
+	height: 2rem;
+}
+br-lg {
+	height: 3rem;
+}
+br-xl {
+	height: 5rem;
+}
