@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"description": "",
 	"type": "module",
-	"main": "pocket-shader.js",
+	"main": "pocket-shader.ts",
 	"scripts": {
 		"dev": "cd www && pnpm dev",
 		"release": "pnpx publint && pnpx jsr publish"
