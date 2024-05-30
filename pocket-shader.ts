@@ -1,5 +1,5 @@
 /**
- * A module providing a class for rendering shaders on a canvas.
+ * A simple webgl shader renderer.
  * @module
  */
 
