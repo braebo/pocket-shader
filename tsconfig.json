@@ -1,15 +1,13 @@
 {
-    "compilerOptions": {
-        "strict": true,
-        "lib": [
-            "ESNext"
-        ],
-        "target": "ESNext",
-        "module": "NodeNext",
-        "moduleResolution": "NodeNext",
-        "skipLibCheck": true,
-        "allowJs": true,
-        "checkJs": true,
-        "noEmit": true,
-    }
+	"compilerOptions": {
+		"strict": true,
+		"lib": ["ESNext", "DOM"],
+		"target": "ESNext",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"skipLibCheck": true,
+		"allowJs": true,
+		"checkJs": true,
+		"noEmit": true
+	}
 }
