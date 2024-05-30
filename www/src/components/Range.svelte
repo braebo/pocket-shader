@@ -29,11 +29,10 @@
 	@mixin thumb {
 		-webkit-appearance: none;
 		appearance: none;
-		width: calc($height / 4);
+		width: calc($height / 3);
 		height: $height;
-		background: var(--theme-a);
+		background: linear-gradient(to top, var(--theme-a, #33c5f4) 50%, #000 84%);
 		cursor: pointer;
-		transform: translateY(-1px);
 		z-index: 1;
 	}
 
@@ -42,10 +41,12 @@
 		height: $height;
 		cursor: pointer;
 		background-color: var(--bg-c);
-		border-radius: $height;
-		border-radius: 0.5rem;
-		outline: 1px solid var(--bg-a);
-		border: 1px solid var(--bg-a);
+		box-shadow:
+			0 3px 1px #0008 inset,
+			0 2px 5px #0007 inset,
+			0 1px 6px #0006 inset;
+		border-radius: 0.4rem;
+		overflow: hidden;
 	}
 
 	input[type='range']::-webkit-slider-thumb {
