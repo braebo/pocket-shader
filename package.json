@@ -5,19 +5,19 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"dev": "cd site && pnpm dev",
+		"dev": "cd www && pnpm dev",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "braebo",
 	"license": "MIT",
 	"devDependencies": {
 		"client": "link:@types/vite/client"
 	},
 	"exports": {
 		".": {
-			"default": "./pocket-shader/index.ts",
-			"types": "./pocket-shader/index.ts"
+			"default": "./pocket-shader.ts",
+			"types": "./pocket-shader.ts"
 		},
 		"./package.json": "./package.json"
 	}

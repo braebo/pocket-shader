@@ -143,9 +143,6 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	set time(value) {
 		this._time = value
 		this.builtinUniforms.time = value
-		// if (this.state.match(/paused|stopped/)) {
-		// 	this.render()
-		// }
 	}
 
 	/**
@@ -155,7 +152,6 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	private _l: (...args: any[]) => void
 
-	// private _uniforms: T
 	private _uniforms: { [K in keyof T]: T[K] }
 	private _uniformLocations = new Map<string, WebGLUniformLocation>()
 
@@ -378,10 +374,20 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	resize = () => {
 		this._l('resize()')
-		const width = this.container instanceof HTMLBodyElement ? window.innerWidth : this.container!.clientWidth
-		const height = this.container instanceof HTMLBodyElement ? window.innerHeight : this.container!.clientHeight
+		const width =
+			this.container instanceof HTMLBodyElement
+				? window.innerWidth
+				: this.container!.clientWidth
+		const height =
+			this.container instanceof HTMLBodyElement
+				? window.innerHeight
+				: this.container!.clientHeight
 
-		if (this.canvas.width !== width || this.canvas.height !== height || this.maxPixelRatio !== this.opts.maxPixelRatio) {
+		if (
+			this.canvas.width !== width ||
+			this.canvas.height !== height ||
+			this.maxPixelRatio !== this.opts.maxPixelRatio
+		) {
 			this.canvas.width = width * this.maxPixelRatio
 			this.canvas.height = height * this.maxPixelRatio
 
