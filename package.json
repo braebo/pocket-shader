@@ -1,20 +1,20 @@
 {
 	"name": "pocket-shader",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "",
 	"type": "module",
-	"main": "index.js",
+	"main": "pocket-shader.js",
 	"scripts": {
 		"dev": "cd www && pnpm dev",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"release": "pnpx publint && pnpx jsr publish"
 	},
 	"keywords": [],
 	"author": "braebo",
 	"license": "MIT",
 	"exports": {
 		".": {
-			"default": "./pocket-shader.ts",
-			"types": "./pocket-shader.ts"
+			"types": "./pocket-shader.ts",
+			"default": "./pocket-shader.ts"
 		},
 		"./package.json": "./package.json"
 	}
