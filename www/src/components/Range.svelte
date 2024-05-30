@@ -29,7 +29,7 @@
 	@mixin thumb {
 		-webkit-appearance: none;
 		appearance: none;
-		width: $height / 4;
+		width: calc($height / 4);
 		height: $height;
 		background: var(--theme-a);
 		cursor: pointer;
