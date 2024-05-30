@@ -11,9 +11,6 @@
 	"keywords": [],
 	"author": "braebo",
 	"license": "MIT",
-	"devDependencies": {
-		"client": "link:@types/vite/client"
-	},
 	"exports": {
 		".": {
 			"default": "./pocket-shader.ts",
