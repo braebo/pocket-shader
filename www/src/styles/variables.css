@@ -37,6 +37,11 @@
 	inherits: false;
 	initial-value: 0deg;
 }
+@property --shade {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #ffffff;
+}
 
 :root {
 	--font-a: 'Fredoka', system-ui, sans-serif;
@@ -62,7 +67,7 @@
 	--gradient: linear-gradient(
 		var(--deg, 45deg),
 		var(--theme-a, #33c5f4),
-		var(--theme-b, #69cb81) 100%
+		var(--theme-b, #a269cb) 100%
 	);
 	/* prettier-ignore */
 	--shadow: 0rem 0.0469rem 0.0625rem rgb(0, 0, 0, 0.115),

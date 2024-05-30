@@ -1,6 +1,6 @@
 ---
+import Importing from '../components/sections/Importing.svelte'
 import HeroText from '../components/HeroSection.astro'
-import Importing from '../components/Importing.svelte'
 import Layout from '../layouts/Layout.astro'
 import Code from '../components/Code.astro'
 
@@ -11,19 +11,22 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 <script>
 	import { PocketShader } from 'pocket-shader'
+import { fadeText } from '../utils/animations.ts'
 
 	let ps1: PocketShader | null = null
 	document.querySelector('#run1')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
-			target.textContent = 'Dispose'
+			// target.textContent = 'Dispose'
+			fadeText(target, 'Dispose')
 			ps1 = new PocketShader()
 		} else {
 			target.classList.remove('active')
 			ps1?.dispose()
 			ps1 = null
-			target.textContent = 'Run'
+			// target.textContent = 'Run'
+			fadeText(target, 'Run')
 		}
 	})
 
@@ -32,13 +35,15 @@ import Dpr from '../components/sections/Dpr.svelte'
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
-			target.textContent = 'Dispose'
+			// target.textContent = 'Dispose'
+			fadeText(target, 'Dispose')
 			ps2 = new PocketShader('#codeblock2')
 		} else {
 			target.classList.remove('active')
 			ps2?.dispose()
 			ps2 = null
-			target.textContent = 'Run'
+			// target.textContent = 'Run'
+			fadeText(target, 'Run')
 		}
 	})
 
@@ -47,7 +52,8 @@ import Dpr from '../components/sections/Dpr.svelte'
 		const target = e.target as HTMLButtonElement
 		target.classList.toggle('active')
 		if (target.textContent === 'Run') {
-			target.textContent = 'Dispose'
+			fadeText(target, 'Dispose')
+			// target.textContent = 'Dispose'
 			ps3 = new PocketShader('#codeblock3', {
 				autoStart: true,
 				fragmentShader: `
@@ -69,7 +75,8 @@ import Dpr from '../components/sections/Dpr.svelte'
                 `,
 			})
 		} else {
-			target.textContent = 'Run'
+			fadeText(target, 'Run')
+			// target.textContent = 'Run'
 			ps3?.dispose()
 			ps3 = null
 		}
@@ -80,7 +87,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
-			target.textContent = 'Dispose'
+			fadeText(target, 'Dispose')
 			ps5 = new PocketShader('#codeblock5', {
 				speed: 2,
 				autoStart: true,
@@ -102,7 +109,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 		<br-xl></br-xl>
 
-		<p class="description">
+		<p class="description gradient-outline" style="position:relative">
 			<code class="text-gradient">pocket-shader</code> is a typescript package that makes it easy
 			to render WebGL shaders.
 		</p>
@@ -158,9 +165,9 @@ import Dpr from '../components/sections/Dpr.svelte'
 			<code>vertexShader</code>.
 		</p>
 
-		<p>
+		<!-- <p>
 			Given a string, like <code>myShader</code> below.
-		</p>
+		</p> -->
 
 		<Code
 			lang="glsl"
@@ -187,7 +194,8 @@ import Dpr from '../components/sections/Dpr.svelte'
 		/>
 
 		<p>
-			We can pass it into the <code>fragmentShader</code> option directly.
+			We can pass a string, like <code>myShader</code> above, directly into the
+			<code>fragmentShader</code> option.
 		</p>
 
 		<Code
@@ -256,11 +264,11 @@ import Dpr from '../components/sections/Dpr.svelte'
             `}
 			/>
 		</Playback>
-		<p>
+		<!-- <p>
 			<em>
 				Notice that calling <code>stop()</code> resets <code>time</code> to <code>0</code>.
 			</em>
-		</p>
+		</p> -->
 	</section>
 
 	<section>

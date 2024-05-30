@@ -72,29 +72,43 @@ button,
 	margin: auto;
 	padding: 0.5rem 1rem;
 
+	/* background: var(--gradient); */
+	border: none;
+	border-radius: 0.75rem;
+
 	font-family: var(--font-a);
 	font-variation-settings: 'wght' 500;
 	font-size: 1rem;
 
-	border: none;
-	border-radius: 0.5rem;
-	background: var(--gradient);
-
 	cursor: pointer;
 }
 
+@property --shade {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: var(--bg-a);
+}
+
 .btn {
-	color: var(--bg-a);
+	position: relative;
+	color: var(--fg-a);
+	outline: var(--outline);
+
+	--theme-a: var(--bg-a);
+	--theme-b: var(--bg-a);
+	--shade: var(--bg-a);
+
 	background: radial-gradient(
 			circle at -25% 50%,
-			white -20%,
-			var(--theme-b, #69cb81),
+			var(--shade, white) -20%,
+			var(--theme-b, #a269cb),
 			var(--theme-a, #33c5f4) 80%,
-			white 120%
+			var(--shade, white) 120%
 		)
 		top right / 200% 200%;
 
 	transition:
+		background-position 2s cubic-bezier(0.23, 1, 0.32, 1),
 		background 2s cubic-bezier(0.23, 1, 0.32, 1),
 		--theme-a 0.5s,
 		--theme-b 0.5s,
@@ -102,15 +116,41 @@ button,
 		filter 0.15s;
 
 	font-weight: 900;
-
+ 
 	&.active {
-		--theme-a: #69cb81;
-		--theme-b: #ff0000;
-		background-position: 50% 50%;
+		--theme-a: #30d84c;
+		--theme-b: #ff0051;
+		background-position: 25% 50%;
+		outline-color: var(--bg-a);
+		outline-width: 2px;
 	}
 
 	&:hover {
-		background-position: 25% 50%;
+		background-position: 50% 50%;
+		color: var(--fg-a);
+
+		&:not(.active) {
+			background-position: 25% 50%;
+			--theme-a: #33c5f4;
+			--theme-b: #a269cb;
+		}
+		/* background: var(--bg-a); */
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		display: inline-block;
+		z-index: -1;
+		border-radius: inherit;
+		width: 100%;
+		height: 100%;
+		padding: 1px;
+		left: -1px;
+		top: -1px;
+
+		background-image: var(--gradient);
 	}
 }
 
