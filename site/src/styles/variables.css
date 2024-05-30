@@ -119,6 +119,9 @@
 	}
 
 	&:hover {
+		color: var(--bg-a) !important;
+		/* font-weight: 700 !important; */
+		font-variation-settings: 'wght' 700 !important;
 		background-color: var(--gradient);
 	}
 }

@@ -27,6 +27,10 @@ p {
 	text-wrap: balance;
 }
 
+em {
+	color: var(--fg-d);
+}
+
 main,
 section {
 	position: relative;
@@ -45,6 +49,7 @@ section {
 
 section {
 	gap: 1.5rem;
+	margin-bottom: 8rem;
 }
 
 h1 {
@@ -57,11 +62,7 @@ h1 {
 
 h2 {
 	font-size: 3rem;
-	/* font-weight: 700; */
-	/* line-height: 1; */
 	text-align: center;
-	/* margin-bottom: 1rem; */
-	/* margin-bottom: 1rem; */
 }
 
 button,

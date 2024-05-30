@@ -11,19 +11,23 @@ import Copy from './Copy.svelte'
 interface Props {
 	id: string
 	code: string
+	lang?: string
+	fontSize?: string
+	lineHeight?: string
 }
 
-const { id, code } = Astro.props
+const { id, code, lang = 'ts', fontSize = 'var(--font-sm)', lineHeight = 'var(--ling-height-sm)' } = Astro.props
 ---
 
 <div class="code-container" id={id}>
 	<div class="code-padding"></div>
-	<div class="code-container-inner">
+	<div class="code-container-inner" style=`font-size:${fontSize};line-height:${lineHeight}`>
 		<div class="copy-button-container">
 			<Copy text={code} client:load />
 		</div>
+		<!-- @ts-ignore -->
 		<AstroCode
-			lang="ts"
+			lang={lang}
 			theme="poimandres"
 			transformers={[
 				transformerNotationFocus(),

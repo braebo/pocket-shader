@@ -1,10 +1,12 @@
 ---
 import HeroText from '../components/HeroSection.astro'
-import Card from '../components/Shaders.astro'
+import Importing from '../components/Importing.svelte'
 import Layout from '../layouts/Layout.astro'
 import Code from '../components/Code.astro'
 
 import Playback from '../components/sections/Playback.svelte'
+import Speed from '../components/sections/Speed.svelte'
+import Dpr from '../components/sections/Dpr.svelte'
 ---
 
 <script>
@@ -43,70 +45,53 @@ import Playback from '../components/sections/Playback.svelte'
 	let ps3: PocketShader | null = null
 	document.querySelector('#run3')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
+		target.classList.toggle('active')
+		if (target.textContent === 'Run') {
+			target.textContent = 'Dispose'
+			ps3 = new PocketShader('#codeblock3', {
+				autoStart: true,
+				fragmentShader: `
+                    precision mediump float;
+
+                    uniform float time;
+                    uniform vec2 resolution;
+
+                    void main() {
+                        float d = distance(gl_FragCoord.xy, resolution.xy / 2.0);
+                        float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0);
+                        gl_FragColor = vec4(
+                            0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0),
+                            0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0),
+                            0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0),
+                            1.0
+                        );
+                    }
+                `,
+			})
+		} else {
+			target.textContent = 'Run'
+			ps3?.dispose()
+			ps3 = null
+		}
+	})
+
+	let ps5: PocketShader | null = null
+	document.querySelector('#run5')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
 			target.textContent = 'Dispose'
-			ps3 = new PocketShader('#codeblock3', {
+			ps5 = new PocketShader('#codeblock5', {
+				speed: 2,
 				autoStart: true,
 			})
 		} else {
 			target.classList.remove('active')
-			ps3?.dispose()
-			ps3 = null
+			ps5?.dispose()
+			ps5 = null
 			target.textContent = 'Run'
 		}
 	})
-
-	// let ps4: PocketShader | null = null
-	// const ps4StartBtn = document.querySelector('#start4') as HTMLButtonElement
-	// function ps4Start() {
-	// 	ps4?.start()
-	// 	ps4StateValue.textContent = ps4?.state ?? ''
-	// }
-	// const ps4PauseBtn = document.querySelector('#pause4') as HTMLButtonElement
-	// function ps4Pause() {
-	// 	ps4?.pause()
-	// 	ps4StateValue.textContent = ps4?.state ?? ''
-	// }
-	// const ps4StopBtn = document.querySelector('#stop4') as HTMLButtonElement
-	// function ps4Stop() {
-	// 	ps4?.stop()
-	// 	ps4StateValue.textContent = ps4?.state ?? ''
-	// }
-	// const ps4StateValue = document.querySelector('#p4-state .value') as HTMLDivElement
-	// const ps4TimeValue = document.querySelector('#p4-time .value') as HTMLDivElement
-	// document.querySelector('#run4')?.addEventListener('click', e => {
-	// 	const target = e.target as HTMLButtonElement
-	// 	target.classList.toggle('active')
-	// 	ps4StateValue.classList.remove('disabled')
-	// 	ps4TimeValue.classList.remove('disabled')
-
-	// 	ps4StartBtn.toggleAttribute('disabled')
-	// 	ps4PauseBtn.toggleAttribute('disabled')
-	// 	ps4StopBtn.toggleAttribute('disabled')
-
-	// 	if (target.textContent === 'Run') {
-	// 		target.textContent = 'Dispose'
-	// 		ps4 = new PocketShader('#codeblock4', {
-	// 			speed: 4,
-	// 		})
-	// 		ps4.on('render', ({ time }) => {
-	// 			ps4TimeValue.textContent = time.toFixed(2)
-	// 		})
-	// 		ps4StartBtn.addEventListener('click', ps4Start)
-	// 		ps4PauseBtn.addEventListener('click', ps4Pause)
-	// 		ps4StopBtn.addEventListener('click', ps4Stop)
-	// 		ps4StateValue.textContent = ps4.state
-	// 	} else {
-	// 		ps4StartBtn?.removeEventListener('start', ps4Start)
-	// 		ps4PauseBtn?.removeEventListener('pause', ps4Pause)
-	// 		ps4StopBtn?.removeEventListener('stop', ps4Stop)
-	// 		ps4?.stop().dispose()
-	// 		ps4StateValue.textContent = ps4?.state ?? ''
-	// 		ps4 = null
-	// 		target.textContent = 'Run'
-	// 	}
-	// })
 </script>
 
 <Layout title="pocket-shader">
@@ -124,16 +109,17 @@ import Playback from '../components/sections/Playback.svelte'
 	</main>
 
 	<!-- <ul class="toc">
-		<li class="toc-item">
-			<a href="#usage">Usage</a>
-		</li>
-		<li class="toc-item">
-			<a href="#usage">ShaderToy</a>
-		</li>
-	</ul> -->
+        <li class="toc-item">
+            <a href="#usage">Usage</a>
+        </li>
+        <li class="toc-item">
+            <a href="#usage">ShaderToy</a>
+        </li>
+    </ul> -->
+
+	<h2 id="usage">Usage</h2>
 
 	<section>
-		<h2 id="usage">Usage</h2>
 		<p>
 			By default, <code>PocketShader</code> will create a fullscreen canvas element and append
 			it to the body.
@@ -142,10 +128,10 @@ import Playback from '../components/sections/Playback.svelte'
 		<Code
 			id="eg1"
 			code={/*js*/ `
-				import { PocketShader } from 'pocket-shader'
+                import { PocketShader } from 'pocket-shader'
 
-				new PocketShader()
-			`}
+                new PocketShader()
+            `}
 		/>
 
 		<button class="btn" id="run1">Run</button>
@@ -157,14 +143,83 @@ import Playback from '../components/sections/Playback.svelte'
 		<Code
 			id="codeblock2"
 			code={/*js*/ `
-				import { PocketShader } from 'pocket-shader'
+                import { PocketShader } from 'pocket-shader'
 
-				new PocketShader('#codeblock2')
-			`}
+                new PocketShader('#codeblock2')
+            `}
 		/>
 
 		<button class="btn" id="run2">Run</button>
 	</section>
+
+	<section style="max-width: 30rem;">
+		<p>
+			Shaders can be passed into the options <code>fragmentShader</code> and/or
+			<code>vertexShader</code>.
+		</p>
+
+		<p>
+			Given a string, like <code>myShader</code> below.
+		</p>
+
+		<Code
+			lang="glsl"
+			id="codeblock3"
+			fontSize="0.7rem"
+			lineHeight="1.15rem"
+			code={/*glsl*/ `
+                const myShader = \`
+                    precision mediump float;    
+                    uniform float time; // built-in time uniform
+                    uniform vec2 resolution; // built-in resolution uniform
+                    void main() {
+                        float d = distance(gl_FragCoord.xy, resolution.xy / 2.0);
+                        float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0);
+                        gl_FragColor = vec4(
+                            0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0),
+                            0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0),
+                            0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0),
+                            1.0
+                        );
+                    }
+                \`
+            `}
+		/>
+
+		<p>
+			We can pass it into the <code>fragmentShader</code> option directly.
+		</p>
+
+		<Code
+			id="codeblock3-2"
+			code={/*js*/ `
+                import { PocketShader } from 'pocket-shader'
+
+                new PocketShader('#codeblock3', {
+                    autoStart: true,
+                    fragmentShader: myShader // [!code highlight]
+                })
+            `}
+		/>
+
+		<button class="btn" id="run3">Run</button>
+	</section>
+
+	<Importing client:load id="#codeblock4">
+		<Code
+			slot="code4"
+			id="codeblock4"
+			code={/*glsl*/ `
+                    import { PocketShader } from 'pocket-shader'
+                    import myShader from './clouds.glsl?raw' // [!code highlight]
+
+                    new PocketShader('#codeblock4', {
+                        autoStart: true,
+                        fragmentShader: myShader // [!code highlight]
+                    })
+			    `}
+		/>
+	</Importing>
 
 	<h2 id="animation">Animation</h2>
 
@@ -172,17 +227,17 @@ import Playback from '../components/sections/Playback.svelte'
 		<p>The <code>autoStart</code> option will automatically start an animation loop.</p>
 
 		<Code
-			id="codeblock3"
+			id="codeblock5"
 			code={/*js*/ `
-				import { PocketShader } from 'pocket-shader'
+                import { PocketShader } from 'pocket-shader'
 
-				new PocketShader('#codeblock3', {
-				    autoStart: true // [!code highlight]
-				})
-			`}
+                new PocketShader('#codeblock5', {
+                    autoStart: true // [!code highlight]
+                })
+            `}
 		/>
 
-		<button class="btn" id="run3">Run</button>
+		<button class="btn" id="run5">Run</button>
 	</section>
 
 	<section>
@@ -190,58 +245,75 @@ import Playback from '../components/sections/Playback.svelte'
 			The animation loop can be controlled with methods like <code>start()</code>
 			and <code>stop()</code>.
 		</p>
-		<Playback client:load>
+		<Playback client:load id="#codeblock6">
 			<Code
 				slot="code"
-				id="codeblock4"
+				id="codeblock6"
 				code={/*js*/ `
-				import { PocketShader } from 'pocket-shader'
+                import { PocketShader } from 'pocket-shader'
 
-				const ps = new PocketShader('#codeblock4')
-			`}
+                const ps = new PocketShader('#codeblock6')
+            `}
 			/>
 		</Playback>
+		<p>
+			<em>
+				Notice that calling <code>stop()</code> resets <code>time</code> to <code>0</code>.
+			</em>
+		</p>
 	</section>
 
-	<!-- <section>
+	<section>
 		<p>
-			The animation loop can be controlled with methods like <code>start()</code>
-			and <code>stop()</code>.
+			The <code>speed</code> can be passed as an option, or adjusted freely on each instance.
 		</p>
 
-		<Code
-			id="codeblock4"
-			code={/*js*/ `
-				import { PocketShader } from 'pocket-shader'
+		<Speed speed={2} id="#codeblock7" client:idle>
+			<Code
+				id="codeblock7"
+				slot="code"
+				code={/*js*/ `
+                    import { PocketShader } from 'pocket-shader'
 
-				const ps = new PocketShader('#codeblock4')
-			`}
-		/>
+                    new PocketShader('#codeblock7', {
+                        autoStart: true,
+                        speed: 2 // [!code highlight]
+                    })
+                `}
+			/>
+		</Speed>
+	</section>
 
-		<button class="btn" id="run4">Run</button>
+	<section>
+		<p>
+			The <code>maxPixelRatio</code> will limit the pixel ratio of the canvas, which is determined
+			by the device's pixel ratio by default.
+		</p>
 
-		<div id="p4-state" class="kv disabled">
-			<div class="key"><code>ps.state</code></div>
-			<div class="value"></div>
-		</div>
+		<p>
+			Lowering this can increse performance significantly depending on the size of the canvas
+			/ DPI of the screen.
+		</p>
 
-		<div id="p4-time" class="kv disabled">
-			<div class="key"><code>ps.time</code></div>
-			<div class="value"></div>
-		</div>
+		<Dpr dpr={0.1} id="#codeblock8" client:idle>
+			<Code
+				id="codeblock8"
+				slot="code"
+				code={/*js*/ `
+                    import myShader from './dyingUniverse.glsl?raw'
+                    import { PocketShader } from 'pocket-shader'
 
-		<div id="buttons4" class="flex">
-			<button class="code gradient-outline" id="start4" disabled>ps.start()</button>
-			<button class="code gradient-outline" id="pause4" disabled>ps.pause()</button>
-			<button class="code gradient-outline" id="stop4" disabled>ps.stop()</button>
-		</div>
-	</section> -->
+                    new PocketShader('#codeblock8', {
+                        fragmentShader: myShader,
+                        maxPixelRatio: 2 // [!code highlight]
+                        autoStart: true,
+                    })
+                `}
+			/>
+		</Dpr>
+	</section>
 
 	<br />
-
-	<ul role="list" class="link-card-grid">
-		<Card />
-	</ul>
 </Layout>
 
 <style>
@@ -262,56 +334,4 @@ import Playback from '../components/sections/Playback.svelte'
 		gap: 2rem;
 		padding: 0;
 	}
-
-	/* .kv {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 11rem;
-		margin: auto;
-		outline: var(--outline);
-		border-radius: var(--radius);
-		overflow: hidden;
-		height: 1.75rem;
-
-		div {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			flex: 1fr;
-
-			line-height: 1.75rem;
-		}
-
-		.value {
-			margin: auto;
-		}
-	}
-
-	.flex {
-		display: flex;
-		gap: 1rem;
-		width: fit-content;
-		margin: auto;
-	}
-
-	button.code {
-		color: var(--fg-a);
-		font-variation-settings: 'wght' 300;
-		font-size: var(--font-sm);
-		position: relative;
-
-		padding: 0.25rem 0.5rem;
-	}
-
-	.disabled,
-	button:disabled {
-		opacity: 0.5;
-		filter: grayscale(1) brightness(0.5);
-		cursor: not-allowed;
-
-		&::before {
-			display: none;
-		}
-	} */
 </style>

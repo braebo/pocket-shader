@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { PocketShader } from 'pocket-shader'
 
+	export let id: string
+
 	let ps: PocketShader | null = null
 	let state = ''
 	let t = ''
@@ -10,7 +12,7 @@
 	function run() {
 		if (!disabled) return dispose()
 
-		ps = new PocketShader('#codeblock4', {
+		ps = new PocketShader(id, {
 			speed: 4,
 		})
 
@@ -50,7 +52,7 @@
 
 <slot name="code" />
 
-<button class="btn" on:click={run}>{disabled ? 'Run' : 'Dispose'}</button>
+<button class="btn" class:active={!disabled} on:click={run}>{disabled ? 'Run' : 'Dispose'}</button>
 
 <div class="kv" class:disabled>
 	<div class="key"><code>ps.state</code></div>
