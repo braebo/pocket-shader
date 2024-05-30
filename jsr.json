@@ -1,5 +1,13 @@
 {
-    "name": "@fractal/greet",
+    "$schema": "https://jsr.io/schema/config-file.v1.json",
+    "name": "@braebo/pocket-shader",
     "version": "0.1.0",
-    "exports": "./pocket-shader/index.ts"
+    "exports": "./pocket-shader/index.ts",
+    "publish": {
+        "include": [
+            "pocket-shader/**",
+            "README.md",
+            "LICENSE"
+        ]
+    }
 }
