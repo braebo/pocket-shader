@@ -130,13 +130,29 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	 */
 	program: WebGLProgram | false = false
 
+	/**
+	 * These uniforms are always available to the shader, and are updated automatically whenever
+	 * the shader state is `running`.
+	 */
 	builtinUniforms = {
 		time: 0,
 		resolution: [0, 0] as [number, number],
 		mouse: [0, 0] as [number, number],
 	}
 
-	_time = 0
+	private _builtinUniformLocations = new Map<string, WebGLUniformLocation>()
+	private _uniformLocations = new Map<string, WebGLUniformLocation>()
+
+	private _listeners = new Map<string, (data: { time: number; delta: number }) => void>()
+	private _positionBuffer: WebGLBuffer | null = null
+	private _l: (...args: any[]) => void
+
+	private _time = 0
+	/**
+	 * The current time in seconds.  This value is updated automatically after calling
+	 * {@link start|`start()`}, and is reset to `0` when {@link stop|`stop()`} is called.  You can
+	 * also set this value yourself if you prefer to control the time uniform manually.
+	 */
 	get time() {
 		return this._time
 	}
@@ -145,26 +161,15 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this.builtinUniforms.time = value
 	}
 
-	/**
-	 * The position buffer used to render the shader.
-	 */
-	private _positionBuffer: WebGLBuffer | null = null
-
-	private _l: (...args: any[]) => void
-
 	private _uniforms: { [K in keyof T]: T[K] }
-	private _uniformLocations = new Map<string, WebGLUniformLocation>()
-
 	/**
 	 * A record of uniform values to pass to the shader.
 	 */
 	get uniforms() {
-		// return this._uniforms
 		return new Proxy(this._uniforms, {
 			set: (target, property, value) => {
 				// @ts-expect-error
 				target[property] = value
-				// Only manually re-render if the animation loop isn't running.
 				if (this.state.match(/paused|stopped/)) {
 					this._render()
 				}
@@ -172,20 +177,16 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			},
 		})
 	}
-
 	set uniforms(value: T) {
 		this._uniforms = value
-		//- This runs in the proxy now.
-		// // Only manually re-render if the animation loop is paused.
-		// if (this.state === 'paused') {
-		// 	this.render()
-		// }
 	}
 
 	constructor(options?: PocketShaderOptions<T>)
 	constructor(
 		/**
-		 * The container element to append the canvas to.
+		 * The container element (or query selector) to use for the canvas.  The canvas will
+		 * automatically adjust its size to fill the container, and re-render whenever the
+		 * window is resized.
 		 * @defaultValue `document.body`
 		 */
 		container: HTMLElement | string,
@@ -280,7 +281,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		}
 	}
 
-	private _setupCanvas() {
+	private _setupCanvas(): void {
 		this._l('setupCanvas()')
 		if (!this.container) throw new Error('Container not found.')
 
@@ -298,22 +299,21 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		window.addEventListener('resize', this.resize)
 	}
 
-	private _removeListeners() {
+	private _removeListeners(): void {
 		this._l('_removeListeners()')
 		if (!this.container) throw new Error('Container not found.')
-
-		if (this.opts.mouseEvents) {
-			this.canvas.removeEventListener('mousemove', this.setMousePosition)
-		}
-
-		if (this.opts.touchEvents) {
-			this.canvas.removeEventListener('touchmove', this.setTouchPosition)
-		}
-
-		window.addEventListener('resize', this.resize)
+		this.canvas.removeEventListener('mousemove', this.setMousePosition)
+		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
+		window.removeEventListener('resize', this.resize)
+		this._listeners.clear()
 	}
 
-	start() {
+	/**
+	 * Starts a render loop, updating the time uniform and re-rendering the shader each frame.
+	 * If the {@link state} is already `running`, this method does nothing.
+	 * @throws If the {@link state} is already `disposed`.
+	 */
+	start(): this {
 		this._l('start()')
 		switch (this.state) {
 			case 'stopped':
@@ -327,25 +327,33 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			case 'disposed':
 				throw new Error('Cannot start a disposed PocketShader.  Call restart() instead.')
 		}
-
 		return this
 	}
 
-	pause() {
+	/**
+	 * Pauses the render loop.
+	 */
+	pause(): this {
 		this._l('pause()')
 		this.state = 'paused'
 		return this
 	}
 
-	stop() {
+	/**
+	 * Stops the render loop and resets the time uniform to `0`.
+	 */
+	stop(): this {
 		this._l('stop()')
 		this.state = 'stopped'
 		this.time = 0
-
 		return this
 	}
 
-	restart() {
+	/**
+	 * Restarts the render loop.  If the WebGL context has already been disposed of, this will
+	 * call {@link reload} to create a new one.
+	 */
+	restart(): this {
 		this._l('restart()')
 		switch (this.state) {
 			case 'running':
@@ -357,23 +365,35 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			case 'disposed':
 				this.reload()
 		}
-
 		return this
 	}
 
+	/**
+	 * Fully dipsoses the current WebGL context and creates a new one.
+	 */
 	reload() {
 		this._l('reload()')
-		this.pause()
-		this.state = 'disposed'
-		this.canvas = this.canvas.cloneNode() as HTMLCanvasElement
-		this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
-		this.ctx = null
-		this.state = 'paused'
-		this.start()
-
+		const running = this.state === 'running'
+		if (running) {
+			this.pause()
+		}
+		// this.state = 'disposed'
+		// this.canvas = this.canvas.cloneNode() as HTMLCanvasElement
+		// this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
+		// this.ctx = null
+		this.dispose()
+		this.state = 'stopped'
+		this.compile()
+		this.resize()
+		if (running) {
+			this.start()
+		}
 		return this
 	}
 
+	/**
+	 * Resizes the canvas to fill the container.
+	 */
 	resize = () => {
 		this._l('resize()')
 		const width =
@@ -407,56 +427,18 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		return this
 	}
 
-	setMousePosition = (e: MouseEvent | Touch) => {
+	setMousePosition = (e: MouseEvent | Touch): void => {
 		const rect = this.canvas.getBoundingClientRect()
 		this.builtinUniforms.mouse[0] = e.clientX - rect.left
 		// bottom is 0 in WebGL
 		this.builtinUniforms.mouse[1] = rect.height - (e.clientY - rect.top) - 1
 	}
 
-	setTouchPosition = (e: TouchEvent) => {
+	setTouchPosition = (e: TouchEvent): void => {
 		e.preventDefault()
 		this.setMousePosition(e.touches[0])
 	}
 
-	createProgram(
-		gl: WebGL2RenderingContext,
-		vertexShader: WebGLShader,
-		fragmentShader: WebGLShader,
-	) {
-		this._l('createProgram()')
-		const program = gl.createProgram()!
-		gl.attachShader(program, vertexShader)
-		gl.attachShader(program, fragmentShader)
-		gl.linkProgram(program)
-
-		const success = gl.getProgramParameter(program, gl.LINK_STATUS)
-
-		if (success) return program
-
-		console.error(gl.getProgramInfoLog(program))
-		gl.deleteProgram(program)
-
-		return false
-	}
-
-	createShader(gl: WebGL2RenderingContext, type: number, source: string) {
-		this._l('createShader()')
-		const shader = gl.createShader(type)!
-		gl.shaderSource(shader, source)
-		gl.compileShader(shader)
-
-		const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
-
-		if (success) return shader
-
-		console.error(gl.getShaderInfoLog(shader))
-		gl.deleteShader(shader)
-
-		return false
-	}
-
-	_listeners = new Map<string, (data: { time: number; delta: number }) => void>()
 	on = (event: 'render', listener: (data: { time: number; delta: number }) => void) => {
 		this._listeners.set(event, listener)
 	}
@@ -471,21 +453,19 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		}
 	}
 
-	private _builtinUniformLocations = new Map<string, WebGLUniformLocation>()
-
 	compile() {
 		this._l('compile()')
 		this.ctx = this.canvas.getContext('webgl2')
 		if (!this.ctx) throw new Error('WebGL2 context not found.')
 
 		// Create / upload / compile the shaders.
-		const vertexShader = this.createShader(this.ctx, this.ctx.VERTEX_SHADER, this.vertexShader)
-		const fragmentShader = this.createShader(
+		const vertexShader = this._createShader(this.ctx, this.ctx.VERTEX_SHADER, this.vertexShader)
+		const fragmentShader = this._createShader(
 			this.ctx,
 			this.ctx.FRAGMENT_SHADER,
 			this.fragmentShader,
 		)
-		this.program = this.createProgram(this.ctx, vertexShader, fragmentShader)
+		this.program = this._createProgram(this.ctx, vertexShader, fragmentShader)
 
 		this._builtinUniformLocations.set(
 			'position',
@@ -522,6 +502,43 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
 			this.ctx.STATIC_DRAW,
 		)
+	}
+
+	private _createProgram(
+		gl: WebGL2RenderingContext,
+		vertexShader: WebGLShader,
+		fragmentShader: WebGLShader,
+	): WebGLProgram {
+		this._l('createProgram()')
+		const program = gl.createProgram()!
+		gl.attachShader(program, vertexShader)
+		gl.attachShader(program, fragmentShader)
+		gl.linkProgram(program)
+
+		const success = gl.getProgramParameter(program, gl.LINK_STATUS)
+
+		if (success) return program
+
+		console.error(gl.getProgramInfoLog(program))
+		gl.deleteProgram(program)
+
+		return false
+	}
+
+	private _createShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
+		this._l('createShader()')
+		const shader = gl.createShader(type)!
+		gl.shaderSource(shader, source)
+		gl.compileShader(shader)
+
+		const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+
+		if (success) return shader
+
+		console.error(gl.getShaderInfoLog(shader))
+		gl.deleteShader(shader)
+
+		return false
 	}
 
 	private _render() {
@@ -684,7 +701,11 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	dispose() {
 		this._l('dispose()')
 		this.state = 'disposed'
+
 		this._removeListeners()
+
+		this._builtinUniformLocations.clear()
+		this._uniformLocations.clear()
 
 		this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
 		this.ctx = null
@@ -701,7 +722,7 @@ function getColorFromId(id: string): string {
 	let color = '#'
 	for (let i = 0; i < 3; i++) {
 		const value = (hash >> (i * 8)) & 0xff
-		color += ('00' + value.toString(16)).substr(-2)
+		color += value.toString(16).padStart(2, '0')
 	}
 	return color
 }
