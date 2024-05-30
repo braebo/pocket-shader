@@ -245,11 +245,13 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this._uniforms = options?.uniforms ?? ({} as T)
 
 		this.container = container ?? document.body
-		this._l = (fn: string, ...args: any[]) => {
-			const id = this.container?.id ?? ''
-			const color = getColorFromId(id)
-			console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:gray', ...args)
-		}
+		this._l = import.meta.env.DEV
+			? (fn: string, ...args: any[]) => {
+					const id = this.container?.id ?? ''
+					const color = getColorFromId(id)
+					console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:gray', ...args)
+			  }
+			: () => {}
 
 		if (this.container instanceof HTMLBodyElement) {
 			this.container = document.body
