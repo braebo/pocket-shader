@@ -1,10 +1,10 @@
 precision highp float;
 
-uniform vec2 iResolution;
-uniform float iTime;
-uniform float iTimeDelta;
+uniform vec2 resolution;
+uniform float time;
+uniform float timeDelta;
 uniform int iFrame;
-uniform vec4 iMouse;
+uniform vec4 mouse;
 // out vec4 gl_FragColor;
 
 // "Dying Universe" by Martijn Steinrucken aka BigWings - 2015
@@ -31,7 +31,7 @@ float dist2(vec2 P0, vec2 P1) { vec2 D=P1-P0; return dot(D,D); }
 const vec3 up = vec3(0.,1.,0.);
 const float pi = 3.141592653589793238;
 const float twopi = 6.283185307179586;
-float time;
+float _time;
 
 struct ray {
     vec3 o;
@@ -334,21 +334,21 @@ vec4 Ground(ray r) {
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	vec2 uv = (fragCoord.xy / iResolution.xy) - 0.5;
-   	uv.y *= iResolution.y/iResolution.x;
+	vec2 uv = (fragCoord.xy / resolution.xy) - 0.5;
+   	uv.y *= resolution.y/resolution.x;
     
-	time = iTime*0.2;
-    fragColor = vec4(uv,0.5+0.5*sin(iTime),1.0);
+	_time = time*0.2;
+    fragColor = vec4(uv,0.5+0.5*sin(_time),1.0);
     
    
-    time *= 2.;
+    _time *= 2.;
     
-	float t = time*pi*0.1;
+	float t = _time*pi*0.1;
     COOLCOLOR = vec4(sin(t), cos(t*0.23), cos(t*0.3453), 1.)*0.5+0.5;
     HOTCOLOR = vec4(sin(t*2.), cos(t*2.*0.33), cos(t*0.3453), 1.)*0.5+0.5;
    	
     vec4 white = vec4(1.);
-    float whiteFade = sin(time*2.)*0.5+0.5;
+    float whiteFade = sin(_time*2.)*0.5+0.5;
     HOTCOLOR = mix(HOTCOLOR, white, whiteFade);
     
     MIDCOLOR = (HOTCOLOR+COOLCOLOR)*0.5;
@@ -359,8 +359,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
                    		  0., 1., 0.,
                    		  s,  0., -c);
     
-    float camHeight = mix(3.5, 0.1, PeriodicPulse(time*0.1, 2.));
-    vec3 pos = vec3(0., camHeight, -10.)*rot*(1.+sin(time)*0.3);
+    float camHeight = mix(3.5, 0.1, PeriodicPulse(_time*0.1, 2.));
+    vec3 pos = vec3(0., camHeight, -10.)*rot*(1.+sin(_time)*0.3);
    	
     CameraSetup(uv, pos, vec3(0.), 0.5);
     

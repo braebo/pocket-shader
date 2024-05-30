@@ -198,11 +198,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     #else
         const float AA=1.,x=0.,y=0.;
     #endif
-    vec2 uv = (2.*(fragCoord+vec2(x,y))-iResolution.xy)/iResolution.y;
+    vec2 uv = (2.*(fragCoord+vec2(x,y))-resolution.xy)/resolution.y;
     const float shutter_speed = 1.25; // for motion blur
-	//float dt = fract(texture(iChannel0,float(AA)*(fragCoord+vec2(x,y))/iChannelResolution[0].xy).r+iTime)*shutter_speed;
-    float dt = fract(hash21(float(AA)*(fragCoord+vec2(x,y)))+iTime)*shutter_speed;
-    jTime = mod(iTime-dt*iTimeDelta,4000.);
+	//float dt = fract(texture(iChannel0,float(AA)*(fragCoord+vec2(x,y))/iChannelResolution[0].xy).r+time)*shutter_speed;
+    float dt = fract(hash21(float(AA)*(fragCoord+vec2(x,y)))+time)*shutter_speed;
+    jTime = mod(time-dt*timeDelta,4000.);
     vec3 ro = vec3(0.,1,(-20000.+jTime*speed));
     
         #ifdef stereo
@@ -448,11 +448,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 //     #else
 //             const float AA = 1., x = 0., y = 0.;
 //     #endif
-//             vec2 uv = (2. * (fragCoord + vec2(x, y)) - iResolution.xy) / iResolution.y;
+//             vec2 uv = (2. * (fragCoord + vec2(x, y)) - resolution.xy) / resolution.y;
 //             const float shutter_speed = 1.25; // for motion blur
-// 	//float dt = fract(texture(iChannel0,float(AA)*(fragCoord+vec2(x,y))/iChannelResolution[0].xy).r+iTime)*shutter_speed;
-//             float dt = fract(hash21(float(AA) * (fragCoord + vec2(x, y))) + iTime) * shutter_speed;
-//             jTime = mod(iTime - dt * iTimeDelta, 4000.);
+// 	//float dt = fract(texture(iChannel0,float(AA)*(fragCoord+vec2(x,y))/iChannelResolution[0].xy).r+time)*shutter_speed;
+//             float dt = fract(hash21(float(AA) * (fragCoord + vec2(x, y))) + time) * shutter_speed;
+//             jTime = mod(time - dt * timeDelta, 4000.);
 //             vec3 ro = vec3(0., 1, (-20000. + jTime * speed));
 
 //         #ifdef stereo

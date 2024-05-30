@@ -1,7 +1,7 @@
 precision mediump float;
 
-uniform vec2 iResolution;
-uniform float iTime;
+uniform vec2 resolution;
+uniform float time;
 
 vec3 palette(float d) {
 	return mix(vec3(0.2, 0.7, 0.9), vec3(1., 0., 1.), d);
@@ -15,7 +15,7 @@ vec2 rotate(vec2 p, float a) {
 
 float map(vec3 p) {
 	for (int i = 0; i < 8; ++ i) {
-		float t = iTime * 0.1;
+		float t = time * 0.1;
 		p.xz = rotate(p.xz, t);
 		p.xy = rotate(p.xy, t * 1.89);
 		p.xz = abs(p.xz);
@@ -44,9 +44,9 @@ vec4 rm(vec3 ro, vec3 rd) {
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-	vec2 uv = (fragCoord - (iResolution.xy / 2.)) / iResolution.x;
+	vec2 uv = (fragCoord - (resolution.xy / 2.)) / resolution.x;
 	vec3 ro = vec3(0., 0., - 50.);
-	ro.xz = rotate(ro.xz, iTime);
+	ro.xz = rotate(ro.xz, time);
 	vec3 cf = normalize(- ro);
 	vec3 cs = normalize(cross(cf, vec3(0., 1., 0.)));
 	vec3 cu = normalize(cross(cf, cs));

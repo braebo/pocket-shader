@@ -21,14 +21,14 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 
 	/**
 	 * When true, the mouse position will be updated on mousemove events and passed to the
-	 * shader as `iMouse`.
+	 * shader as `mouse`: `[number, number]`.
 	 * @defaultValue `false`
 	 */
 	mouseEvents?: boolean
 
 	/**
 	 * When true, the touch position will be updated on touchmove events and passed to the
-	 * shader as `iMouse`.
+	 * shader as `mouse`: `[number, number]`.
 	 * @defaultValue `false`
 	 */
 	touchEvents?: boolean
@@ -67,9 +67,9 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 }
 
 const DEFAULT_UNIFORMS = {
-	iTime: 0,
-	iResolution: [0, 0] as [number, number],
-	iMouse: [0, 0] as [number, number],
+	time: 0,
+	resolution: [0, 0] as [number, number],
+	mouse: [0, 0] as [number, number],
 }
 
 /**
@@ -131,9 +131,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	program: WebGLProgram | false = false
 
 	builtinUniforms = {
-		iTime: 0,
-		iResolution: [0, 0] as [number, number],
-		iMouse: [0, 0] as [number, number],
+		time: 0,
+		resolution: [0, 0] as [number, number],
+		mouse: [0, 0] as [number, number],
 	}
 
 	_time = 0
@@ -142,7 +142,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	}
 	set time(value) {
 		this._time = value
-		this.builtinUniforms.iTime = value
+		this.builtinUniforms.time = value
 		// if (this.state.match(/paused|stopped/)) {
 		// 	this.render()
 		// }
@@ -227,9 +227,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this.vertexShader =
 			options?.vertexShader ??
 			/*glsl*/ `
-                attribute vec4 iPosition;
+                attribute vec4 position;
                 void main() {
-                    gl_Position = iPosition;
+                    gl_Position = position;
                 }
             `
 
@@ -237,28 +237,30 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			options?.fragmentShader ??
 			/*glsl*/ `
                 precision mediump float;
-                uniform vec2 iResolution;
-                uniform vec2 iMouse;
-                uniform float iTime;
+                uniform vec2 resolution;
+                uniform vec2 mouse;
+                uniform float time;
                 void main() {
-                    vec2 uv = gl_FragCoord.xy / iResolution.xy;
-                    gl_FragColor = vec4(uv, 0.5 + 0.5 * sin(iTime), 1.0);
+                    vec2 uv = gl_FragCoord.xy / resolution.xy;
+                    gl_FragColor = vec4(uv, 0.5 + 0.5 * sin(time), 1.0);
                 }
             `
 
 		this._uniforms = options?.uniforms ?? ({} as T)
 
-		this.container = container
+		this.container = container ?? document.body
 		this._l = (fn: string, ...args: any[]) => {
 			const id = this.container?.id ?? ''
 			const color = getColorFromId(id)
 			console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:gray', ...args)
 		}
 
-		if (!this.container) {
+		if (this.container instanceof HTMLBodyElement) {
 			this.container = document.body
-			this.canvas.style.setProperty('width', this.container.offsetHeight + 'px')
-			this.canvas.style.setProperty('height', this.container.offsetHeight + 'px')
+			const w = window.innerWidth
+			const h = window.innerHeight
+			this.canvas.style.setProperty('width', w + 'px')
+			this.canvas.style.setProperty('height', h + 'px')
 			this.canvas.style.setProperty('position', 'fixed')
 			this.canvas.style.setProperty('inset', '0')
 			this.canvas.style.setProperty('zIndex', '0')
@@ -267,7 +269,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			this.canvas.style.setProperty('height', this.container.offsetHeight + 'px')
 			this.canvas.style.setProperty('position', 'absolute')
 			this.canvas.style.setProperty('inset', '0')
-			this.canvas.style.setProperty('zIndex', '0')
+			this.canvas.style.setProperty('zIndex', '1')
 		}
 
 		this._setupCanvas()
@@ -376,18 +378,18 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	resize = () => {
 		this._l('resize()')
-		const width = this.container!.clientWidth * this.maxPixelRatio
-		const height = this.container!.clientHeight * this.maxPixelRatio
+		const width = this.container instanceof HTMLBodyElement ? window.innerWidth : this.container!.clientWidth
+		const height = this.container instanceof HTMLBodyElement ? window.innerHeight : this.container!.clientHeight
 
-		if (this.canvas.width !== width || this.canvas.height !== height) {
-			this.canvas.width = width
-			this.canvas.height = height
+		if (this.canvas.width !== width || this.canvas.height !== height || this.maxPixelRatio !== this.opts.maxPixelRatio) {
+			this.canvas.width = width * this.maxPixelRatio
+			this.canvas.height = height * this.maxPixelRatio
 
-			this.canvas.style.width = this.container!.clientWidth + 'px'
-			this.canvas.style.height = this.container!.clientHeight + 'px'
+			this.canvas.style.width = width + 'px'
+			this.canvas.style.height = height + 'px'
 
-			this.builtinUniforms.iResolution[0] = width
-			this.builtinUniforms.iResolution[1] = height
+			this.builtinUniforms.resolution[0] = width * this.maxPixelRatio
+			this.builtinUniforms.resolution[1] = height * this.maxPixelRatio
 		}
 
 		if (this.state.match(/paused|stopped/)) {
@@ -399,9 +401,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	setMousePosition = (e: MouseEvent | Touch) => {
 		const rect = this.canvas.getBoundingClientRect()
-		this.builtinUniforms.iMouse[0] = e.clientX - rect.left
+		this.builtinUniforms.mouse[0] = e.clientX - rect.left
 		// bottom is 0 in WebGL
-		this.builtinUniforms.iMouse[1] = rect.height - (e.clientY - rect.top) - 1
+		this.builtinUniforms.mouse[1] = rect.height - (e.clientY - rect.top) - 1
 	}
 
 	setTouchPosition = (e: TouchEvent) => {
@@ -478,20 +480,20 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this.program = this.createProgram(this.ctx, vertexShader, fragmentShader)
 
 		this._builtinUniformLocations.set(
-			'iPosition',
-			this.ctx.getUniformLocation(this.program, 'iPosition')!,
+			'position',
+			this.ctx.getUniformLocation(this.program, 'position')!,
 		)
 		this._builtinUniformLocations.set(
-			'iResolution',
-			this.ctx.getUniformLocation(this.program, 'iResolution')!,
+			'resolution',
+			this.ctx.getUniformLocation(this.program, 'resolution')!,
 		)
 		this._builtinUniformLocations.set(
-			'iMouse',
-			this.ctx.getUniformLocation(this.program, 'iMouse')!,
+			'mouse',
+			this.ctx.getUniformLocation(this.program, 'mouse')!,
 		)
 		this._builtinUniformLocations.set(
-			'iTime',
-			this.ctx.getUniformLocation(this.program, 'iTime')!,
+			'time',
+			this.ctx.getUniformLocation(this.program, 'time')!,
 		)
 
 		if (this.opts.fragmentShader) {
@@ -538,11 +540,11 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			// Tell it to use our program (pair of shaders).
 			this.ctx.useProgram(this.program)
 
-			const positionAttributeLocation = this._builtinUniformLocations.get('iPosition')!
-			//// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'iPosition')
-			const resolutionLocation = this._builtinUniformLocations.get('iResolution')!
-			const mouseLocation = this._builtinUniformLocations.get('iMouse')!
-			const timeLocation = this._builtinUniformLocations.get('iTime')!
+			const positionAttributeLocation = this._builtinUniformLocations.get('position')!
+			//// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'position')
+			const resolutionLocation = this._builtinUniformLocations.get('resolution')!
+			const mouseLocation = this._builtinUniformLocations.get('mouse')!
+			const timeLocation = this._builtinUniformLocations.get('time')!
 
 			// Turn on the attribute.
 			this.ctx.enableVertexAttribArray(positionAttributeLocation as number)
@@ -563,15 +565,15 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			// this.ctx.uniform2f(resolutionLocation, this.ctx.canvas.width, this.ctx.canvas.height)
 			this.ctx.uniform2f(
 				resolutionLocation,
-				this.builtinUniforms.iResolution[0],
-				this.builtinUniforms.iResolution[1],
+				this.builtinUniforms.resolution[0],
+				this.builtinUniforms.resolution[1],
 			)
 			this.ctx.uniform2f(
 				mouseLocation,
-				this.builtinUniforms.iMouse[0],
-				this.builtinUniforms.iMouse[1],
+				this.builtinUniforms.mouse[0],
+				this.builtinUniforms.mouse[1],
 			)
-			this.ctx.uniform1f(timeLocation, this.builtinUniforms.iTime)
+			this.ctx.uniform1f(timeLocation, this.builtinUniforms.time)
 
 			// todo - Dynamic uniforms instead?
 			for (const [key, value] of this._uniformLocations) {

@@ -21,9 +21,9 @@ export function render(
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
 
 	// Look up uniform locations.
-	const resolutionLocation = gl.getUniformLocation(program, 'iResolution')
-	const mouseLocation = gl.getUniformLocation(program, 'iMouse')
-	const timeLocation = gl.getUniformLocation(program, 'iTime')
+	const resolutionLocation = gl.getUniformLocation(program, 'resolution')
+	const mouseLocation = gl.getUniformLocation(program, 'mouse')
+	const timeLocation = gl.getUniformLocation(program, 'time')
 
 	// Create a buffer to put three 2d clip space points in.
 	const positionBuffer = gl.createBuffer()
