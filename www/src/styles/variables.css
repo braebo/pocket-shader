@@ -37,11 +37,6 @@
 	inherits: false;
 	initial-value: 0deg;
 }
-@property --shade {
-	syntax: '<color>';
-	inherits: true;
-	initial-value: #ffffff;
-}
 
 :root {
 	--font-a: 'Fredoka', system-ui, sans-serif;
@@ -50,6 +45,7 @@
 
 	--font: clamp(0.75rem, calc(0.75rem + 1vw), 1.25rem);
 	--font-sm: clamp(10px, calc(8px + 1vw), 14px);
+	--font-xs: clamp(9px, calc(6px + 1vw), 12px);
 	--line-height-sm: clamp(1rem, calc(0.5rem + 1vw), 1.25rem);
 
 	--bg-a: black;
@@ -120,13 +116,16 @@
 		left: -1px;
 		top: -1px;
 
-		background-image: var(--gradient);
+		background-image: linear-gradient(
+			var(--deg, 45deg),
+			color-mix(in lch, var(--theme-a, #33c5f4) 25%, transparent),
+			color-mix(in lch, var(--theme-b, #a269cb) 25%, transparent) 100%
+		);
+
+		animation: gradient-animation 5s infinite alternate;
 	}
 
 	&:hover {
-		color: var(--bg-a) !important;
-		/* font-weight: 700 !important; */
-		font-variation-settings: 'wght' 700 !important;
 		background-color: var(--gradient);
 	}
 }

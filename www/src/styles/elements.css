@@ -29,6 +29,7 @@ p {
 
 em {
 	color: var(--fg-d);
+	font-variation-settings: 'wght' 300;
 }
 
 main,
@@ -54,7 +55,7 @@ section {
 
 h1 {
 	font-size: 4rem;
-	font-weight: 700;
+	font-weight: 00;
 	line-height: 1;
 	text-align: center;
 	margin-bottom: 1em;
@@ -63,6 +64,9 @@ h1 {
 h2 {
 	font-size: 3rem;
 	text-align: center;
+	font-weight: 500;
+	font-variation-settings: 'wght' 100;
+	z-index: 1;
 }
 
 button,
@@ -116,7 +120,7 @@ button,
 		filter 0.15s;
 
 	font-weight: 900;
- 
+
 	&.active {
 		--theme-a: #30d84c;
 		--theme-b: #ff0051;
@@ -134,7 +138,6 @@ button,
 			--theme-a: #33c5f4;
 			--theme-b: #a269cb;
 		}
-		/* background: var(--bg-a); */
 	}
 
 	&::before {
@@ -170,21 +173,19 @@ code,
 
 :not(pre) > code,
 .code {
-	padding: 0.2rem 0.4rem;
+	padding: 0.1rem 0.4rem;
 
 	background: #1b1e28;
 	border-radius: 0.2rem;
 	outline: var(--outline);
 
-	line-height: 1.25;
-	vertical-align: middle;
-
 	display: inline-flex;
 	align-items: center;
 	width: fit-content;
 
-	font-size: var(--font-sm);
+	font-size: var(--font-xs);
 	line-height: var(--line-height-sm);
+	vertical-align: middle;
 }
 
 br {

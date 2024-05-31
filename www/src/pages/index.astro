@@ -1,31 +1,31 @@
 ---
 import Importing from '../components/sections/Importing.svelte'
-import HeroText from '../components/HeroSection.astro'
+import HeroSection from '../components/HeroSection.svelte'
 import Layout from '../layouts/Layout.astro'
 import Code from '../components/Code.astro'
 
 import Playback from '../components/sections/Playback.svelte'
+import Uniforms from '../components/sections/Uniforms.svelte'
 import Speed from '../components/sections/Speed.svelte'
 import Dpr from '../components/sections/Dpr.svelte'
 ---
 
 <script>
 	import { PocketShader } from 'pocket-shader'
-import { fadeText } from '../utils/animations.ts'
+	import { fadeText } from '../utils/animations.ts'
+	import { dedent } from '../utils/dedent.ts'
 
 	let ps1: PocketShader | null = null
 	document.querySelector('#run1')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
-			// target.textContent = 'Dispose'
 			fadeText(target, 'Dispose')
 			ps1 = new PocketShader()
 		} else {
 			target.classList.remove('active')
 			ps1?.dispose()
 			ps1 = null
-			// target.textContent = 'Run'
 			fadeText(target, 'Run')
 		}
 	})
@@ -35,14 +35,12 @@ import { fadeText } from '../utils/animations.ts'
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
-			// target.textContent = 'Dispose'
 			fadeText(target, 'Dispose')
 			ps2 = new PocketShader('#codeblock2')
 		} else {
 			target.classList.remove('active')
 			ps2?.dispose()
 			ps2 = null
-			// target.textContent = 'Run'
 			fadeText(target, 'Run')
 		}
 	})
@@ -53,22 +51,21 @@ import { fadeText } from '../utils/animations.ts'
 		target.classList.toggle('active')
 		if (target.textContent === 'Run') {
 			fadeText(target, 'Dispose')
-			// target.textContent = 'Dispose'
 			ps3 = new PocketShader('#codeblock3', {
 				autoStart: true,
-				fragmentShader: `
-                    precision mediump float;
+				fragment: `
+                    uniform float u_time;
+                    uniform vec2 u_resolution;
 
-                    uniform float time;
-                    uniform vec2 resolution;
+                    out vec4 fragColor;
 
                     void main() {
-                        float d = distance(gl_FragCoord.xy, resolution.xy / 2.0);
-                        float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0);
-                        gl_FragColor = vec4(
-                            0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0),
-                            0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0),
-                            0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0),
+                        float d = distance(fragColor.xy, u_resolution.xy / 2.0);
+                        float a = atan(fragColor.y - u_resolution.y / 2.0, fragColor.x - u_resolution.x / 2.0);
+                        fragColor = vec4(
+                            0.5 + 0.5 * cos(u_time + a) + 0.5 * sin(d / 10.0),
+                            0.5 + 0.5 * sin(u_time + a) + 0.5 * cos(d / 10.0),
+                            0.5 + 0.5 * cos(u_time + a) + 0.5 * cos(d / 10.0),
                             1.0
                         );
                     }
@@ -76,9 +73,39 @@ import { fadeText } from '../utils/animations.ts'
 			})
 		} else {
 			fadeText(target, 'Run')
-			// target.textContent = 'Run'
 			ps3?.dispose()
 			ps3 = null
+		}
+	})
+
+	let ps4: PocketShader | null = null
+	document.querySelector('#run4')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		target.classList.toggle('active')
+		if (target.textContent === 'Run') {
+			if (ps4?.state !== 'disposed') {
+				fadeText(target, 'Dispose')
+				ps4 ||= new PocketShader('#codeblock3-3', {
+					autoStart: true,
+					fragment: dedent(`
+                    uniform float u_time;
+                    uniform vec2 u_mouse;
+                    uniform vec2 u_resolution;
+                    in vec2 vUv;
+                    out vec4 color;
+                    void main() {
+                      vec2 p = vUv - 0.5;
+                      vec2 m = u_mouse - 0.5;
+                      float angle = atan(p.y, p.x) - atan(m.y, m.x);
+                      color = vec4(0.5 + 0.5 * cos(angle), m.x + 0.5, m.y + 0.5, 1.0);
+                    }
+                `),
+				})
+			}
+		} else {
+			fadeText(target, 'Run')
+			ps4?.dispose()
+			ps4 = null
 		}
 	})
 
@@ -105,14 +132,9 @@ import { fadeText } from '../utils/animations.ts'
 	<main>
 		<br />
 
-		<HeroText />
+		<HeroSection client:load />
 
-		<br-xl></br-xl>
-
-		<p class="description gradient-outline" style="position:relative">
-			<code class="text-gradient">pocket-shader</code> is a typescript package that makes it easy
-			to render WebGL shaders.
-		</p>
+		<!-- <div style="height:10rem;"></div> -->
 	</main>
 
 	<!-- <ul class="toc">
@@ -133,7 +155,7 @@ import { fadeText } from '../utils/animations.ts'
 		</p>
 
 		<Code
-			id="eg1"
+			id="ps1"
 			code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
 
@@ -161,41 +183,162 @@ import { fadeText } from '../utils/animations.ts'
 
 	<section style="max-width: 30rem;">
 		<p>
-			Shaders can be passed into the options <code>fragmentShader</code> and/or
-			<code>vertexShader</code>.
+			Shaders can be passed into the <code>fragment</code> and/or
+			<code>vertex</code> options.
 		</p>
 
-		<!-- <p>
-			Given a string, like <code>myShader</code> below.
-		</p> -->
-
 		<Code
-			lang="glsl"
-			id="codeblock3"
-			fontSize="0.7rem"
-			lineHeight="1.15rem"
-			code={/*glsl*/ `
-                const myShader = \`
-                    precision mediump float;    
-                    uniform float time; // built-in time uniform
-                    uniform vec2 resolution; // built-in resolution uniform
-                    void main() {
-                        float d = distance(gl_FragCoord.xy, resolution.xy / 2.0);
-                        float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0);
-                        gl_FragColor = vec4(
-                            0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0),
-                            0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0),
-                            0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0),
-                            1.0
-                        );
-                    }
-                \`
-            `}
+			id="codeblock3-3"
+			code=""
+			fontSize="0.8rem"
+			code={`new PocketShader('#codeblock3', { // [!code highlight]
+              vertex: ${'`'} // [!code highlight]
+                // The default vertex shader if none is provided. // [!code highlight]
+                in vec4 a_position;
+                out vec2 vUv;
+                void main() {
+                  vUv = a_position.xy;
+                  gl_Position = a_position;
+                } // [!code highlight]
+              ${'`'},
+              fragment: ${'`'} // [!code highlight]
+                // These 3 uniforms are always available. // [!code highlight]
+                uniform float u_time;
+                uniform vec2 u_mouse;
+                uniform vec2 u_resolution;
+                
+                in vec2 vUv;
+                out vec4 color;
+                
+                void main() {
+                  vec2 p = vUv - 0.5;
+                  vec2 m = u_mouse - 0.5;
+                  float angle = atan(p.y, p.x) - atan(m.y, m.x);
+                  color = vec4(0.5 + 0.5 * cos(angle), m.x + 0.5, m.y + 0.5, 1.0);
+                }
+              ${'`'}
+            })`}
 		/>
 
-		<p>
+		<button class="btn" id="run4">Run</button>
+
+		<!-- <Code
+			id="codeblock3-2"
+			code=""
+			fontSize="0.7rem"
+			codes={[
+				{
+					lang: 'js',
+					code: `
+                        new PocketShader('#codeblock3', {
+                            vertex: ${'`'}  // [!code highlight]
+                        `,
+				},
+				{
+					lang: 'glsl',
+					trim: false,
+					code: /*glsl*/ `        in vec4 a_position; // [!code highlight]
+        void main() { // [!code highlight]
+            gl_Position = a_position; // [!code highlight]
+        } // [!code highlight]
+    ${'`'}, // [!code highlight]
+`,
+				},
+				{
+					lang: 'js',
+					code: `{     fragment: ${'`'}  // [!code highlight]
+                        `,
+				},
+				// {
+				// 	lang: 'glsl',
+				// 	code: /*glsl*/ `
+				//             out vec4 color; // [!code highlight]
+				//             uniform float time; // builtin time uniform // [!code highlight]
+				//             uniform vec2 resolution; // builtin resolution uniform // [!code highlight]
+				//             void main() { // [!code highlight]
+				//                 float d = distance(gl_FragCoord.xy, resolution.xy / 2.0); // [!code highlight]
+				//                 float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0); // [!code highlight]
+				//                 color = vec4( // [!code highlight]
+				//                     0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0), // [!code highlight]
+				//                     0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
+				//                     0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
+				//                     1.0 // [!code highlight]
+				//                 ); // [!code highlight]
+				//     }`,
+				// },
+				{
+					lang: 'glsl',
+					code: `
+                            out vec4 color; // [!code highlight]
+                            void main() { // [!code highlight]
+                                color = vec4(\${[...Array(4)].map(Math.random)}); // [!code highlight]
+                            } // [!code highlight]
+                        ${'`'} // [!code highlight]
+                    })`,
+				},
+			]}
+		/> -->
+
+		<!-- <Code
+			id="codeblock3-2"
+			code=""
+			fontSize="0.7rem"
+			codes={[
+				{
+					lang: 'js',
+					code: `
+                        import { PocketShader } from 'pocket-shader'
+
+                        new PocketShader('#codeblock3', {
+                            autoStart: true,
+                            fragment: ${'`'}  // [!code highlight]
+                        `,
+				},
+				// {
+				// 	lang: 'glsl',
+				// 	code: /*glsl*/ `
+				//             out vec4 color; // [!code highlight]
+				//             uniform float time; // builtin time uniform // [!code highlight]
+				//             uniform vec2 resolution; // builtin resolution uniform // [!code highlight]
+				//             void main() { // [!code highlight]
+				//                 float d = distance(gl_FragCoord.xy, resolution.xy / 2.0); // [!code highlight]
+				//                 float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0); // [!code highlight]
+				//                 color = vec4( // [!code highlight]
+				//                     0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0), // [!code highlight]
+				//                     0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
+				//                     0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
+				//                     1.0 // [!code highlight]
+				//                 ); // [!code highlight]
+				//     }`,
+				// },
+				{
+					lang: 'glsl',
+					code: /*glsl*/ `
+                            out vec4 color; // [!code highlight]
+                            uniform float time; // builtin time uniform // [!code highlight]
+                            uniform vec2 resolution; // builtin resolution uniform // [!code highlight]
+                            uniform vec2 mouse; // builtin mouse uniform // [!code highlight]
+                            void main() { // [!code highlight]
+                                float d = distance(gl_FragCoord.xy, resolution.xy / 2.0); // [!code highlight]
+                                float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0); // [!code highlight]
+                                color = vec4( // [!code highlight]
+                                    0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0), // [!code highlight]
+                                    0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
+                                    0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
+                                    1.0 // [!code highlight]
+                                ); // [!code highlight]
+                    }`,
+				},
+				{
+					lang: 'js',
+					code: /*js*/ `})`,
+				},
+			]}
+		/> -->
+
+		<!-- <p>
 			We can pass a string, like <code>myShader</code> above, directly into the
-			<code>fragmentShader</code> option.
+			<code>fragment</code> option.
 		</p>
 
 		<Code
@@ -205,12 +348,12 @@ import { fadeText } from '../utils/animations.ts'
 
                 new PocketShader('#codeblock3', {
                     autoStart: true,
-                    fragmentShader: myShader // [!code highlight]
+                    fragment: myShader // [!code highlight]
                 })
             `}
 		/>
 
-		<button class="btn" id="run3">Run</button>
+		<button class="btn" id="run3">Run</button> -->
 	</section>
 
 	<Importing client:load id="#codeblock4">
@@ -223,9 +366,9 @@ import { fadeText } from '../utils/animations.ts'
 
                     new PocketShader('#codeblock4', {
                         autoStart: true,
-                        fragmentShader: myShader // [!code highlight]
+                        fragment: myShader // [!code highlight]
                     })
-			    `}
+                `}
 		/>
 	</Importing>
 
@@ -265,10 +408,10 @@ import { fadeText } from '../utils/animations.ts'
 			/>
 		</Playback>
 		<!-- <p>
-			<em>
-				Notice that calling <code>stop()</code> resets <code>time</code> to <code>0</code>.
-			</em>
-		</p> -->
+            <em>
+                Notice that calling <code>stop()</code> resets <code>time</code> to <code>0</code>.
+            </em>
+        </p> -->
 	</section>
 
 	<section>
@@ -312,7 +455,7 @@ import { fadeText } from '../utils/animations.ts'
                     import { PocketShader } from 'pocket-shader'
 
                     new PocketShader('#codeblock8', {
-                        fragmentShader: myShader,
+                        fragment: myShader,
                         maxPixelRatio: 2 // [!code highlight]
                         autoStart: true,
                     })
@@ -321,25 +464,89 @@ import { fadeText } from '../utils/animations.ts'
 		</Dpr>
 	</section>
 
-	<br />
+	<section>
+		<p>
+			The <code>uniforms</code> option allows you to specify custom uniforms. They can be accessed
+			anytime with <code>ps.uniforms</code>, and will auto-update in the shader when changed.
+		</p>
+
+		<Uniforms id="#codeblock9" client:idle>
+			<Code
+				id="codeblock9"
+				slot="code"
+				code={/*js*/ `
+                    import { PocketShader } from 'pocket-shader'
+                    import myShader from './clouds.glsl?raw'
+
+                    const ps = new PocketShader('#codeblock9', {
+                        fragment: myShader,
+                        autoStart: true,
+                        uniforms: { // [!code highlight]
+                            octave: { type: 'int',   value: 3 }, // [!code highlight]
+                            outer:  { type: 'float', value: 1 }, // [!code highlight]
+                            inner:  { type: 'float', value: 1 }, // [!code highlight]
+                            // etc... // [!code highlight]
+                        } // [!code highlight]
+                    })
+
+                    ps.uniforms.octave = 0.1 // [!code highlight]
+                    ps.uniforms.sphere = 0.9 // [!code highlight]
+                `}
+			/>
+		</Uniforms>
+
+		<br />
+
+		<p class="note" style="text-wrap: pretty">
+			For now, <code>uniforms</code> must be <code>&#123;type,value&#125;</code> objects.&nbsp;&nbsp;In
+			the future, it will accept primitive values and infer the <code>type</code> internally.
+			<br /><em>(just ran out of time for now...)</em>
+		</p>
+	</section>
+
+	<style>
+		.link-card-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+			gap: 2rem;
+			padding: 0;
+		}
+
+		.note {
+			position: relative;
+
+			padding: 1rem;
+
+			background: rgba(136, 158, 186, 0.05);
+			border-radius: var(--radius);
+			outline: 1px solid rgba(136, 148, 186, 0.5);
+			opacity: 0.75;
+			transition: opacity 0.2s;
+
+			&:hover {
+				opacity: 1;
+			}
+
+			&::before {
+				content: 'ⓘ';
+				position: absolute;
+				left: 0.5rem;
+				bottom: 0.2rem;
+
+				color: rgba(136, 148, 186, 0.5);
+
+				font-size: 1.5rem;
+				/* font-weight: bold; */
+			}
+		}
+
+		:global(#codeblock3-2 pre.astro-code) {
+			&:not(:first-of-type) {
+				margin-top: 0;
+			}
+			&:not(:last-of-type) {
+				margin-bottom: 0;
+			}
+		}
+	</style>
 </Layout>
-
-<style>
-	.description {
-		box-sizing: border-box;
-		padding: 1rem;
-
-		outline: var(--outline);
-		background: var(--bg-a);
-		border-radius: var(--radius);
-
-		text-wrap: balance;
-	}
-
-	.link-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-		gap: 2rem;
-		padding: 0;
-	}
-</style>
