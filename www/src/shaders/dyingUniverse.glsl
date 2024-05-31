@@ -3,10 +3,10 @@ precision highp float;
 
 uniform vec2 u_resolution;
 uniform float u_time;
-uniform float u_timeDelta;
 uniform vec4 u_mouse;
-uniform int iFrame;
-// out vec4 gl_FragColor;
+
+in vec2 vUv;
+out vec4 fragColor;
 
 // "Dying Universe" by Martijn Steinrucken aka BigWings - 2015
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
@@ -38,7 +38,7 @@ float dist2(vec2 P0, vec2 P1) {
 const vec3 up = vec3(0.f, 1.f, 0.f);
 const float pi = 3.141592653589793238f;
 const float twopi = 6.283185307179586f;
-float _u_time;
+float time;
 
 struct ray {
     vec3 o;
@@ -62,7 +62,7 @@ camera cam;
 
 void CameraSetup(vec2 uv, vec3 position, vec3 lookAt, float zoom) {
 
-    cam.p = a_position;
+    cam.p = position;
     cam.lookAt = lookAt;
     cam.forward = normalize(cam.lookAt - cam.p);
     cam.left = cross(up, cam.forward);
@@ -339,21 +339,22 @@ vec4 Ground(ray r) {
     return ground;
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    vec2 uv = (fragCoord.xy / u_resolution.xy) - 0.5f;
+void main() {
+    vec2 uv = (gl_FragCoord.xy / u_resolution.xy) - 0.5f;
+    // vec2 uv = vUv;
     uv.y *= u_resolution.y / u_resolution.x;
 
-    _u_time = u_time * 0.2f;
-    fragColor = vec4(uv, 0.5f + 0.5f * sin(_u_time), 1.0f);
+    time = u_time * 0.2f;
+    fragColor = vec4(uv, 0.5f + 0.5f * sin(time), 1.0f);
 
-    _u_time *= 2.f;
+    time *= 2.f;
 
-    float t = _u_time * pi * 0.1f;
+    float t = time * pi * 0.1f;
     COOLCOLOR = vec4(sin(t), cos(t * 0.23f), cos(t * 0.3453f), 1.f) * 0.5f + 0.5f;
     HOTCOLOR = vec4(sin(t * 2.f), cos(t * 2.f * 0.33f), cos(t * 0.3453f), 1.f) * 0.5f + 0.5f;
 
     vec4 white = vec4(1.f);
-    float whiteFade = sin(_u_time * 2.f) * 0.5f + 0.5f;
+    float whiteFade = sin(time * 2.f) * 0.5f + 0.5f;
     HOTCOLOR = mix(HOTCOLOR, white, whiteFade);
 
     MIDCOLOR = (HOTCOLOR + COOLCOLOR) * 0.5f;
@@ -362,14 +363,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     float c = cos(t);
     mat3 rot = mat3(c, 0.f, s, 0.f, 1.f, 0.f, s, 0.f, -c);
 
-    float camHeight = mix(3.5f, 0.1f, PeriodicPulse(_u_time * 0.1f, 2.f));
-    vec3 pos = vec3(0.f, camHeight, -10.f) * rot * (1.f + sin(_u_time) * 0.3f);
+    float camHeight = mix(3.5f, 0.1f, PeriodicPulse(time * 0.1f, 2.f));
+    vec3 pos = vec3(0.f, camHeight, -10.f) * rot * (1.f + sin(time) * 0.3f);
 
     CameraSetup(uv, pos, vec3(0.f), 0.5f);
 
     fragColor = Ground(cam.ray);
     fragColor += Stars(cam.ray);
-}
-void main() {
-    mainImage(gl_FragColor, gl_FragCoord.xy);
 }
