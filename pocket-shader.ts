@@ -571,8 +571,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			// Tell it to use our program (pair of shaders).
 			this.ctx.useProgram(this.program)
 
-			const positionAttributeLocation = this._builtinUniformLocations.get('u_position')!
-			//// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'position')
+			const positionAttributeLocation = this._builtinUniformLocations.get('a_position')!
 			const resolutionLocation = this._builtinUniformLocations.get('u_resolution')!
 			const mouseLocation = this._builtinUniformLocations.get('u_mouse')!
 			const timeLocation = this._builtinUniformLocations.get('u_time')!
