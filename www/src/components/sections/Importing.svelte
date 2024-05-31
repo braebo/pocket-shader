@@ -1,5 +1,5 @@
 <script lang="ts">
-	import fragmentShader from '../../shaders/clouds.glsl?raw'
+	import fragment from '../../shaders/clouds.glsl?raw'
 	import { fadeText } from '../../utils/animations.ts'
 	import { PocketShader } from 'pocket-shader'
 
@@ -17,7 +17,7 @@
 		ps = new PocketShader(id, {
 			autoStart: true,
 			speed: 1,
-			fragmentShader,
+			fragment,
 		})
 
 		ps.on('render', ({ time }) => {

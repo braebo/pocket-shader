@@ -3,6 +3,8 @@
  * @module
  */
 
+import { dedent } from './www/src/utils/dedent.js'
+
 export interface PocketShaderOptions<T extends Record<string, any> = Record<string, any>> {
 	/**
 	 * The canvas element to render the shader on.
@@ -12,26 +14,12 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	/**
 	 * The vertex shader source code.
 	 */
-	vertexShader?: string
+	vertex?: string
 
 	/**
 	 * The fragment shader source code.
 	 */
-	fragmentShader?: string
-
-	/**
-	 * When true, the mouse position will be updated on mousemove events and passed to the
-	 * shader as `mouse`: `[number, number]`.
-	 * @defaultValue `false`
-	 */
-	mouseEvents?: boolean
-
-	/**
-	 * When true, the touch position will be updated on touchmove events and passed to the
-	 * shader as `mouse`: `[number, number]`.
-	 * @defaultValue `false`
-	 */
-	touchEvents?: boolean
+	fragment?: string
 
 	/**
 	 * When true, the render loop will start automatically.  Otherwise, you will need to call the
@@ -67,9 +55,14 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 }
 
 const DEFAULT_UNIFORMS = {
-	time: 0,
-	resolution: [0, 0] as [number, number],
-	mouse: [0, 0] as [number, number],
+	u_time: 0,
+	u_resolution: [0, 0] as [number, number],
+	u_mouse: [0, 0] as [number, number],
+}
+
+interface Uniform {
+	type: 'int' | 'float' | 'vec2' | 'vec3' | 'vec4'
+	value: number | number[]
 }
 
 /**
@@ -77,7 +70,7 @@ const DEFAULT_UNIFORMS = {
  *
  * @param container The element to append the canvas to.  Can be an HTMLElement or a string selector.
  */
-export class PocketShader<T extends Record<string, any> = Record<string, any>> {
+export class PocketShader<T extends Record<string, Uniform> = Record<string, Uniform>> {
 	/**
 	 * The container for the canvas element is used to determine the size of the canvas.
 	 */
@@ -96,12 +89,12 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	/**
 	 * The vertex shader used by this instance.
 	 */
-	vertexShader: string
+	vertex: string
 
 	/**
 	 * The fragment shader used by this instance.
 	 */
-	fragmentShader: string
+	fragment: string
 
 	/**
 	 * The maximum resolution multiplier, determined by the device pixel
@@ -135,9 +128,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	 * the shader state is `running`.
 	 */
 	builtinUniforms = {
-		time: 0,
-		resolution: [0, 0] as [number, number],
-		mouse: [0, 0] as [number, number],
+		u_time: 0,
+		u_resolution: [0, 0] as [number, number],
+		u_mouse: [0.5, 0.5] as [number, number],
 	}
 
 	private _builtinUniformLocations = new Map<string, WebGLUniformLocation>()
@@ -158,7 +151,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	}
 	set time(value) {
 		this._time = value
-		this.builtinUniforms.time = value
+		this.builtinUniforms.u_time = value
 	}
 
 	private _uniforms: { [K in keyof T]: T[K] }
@@ -220,36 +213,57 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this.opts = options ?? {}
 		this.speed = options?.speed ?? 1
 		this.maxPixelRatio = options?.maxPixelRatio ?? (globalThis.window?.devicePixelRatio || 1)
+		this.container = container ?? document.body
 
-		this.vertexShader =
-			options?.vertexShader ??
-			/*glsl*/ `
-                attribute vec4 position;
-                void main() {
-                    gl_Position = position;
-                }
-            `
+		this.vertex =
+			options?.vertex ??
+			dedent(/*glsl*/ `
+				#version 300 es
 
-		this.fragmentShader =
-			options?.fragmentShader ??
-			/*glsl*/ `
+        		in vec4 a_position;
+        		out vec2 vUv;
+
+				void main() {
+        		    vUv = a_position.xy * 0.5 + 0.5;
+        		    gl_Position = a_position;
+        		}
+            `)
+
+		this.fragment =
+			options?.fragment ??
+			dedent(/*glsl*/ `
+				#version 300 es
                 precision mediump float;
-                uniform vec2 resolution;
-                uniform vec2 mouse;
-                uniform float time;
-                void main() {
-                    vec2 uv = gl_FragCoord.xy / resolution.xy;
-                    gl_FragColor = vec4(uv, 0.5 + 0.5 * sin(time), 1.0);
+
+				uniform float u_time;
+				in vec2 vUv;
+				out vec4 color;
+
+				void main() {
+                    color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
                 }
-            `
+            `)
+
+		if (!this.vertex.startsWith('#version')) {
+			this.vertex = '#version 300 es\n' + this.vertex
+		}
+		const prepends = []
+		if (!this.fragment.startsWith('#version')) {
+			prepends.push('#version 300 es')
+		}
+		if (!this.fragment.includes('precision')) {
+			prepends.push('precision mediump float;')
+		}
+		if (prepends.length) {
+			this.fragment = prepends.concat(this.fragment).join('\n')
+		}
 
 		this._uniforms = options?.uniforms ?? ({} as T)
 
-		this.container = container ?? document.body
 		this._l = import.meta.env.DEV
 			? (fn: string, ...args: any[]) => {
 					const id = this.container?.id ?? ''
-					const color = getColorFromId(id)
+					const color = idToColor(id)
 					console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:gray', ...args)
 			  }
 			: () => {}
@@ -285,12 +299,8 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		this._l('setupCanvas()')
 		if (!this.container) throw new Error('Container not found.')
 
-		if (this.opts.mouseEvents) {
-			this.canvas.addEventListener('mousemove', this.setMousePosition)
-		}
-		if (this.opts.touchEvents) {
-			this.canvas.addEventListener('touchmove', this.setTouchPosition, { passive: false })
-		}
+		this.canvas.addEventListener('mousemove', this.setMousePosition)
+		this.canvas.addEventListener('touchmove', this.setTouchPosition, { passive: false })
 
 		if (!Array.from(this.container.children).includes(this.canvas)) {
 			this.container.appendChild(this.canvas)
@@ -416,8 +426,8 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			this.canvas.style.width = width + 'px'
 			this.canvas.style.height = height + 'px'
 
-			this.builtinUniforms.resolution[0] = width * this.maxPixelRatio
-			this.builtinUniforms.resolution[1] = height * this.maxPixelRatio
+			this.builtinUniforms.u_resolution[0] = width * this.maxPixelRatio
+			this.builtinUniforms.u_resolution[1] = height * this.maxPixelRatio
 		}
 
 		if (this.state.match(/paused|stopped/)) {
@@ -429,9 +439,9 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	setMousePosition = (e: MouseEvent | Touch): void => {
 		const rect = this.canvas.getBoundingClientRect()
-		this.builtinUniforms.mouse[0] = e.clientX - rect.left
+		this.builtinUniforms.u_mouse[0] = (e.clientX - rect.left) / rect.width
 		// bottom is 0 in WebGL
-		this.builtinUniforms.mouse[1] = rect.height - (e.clientY - rect.top) - 1
+		this.builtinUniforms.u_mouse[1] = (rect.height - (e.clientY - rect.top) - 1) / rect.height
 	}
 
 	setTouchPosition = (e: TouchEvent): void => {
@@ -459,33 +469,29 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		if (!this.ctx) throw new Error('WebGL2 context not found.')
 
 		// Create / upload / compile the shaders.
-		const vertexShader = this._createShader(this.ctx, this.ctx.VERTEX_SHADER, this.vertexShader)
-		const fragmentShader = this._createShader(
-			this.ctx,
-			this.ctx.FRAGMENT_SHADER,
-			this.fragmentShader,
-		)
-		this.program = this._createProgram(this.ctx, vertexShader, fragmentShader)
+		const vertex = this._createShader(this.ctx, this.ctx.VERTEX_SHADER, this.vertex)
+		const fragment = this._createShader(this.ctx, this.ctx.FRAGMENT_SHADER, this.fragment)
+		this.program = this._createProgram(this.ctx, vertex, fragment)
 
 		this._builtinUniformLocations.set(
-			'position',
-			this.ctx.getUniformLocation(this.program, 'position')!,
+			'a_position',
+			this.ctx.getUniformLocation(this.program, 'a_position')!,
 		)
 		this._builtinUniformLocations.set(
-			'resolution',
-			this.ctx.getUniformLocation(this.program, 'resolution')!,
+			'u_resolution',
+			this.ctx.getUniformLocation(this.program, 'u_resolution')!,
 		)
 		this._builtinUniformLocations.set(
-			'mouse',
-			this.ctx.getUniformLocation(this.program, 'mouse')!,
+			'u_mouse',
+			this.ctx.getUniformLocation(this.program, 'u_mouse')!,
 		)
 		this._builtinUniformLocations.set(
-			'time',
-			this.ctx.getUniformLocation(this.program, 'time')!,
+			'u_time',
+			this.ctx.getUniformLocation(this.program, 'u_time')!,
 		)
 
-		if (this.opts.fragmentShader) {
-			this._extractUniforms(this.opts.fragmentShader)
+		if (this.opts.fragment) {
+			this._validateUniforms(this.opts.fragment)
 		}
 
 		for (const key in this.uniforms) {
@@ -506,13 +512,13 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 
 	private _createProgram(
 		gl: WebGL2RenderingContext,
-		vertexShader: WebGLShader,
-		fragmentShader: WebGLShader,
+		vertex: WebGLShader,
+		fragment: WebGLShader,
 	): WebGLProgram {
 		this._l('createProgram()')
 		const program = gl.createProgram()!
-		gl.attachShader(program, vertexShader)
-		gl.attachShader(program, fragmentShader)
+		gl.attachShader(program, vertex)
+		gl.attachShader(program, fragment)
 		gl.linkProgram(program)
 
 		const success = gl.getProgramParameter(program, gl.LINK_STATUS)
@@ -565,11 +571,11 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			// Tell it to use our program (pair of shaders).
 			this.ctx.useProgram(this.program)
 
-			const positionAttributeLocation = this._builtinUniformLocations.get('position')!
+			const positionAttributeLocation = this._builtinUniformLocations.get('u_position')!
 			//// const positionAttributeLocation = this.ctx.getAttribLocation(this.program, 'position')
-			const resolutionLocation = this._builtinUniformLocations.get('resolution')!
-			const mouseLocation = this._builtinUniformLocations.get('mouse')!
-			const timeLocation = this._builtinUniformLocations.get('time')!
+			const resolutionLocation = this._builtinUniformLocations.get('u_resolution')!
+			const mouseLocation = this._builtinUniformLocations.get('u_mouse')!
+			const timeLocation = this._builtinUniformLocations.get('u_time')!
 
 			// Turn on the attribute.
 			this.ctx.enableVertexAttribArray(positionAttributeLocation as number)
@@ -590,15 +596,15 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 			// this.ctx.uniform2f(resolutionLocation, this.ctx.canvas.width, this.ctx.canvas.height)
 			this.ctx.uniform2f(
 				resolutionLocation,
-				this.builtinUniforms.resolution[0],
-				this.builtinUniforms.resolution[1],
+				this.builtinUniforms.u_resolution[0],
+				this.builtinUniforms.u_resolution[1],
 			)
 			this.ctx.uniform2f(
 				mouseLocation,
-				this.builtinUniforms.mouse[0],
-				this.builtinUniforms.mouse[1],
+				this.builtinUniforms.u_mouse[0],
+				this.builtinUniforms.u_mouse[1],
 			)
-			this.ctx.uniform1f(timeLocation, this.builtinUniforms.time)
+			this.ctx.uniform1f(timeLocation, this.builtinUniforms.u_time)
 
 			// todo - Dynamic uniforms instead?
 			for (const [key, value] of this._uniformLocations) {
@@ -623,35 +629,53 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 		return this
 	}
 
+	private _initializeUniforms(userUniforms: T | undefined): T {
+		const uniforms: Record<string, Uniform> = {}
+
+		for (const [name, uniform] of Object.entries(userUniforms || {})) {
+			uniforms[name] = {
+				type: uniform.type,
+				value: Array.isArray(uniform.value)
+					? (new Float32Array(uniform.value) as any as number[])
+					: uniform.value,
+			}
+		}
+
+		return uniforms as T
+	}
+
+	test = 0
 	private _setUniform(
 		ctx: WebGL2RenderingContext,
 		location: WebGLUniformLocation | null,
-		value: any,
+		uniform: Uniform,
 	) {
 		if (location === null) return
 
-		if (typeof value === 'number') {
-			ctx.uniform1f(location, value)
-		} else if (Array.isArray(value)) {
-			switch (value.length) {
-				case 2:
-					ctx.uniform2fv(location, new Float32Array(value))
-					break
-				case 3:
-					ctx.uniform3fv(location, new Float32Array(value))
-					break
-				case 4:
-					ctx.uniform4fv(location, new Float32Array(value))
-					break
-				default:
-					throw new Error('Unsupported uniform value')
-			}
-		} else {
-			throw new Error('Unsupported uniform type')
+		const { type, value } = uniform
+
+		switch (type) {
+			case 'float':
+				ctx.uniform1f(location, value as number)
+				break
+			case 'int':
+				ctx.uniform1i(location, value as number)
+				break
+			case 'vec2':
+				ctx.uniform2fv(location, value as any as Float32Array)
+				break
+			case 'vec3':
+				ctx.uniform3fv(location, value as any as Float32Array)
+				break
+			case 'vec4':
+				ctx.uniform4fv(location, value as any as Float32Array)
+				break
+			default:
+				throw new Error(`Unsupported uniform type: ${type}`)
 		}
 	}
 
-	private _extractUniforms(source: string): { [key: string]: any } {
+	private _validateUniforms(source: string): { [key: string]: any } {
 		const uniformRegex = /uniform\s+(\w+)\s+(\w+)\s*;/g
 
 		let match
@@ -663,36 +687,11 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 					k => k === name,
 				)
 			) {
-				console.log('%cSkipping', 'color:orange', name)
+				console.log('%cUniform found:', 'color:lightgreen', name)
 				continue
 			}
 
-			console.log('%cAdding', 'color:lightgreen', name)
-
-			switch (type) {
-				case 'int':
-					// @ts-expect-error
-					this.uniforms[name] = 0
-					break
-				case 'float':
-					// @ts-expect-error
-					this.uniforms[name] = 0
-					break
-				case 'vec2':
-					// @ts-expect-error
-					this.uniforms[name] = [0, 0]
-					break
-				case 'vec3':
-					// @ts-expect-error
-					this.uniforms[name] = [0, 0, 0]
-					break
-				case 'vec4':
-					// @ts-expect-error
-					this.uniforms[name] = [0, 0, 0, 0]
-					break
-				default:
-					console.warn(`Unsupported uniform type: ${type}`)
-			}
+			throw new Error(`Uniform not found: ${name}`)
 		}
 
 		return this
@@ -714,7 +713,7 @@ export class PocketShader<T extends Record<string, any> = Record<string, any>> {
 	}
 }
 
-function getColorFromId(id: string): string {
+function idToColor(id: string): string {
 	let hash = 0
 	for (let i = 0; i < id.length; i++) {
 		hash = id.charCodeAt(i) + ((hash << 5) - hash)

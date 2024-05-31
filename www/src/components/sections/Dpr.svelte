@@ -1,5 +1,5 @@
 <script lang="ts">
-	import fragmentShader from '../../shaders/dyingUniverse.glsl?raw'
+	import fragment from '../../shaders/dyingUniverse.glsl?raw'
 	import { fadeText } from '../../utils/animations.ts'
 	import { PocketShader } from 'pocket-shader'
 	import Range from '../Range.svelte'
@@ -20,7 +20,7 @@
 		if (!disabled) return dispose()
 
 		ps = new PocketShader(id, {
-			fragmentShader,
+			fragment,
 			maxPixelRatio: dpr,
 			autoStart: true,
 		})
