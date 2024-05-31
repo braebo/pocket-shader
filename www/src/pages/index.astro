@@ -11,8 +11,9 @@ import Dpr from '../components/sections/Dpr.svelte'
 ---
 
 <script>
-	import { PocketShader } from 'pocket-shader'
 	import { fadeText } from '../utils/animations.ts'
+	import kirby from '../shaders/kirby.frag?raw'
+	import { PocketShader } from 'pocket-shader'
 	import { dedent } from '../utils/dedent.ts'
 
 	let ps1: PocketShader | null = null
@@ -126,6 +127,59 @@ import Dpr from '../components/sections/Dpr.svelte'
 			target.textContent = 'Run'
 		}
 	})
+
+	let ps10: PocketShader | null = null
+	document.querySelector('#run10')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		if (target.textContent === 'Run') {
+			target.classList.add('active')
+			fadeText(target, 'Dispose')
+			ps10 = new PocketShader('#codeblock10', {
+				speed: 2,
+				autoStart: true,
+				uniforms: {
+					u_happy: { type: 'float', value: 0 },
+				},
+				fragment: kirby,
+				// fragment: /*glsl*/ `#version 300 es
+				//     precision highp float;
+
+				//     uniform vec2 u_resolution;
+				//     uniform float u_size;
+				//     in vec2 vUv; // Receive UV coordinates from vertex shader
+				//     out vec4 fragColor;
+
+				//     void main() {
+				//         // Calculate the distance from the center of the screen
+				//         vec2 center = vec2(0.5, 0.5);
+				//         float dist = distance(vUv.xy, center);
+
+				//         // Calculate the radius based on u_size and the resolution
+				//         float radius = u_size / u_resolution.x; // Assuming u_size is in pixels
+
+				//         // If the distance is less than the radius, draw the circle
+				//         if (dist < radius) {
+				//             fragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color for the circle
+				//         } else {
+				//             fragColor = vec4(vec3(0.0), 1.0); // Black color for the background
+				//         }
+				//     }
+				// `,
+			})
+
+			ps10.on('render', ({time}) => {
+				if (ps10 && ps10.state !== 'disposed')
+					ps10.uniforms.u_happy.value = (Math.sin(time * 2) / 5)
+
+                console.log(ps10?.builtinUniforms.u_time)
+			})
+		} else {
+			target.classList.remove('active')
+			ps10?.dispose()
+			ps10 = null
+			target.textContent = 'Run'
+		}
+	})
 </script>
 
 <Layout title="pocket-shader">
@@ -221,139 +275,6 @@ import Dpr from '../components/sections/Dpr.svelte'
 		/>
 
 		<button class="btn" id="run4">Run</button>
-
-		<!-- <Code
-			id="codeblock3-2"
-			code=""
-			fontSize="0.7rem"
-			codes={[
-				{
-					lang: 'js',
-					code: `
-                        new PocketShader('#codeblock3', {
-                            vertex: ${'`'}  // [!code highlight]
-                        `,
-				},
-				{
-					lang: 'glsl',
-					trim: false,
-					code: /*glsl*/ `        in vec4 a_position; // [!code highlight]
-        void main() { // [!code highlight]
-            gl_Position = a_position; // [!code highlight]
-        } // [!code highlight]
-    ${'`'}, // [!code highlight]
-`,
-				},
-				{
-					lang: 'js',
-					code: `{     fragment: ${'`'}  // [!code highlight]
-                        `,
-				},
-				// {
-				// 	lang: 'glsl',
-				// 	code: /*glsl*/ `
-				//             out vec4 color; // [!code highlight]
-				//             uniform float time; // builtin time uniform // [!code highlight]
-				//             uniform vec2 resolution; // builtin resolution uniform // [!code highlight]
-				//             void main() { // [!code highlight]
-				//                 float d = distance(gl_FragCoord.xy, resolution.xy / 2.0); // [!code highlight]
-				//                 float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0); // [!code highlight]
-				//                 color = vec4( // [!code highlight]
-				//                     0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0), // [!code highlight]
-				//                     0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
-				//                     0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
-				//                     1.0 // [!code highlight]
-				//                 ); // [!code highlight]
-				//     }`,
-				// },
-				{
-					lang: 'glsl',
-					code: `
-                            out vec4 color; // [!code highlight]
-                            void main() { // [!code highlight]
-                                color = vec4(\${[...Array(4)].map(Math.random)}); // [!code highlight]
-                            } // [!code highlight]
-                        ${'`'} // [!code highlight]
-                    })`,
-				},
-			]}
-		/> -->
-
-		<!-- <Code
-			id="codeblock3-2"
-			code=""
-			fontSize="0.7rem"
-			codes={[
-				{
-					lang: 'js',
-					code: `
-                        import { PocketShader } from 'pocket-shader'
-
-                        new PocketShader('#codeblock3', {
-                            autoStart: true,
-                            fragment: ${'`'}  // [!code highlight]
-                        `,
-				},
-				// {
-				// 	lang: 'glsl',
-				// 	code: /*glsl*/ `
-				//             out vec4 color; // [!code highlight]
-				//             uniform float time; // builtin time uniform // [!code highlight]
-				//             uniform vec2 resolution; // builtin resolution uniform // [!code highlight]
-				//             void main() { // [!code highlight]
-				//                 float d = distance(gl_FragCoord.xy, resolution.xy / 2.0); // [!code highlight]
-				//                 float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0); // [!code highlight]
-				//                 color = vec4( // [!code highlight]
-				//                     0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0), // [!code highlight]
-				//                     0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
-				//                     0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
-				//                     1.0 // [!code highlight]
-				//                 ); // [!code highlight]
-				//     }`,
-				// },
-				{
-					lang: 'glsl',
-					code: /*glsl*/ `
-                            out vec4 color; // [!code highlight]
-                            uniform float time; // builtin time uniform // [!code highlight]
-                            uniform vec2 resolution; // builtin resolution uniform // [!code highlight]
-                            uniform vec2 mouse; // builtin mouse uniform // [!code highlight]
-                            void main() { // [!code highlight]
-                                float d = distance(gl_FragCoord.xy, resolution.xy / 2.0); // [!code highlight]
-                                float a = atan(gl_FragCoord.y - resolution.y / 2.0, gl_FragCoord.x - resolution.x / 2.0); // [!code highlight]
-                                color = vec4( // [!code highlight]
-                                    0.5 + 0.5 * cos(time + a) + 0.5 * sin(d / 10.0), // [!code highlight]
-                                    0.5 + 0.5 * sin(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
-                                    0.5 + 0.5 * cos(time + a) + 0.5 * cos(d / 10.0), // [!code highlight]
-                                    1.0 // [!code highlight]
-                                ); // [!code highlight]
-                    }`,
-				},
-				{
-					lang: 'js',
-					code: /*js*/ `})`,
-				},
-			]}
-		/> -->
-
-		<!-- <p>
-			We can pass a string, like <code>myShader</code> above, directly into the
-			<code>fragment</code> option.
-		</p>
-
-		<Code
-			id="codeblock3-2"
-			code={/*js*/ `
-                import { PocketShader } from 'pocket-shader'
-
-                new PocketShader('#codeblock3', {
-                    autoStart: true,
-                    fragment: myShader // [!code highlight]
-                })
-            `}
-		/>
-
-		<button class="btn" id="run3">Run</button> -->
 	</section>
 
 	<Importing client:load id="#codeblock4">
@@ -464,6 +385,8 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</Dpr>
 	</section>
 
+	<h2 id="uniforms">Uniforms</h2>
+
 	<section>
 		<p>
 			The <code>uniforms</code> option allows you to specify custom uniforms. They can be accessed
@@ -502,6 +425,41 @@ import Dpr from '../components/sections/Dpr.svelte'
 			the future, it will accept primitive values and infer the <code>type</code> internally.
 			<br /><em>(just ran out of time for now...)</em>
 		</p>
+	</section>
+
+	<section>
+		<h2 id="events">Events</h2>
+
+		<p>
+			The <code>on</code> method allows you to listen for the <code>'render'</code> event, which
+			fires before each frame. This is useful for updating uniforms or other properties before
+			the frame is drawn.
+		</p>
+
+		<Code
+			id="codeblock10"
+			fontSize="0.75rem"
+			code={/*js*/ `
+                import { PocketShader } from 'pocket-shader'
+                import fragment from './kirby.frag?raw'
+
+                const ps = new PocketShader('#codeblock10', {
+                    fragment,
+                    autoStart: true,
+                    uniforms: { // [!code highlight]
+                        u_happy: { type: 'float', value: 0 } // [!code highlight]
+                    }, // [!code highlight]
+                })
+
+                ps.on('render', ({ time }) => { // [!code highlight]
+                    ps.uniforms.u_happy.value = Math.sin(time) // [!code highlight]
+                }) // [!code highlight]
+            `}
+		/>
+
+		<button class="btn" id="run10">Run</button>
+
+		<p>More events will likely be added in the future.</p>
 	</section>
 
 	<style>
