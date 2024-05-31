@@ -1,9 +1,9 @@
 <script>
-	import { nanoid } from '../utils/nanoid'
+	// import { nanoid } from '../utils/nanoid'
 	import { fly } from 'svelte/transition'
 
 	export let text // string
-	export let id = nanoid()
+	// export let id = nanoid()
 	export let style = ''
 
 	/**
@@ -19,7 +19,7 @@
 	let cooldown // ReturnType<typeof setTimeout>
 	let outroCooldown // ReturnType<typeof setTimeout>
 	let btn // HTMLButtonElement
-	let popover // HTMLDivElement
+	// let popover // HTMLDivElement
 
 	function copy() {
 		if (typeof navigator === 'undefined') return
@@ -54,12 +54,15 @@
 	transition:fly
 	on:click|preventDefault={copy}
 	bind:this={btn}
+	>
+<!--
 	popvertarget="copy-popover"
 	on:pointeroever={() => popover.showPopover()}
 	on:pointerout={() => popover.hidePopover()}
 	on:blur={() => popover.hidePopover()}
->
+	
 	<div {id} bind:this={popover} popover="manual">Copy to Clipboard</div>
+-->
 	<div class="svg-container">
 		<svg
 			class="icon copy"
@@ -119,26 +122,26 @@
 
 		&:hover {
 			color: var(--fg-c);
-			background: var(--bg-b);
+			background: var(--bg-hover, var(--bg-b));
 
-			@at-root {
-				:global(:root[theme='light']) & {
-					&:hover {
-						background: var(--bg-e);
-						color: var(--bg-a);
-					}
-					&.active,
-					&.outro {
-						background: transparent;
-					}
-				}
-			}
+			// @at-root {
+			// 	:global(:root[theme='light']) & {
+			// 		&:hover {
+			// 			background: var(--bg-e);
+			// 			color: var(--bg-a);
+			// 		}
+			// 		&.active,
+			// 		&.outro {
+			// 			background: transparent;
+			// 		}
+			// 	}
+			// }
 		}
 
 		&:active,
 		&:focus {
 			color: var(--fg-b);
-			background: var(--bg-c);
+			background: var(--bg-active, var(--bg-c));
 		}
 
 		line-height: 1;
@@ -168,7 +171,7 @@
 	$quartInOut: cubic-bezier(0.77, 0, 0.175, 1);
 	button.copy {
 		&:not(.active, .outro) {
-			backdrop-filter: blur(0.35rem);
+			backdrop-filter: blur(var(--blur, 0.35rem));
 		}
 
 		svg {
@@ -242,16 +245,16 @@
 		background: transparent;
 	}
 
-	[popover] {
-		position: fixed;
-		inset: 0;
-		width: fit-content;
-		height: fit-content;
-		margin: auto;
-		border: solid;
-		padding: 0.25em;
-		overflow: auto;
-		color: CanvasText;
-		background-color: Canvas;
-	}
+	// [popover] {
+	// 	position: fixed;
+	// 	inset: 0;
+	// 	width: fit-content;
+	// 	height: fit-content;
+	// 	margin: auto;
+	// 	border: solid;
+	// 	padding: 0.25em;
+	// 	overflow: auto;
+	// 	color: CanvasText;
+	// 	background-color: Canvas;
+	// }
 </style>
