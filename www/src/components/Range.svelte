@@ -14,7 +14,7 @@
 		cursor: not-allowed;
 	}
 
-	$height: 1rem;
+	$height: 1.25rem;
 
 	input[type='range'] {
 		-webkit-appearance: none;
@@ -24,6 +24,10 @@
 
 		transition: opacity 0.2s;
 		border-radius: $height;
+
+		&:hover {
+			filter: brightness(1.1);
+		}
 	}
 
 	@mixin thumb {
