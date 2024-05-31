@@ -32,7 +32,7 @@ export function dedent(
 		.map(line => line.match(/^\s*/)?.[0].length)
 		.filter(indent => indent !== undefined)
 		// @ts-ignore - Astro is hallucinating errors here and throwing on build
-		.reduce((a, b) => Math.min(a, b), Infinity)
+		.reduce((a, b) => Math.min(a, b), 9999)
 
 	if (leadingNewline) {
 		// @ts-ignore - Astro is hallucinating errors here and throwing on build
