@@ -101,12 +101,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+
 		width: 11rem;
+		height: 1.75rem;
 		margin: auto;
-		// outline: var(--outline);
+
 		border-radius: 0.15rem;
 		overflow: hidden;
-		height: 1.75rem;
 
 		&:first-of-type {
 			border-bottom-left-radius: 0;
@@ -129,12 +130,14 @@
 
 		.key,
 		.key code {
-			border-radius: 0;
 			width: 5.5rem;
-			font-variation-settings: 'wght' 100;
+
 			color: var(--fg-b);
 			background: none;
+			border-radius: 0;
 			outline: none;
+
+			font-variation-settings: 'wght' 100;
 		}
 
 		.value {
@@ -152,7 +155,6 @@
 	.disabled,
 	button:disabled {
 		opacity: 0.5;
-		// filter: grayscale(1) brightness(0.5);
 		cursor: default;
 		pointer-events: none;
 
@@ -162,26 +164,15 @@
 	}
 
 	button.code {
-		color: var(--fg-a) !important;
-		font-variation-settings: 'wght' 300;
-		font-size: var(--font-sm);
 		position: relative;
-		background: var(--bg-a);
-		border-radius: 0.5rem;
 
 		padding: 0.25rem 0.5rem;
 
-		&.active {
-			// color: var(--bg-a);
-			// --theme-a: #30d84c;
-			// --theme-b: #ff0051;
-			// background-position: 25% 50%;
-			// background: linear-gradient(
-			// 	var(--deg, 45deg),
-			// 	var(--theme-a, #33c5f4),
-			// 	var(--theme-b, #a269cb) 100%
-			// );
-			// outline: var(--gradient);
-		}
+		color: var(--fg-a) !important;
+		background: var(--bg-a);
+		border-radius: 0.5rem;
+
+		font-variation-settings: 'wght' 300;
+		font-size: var(--font-sm);
 	}
 </style>
