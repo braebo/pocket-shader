@@ -1,13 +1,9 @@
 {
-    "$schema": "https://jsr.io/schema/config-file.v1.json",
-    "name": "@braebo/pocket-shader",
-    "version": "0.1.0",
-    "exports": "./pocket-shader.ts",
-    "publish": {
-        "include": [
-            "pocket-shader.ts",
-            "README.md",
-            "LICENSE"
-        ]
-    }
+	"$schema": "https://jsr.io/schema/config-file.v1.json",
+	"name": "@braebo/pocket-shader",
+	"version": "0.1.0",
+	"exports": "./pocket-shader.ts",
+	"publish": {
+		"include": ["pocket-shader.ts", "README.md", "LICENSE"]
+	}
 }
