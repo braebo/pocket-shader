@@ -247,16 +247,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		if (!this.vertex.startsWith('#version')) {
 			this.vertex = '#version 300 es\n' + this.vertex
 		}
-		const prepends = []
-		if (!this.fragment.startsWith('#version')) {
-			prepends.push('#version 300 es')
-		}
-		if (!this.fragment.includes('precision')) {
-			prepends.push('precision mediump float;')
-		}
-		if (prepends.length) {
-			this.fragment = prepends.concat(this.fragment).join('\n')
-		}
+
+		const parts = this.fragment.split('\n')
+		const prepends = [parts[0].startsWith('#version') ? parts.shift() : '#version 300 es']
+		if (!this.fragment.includes('precision')) prepends.push('precision mediump float;\n')
+		this.fragment = prepends.concat(parts).join('\n')
 
 		this._uniforms = options?.uniforms ?? ({} as T)
 
@@ -387,10 +382,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		if (running) {
 			this.pause()
 		}
-		// this.state = 'disposed'
-		// this.canvas = this.canvas.cloneNode() as HTMLCanvasElement
-		// this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
-		// this.ctx = null
 		this.dispose()
 		this.state = 'stopped'
 		this.compile()
@@ -437,11 +428,25 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return this
 	}
 
+	mouse = {
+		x: 0,
+		y: 0,
+	}
+	mouseSmoothing = 0.1
+
 	setMousePosition = (e: MouseEvent | Touch): void => {
 		const rect = this.canvas.getBoundingClientRect()
-		this.builtinUniforms.u_mouse[0] = (e.clientX - rect.left) / rect.width
-		// bottom is 0 in WebGL
-		this.builtinUniforms.u_mouse[1] = (rect.height - (e.clientY - rect.top) - 1) / rect.height
+		// this.builtinUniforms.u_mouse[0] = (e.clientX - rect.left) / rect.width
+		// this.builtinUniforms.u_mouse[1] = (rect.height - (e.clientY - rect.top) - 1) / rect.height
+
+		const targetX = (e.clientX - rect.left) / rect.width
+		const targetY = (rect.height - (e.clientY - rect.top) - 1) / rect.height
+
+		this.mouse.x += (targetX - this.mouse.x) * this.mouseSmoothing
+		this.mouse.y += (targetY - this.mouse.y) * this.mouseSmoothing
+
+		this.builtinUniforms.u_mouse[0] = this.mouse.x
+		this.builtinUniforms.u_mouse[1] = this.mouse.y
 	}
 
 	setTouchPosition = (e: TouchEvent): void => {
@@ -541,6 +546,8 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		if (success) return shader
 
+		console.error('Failed to compile shader:')
+		console.error({ type, source, this: this })
 		console.error(gl.getShaderInfoLog(shader))
 		gl.deleteShader(shader)
 
@@ -686,7 +693,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 					k => k === name,
 				)
 			) {
-				console.log('%cUniform found:', 'color:lightgreen', name)
+				// console.log('%cUniform found:', 'color:lightgreen', name)
 				continue
 			}
 
