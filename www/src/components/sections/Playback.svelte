@@ -23,6 +23,8 @@
 			t = time.toFixed(2)
 		})
 
+		ps.start()
+
 		update()
 		fadeText(btnEl, 'Dispose')
 	}

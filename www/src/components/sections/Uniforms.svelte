@@ -90,7 +90,7 @@
 		<div class="label">{poly_zoom.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0.1} max={10} step={0.01} bind:value={poly_zoom} />
+		<Range min={0.1} max={5} step={0.01} bind:value={poly_zoom} />
 	</div>
 </div>
 

@@ -1,4 +1,4 @@
-uniform float u_happy;
+uniform float u_jump;
 uniform float u_time;
 uniform vec2 u_resolution;
 
@@ -8,7 +8,7 @@ out vec4 fragColor;
 // polynomial smooth min (from IQ)
 float smin(float a, float b, float k) {
     // float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
-    float h = clamp(u_happy + 0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+    float h = clamp(u_jump + 0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
     return mix(b, a, h) - k * h * (1.0 - h);
 }
 
@@ -25,8 +25,8 @@ float shoesDist(vec3 p) {
     float d = 1e4;
 
     // p.y -= 1.5;
-    // p.y -= 1.5 + u_happy;
-    p.y -= 1.25 + u_happy;
+    // p.y -= 1.5 + u_jump;
+    p.y -= 1.25 + u_jump;
 
     // right shoe
     op = p;

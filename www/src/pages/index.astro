@@ -138,40 +138,15 @@ import Dpr from '../components/sections/Dpr.svelte'
 				speed: 2,
 				autoStart: true,
 				uniforms: {
-					u_happy: { type: 'float', value: 0 },
+					u_jump: { type: 'float', value: 0 },
 				},
 				fragment: kirby,
-				// fragment: /*glsl*/ `#version 300 es
-				//     precision highp float;
-
-				//     uniform vec2 u_resolution;
-				//     uniform float u_size;
-				//     in vec2 vUv; // Receive UV coordinates from vertex shader
-				//     out vec4 fragColor;
-
-				//     void main() {
-				//         // Calculate the distance from the center of the screen
-				//         vec2 center = vec2(0.5, 0.5);
-				//         float dist = distance(vUv.xy, center);
-
-				//         // Calculate the radius based on u_size and the resolution
-				//         float radius = u_size / u_resolution.x; // Assuming u_size is in pixels
-
-				//         // If the distance is less than the radius, draw the circle
-				//         if (dist < radius) {
-				//             fragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color for the circle
-				//         } else {
-				//             fragColor = vec4(vec3(0.0), 1.0); // Black color for the background
-				//         }
-				//     }
-				// `,
 			})
 
-			ps10.on('render', ({time}) => {
-				if (ps10 && ps10.state !== 'disposed')
-					ps10.uniforms.u_happy.value = (Math.sin(time * 2) / 5)
-
-                console.log(ps10?.builtinUniforms.u_time)
+			ps10.on('render', ({ time }) => {
+				if (ps10 && ps10.state !== 'disposed') {
+					ps10.uniforms.u_jump.value = Math.sin(time * 2) / 5
+				}
 			})
 		} else {
 			target.classList.remove('active')
@@ -325,6 +300,8 @@ import Dpr from '../components/sections/Dpr.svelte'
                 import { PocketShader } from 'pocket-shader'
 
                 const ps = new PocketShader('#codeblock6')
+              
+                ps.start() // [!code highlight]
             `}
 			/>
 		</Playback>
@@ -406,14 +383,14 @@ import Dpr from '../components/sections/Dpr.svelte'
                         autoStart: true,
                         uniforms: { // [!code highlight]
                             octave: { type: 'int',   value: 3 }, // [!code highlight]
-                            outer:  { type: 'float', value: 1 }, // [!code highlight]
-                            inner:  { type: 'float', value: 1 }, // [!code highlight]
+                            zoom:   { type: 'float', value: 0 }, // [!code highlight]
+                            sphere: { type: 'float', value: 1 }, // [!code highlight]
                             // etc... // [!code highlight]
                         } // [!code highlight]
                     })
 
-                    ps.uniforms.octave = 0.1 // [!code highlight]
-                    ps.uniforms.sphere = 0.9 // [!code highlight]
+                    ps.uniforms.octave = 4 // [!code highlight]
+                    ps.uniforms.zoom = 1 // [!code highlight]
                 `}
 			/>
 		</Uniforms>
@@ -447,12 +424,12 @@ import Dpr from '../components/sections/Dpr.svelte'
                     fragment,
                     autoStart: true,
                     uniforms: { // [!code highlight]
-                        u_happy: { type: 'float', value: 0 } // [!code highlight]
+                        u_jump: { type: 'float', value: 0 } // [!code highlight]
                     }, // [!code highlight]
                 })
 
                 ps.on('render', ({ time }) => { // [!code highlight]
-                    ps.uniforms.u_happy.value = Math.sin(time) // [!code highlight]
+                    ps.uniforms.u_jump.value = Math.sin(time) // [!code highlight]
                 }) // [!code highlight]
             `}
 		/>
