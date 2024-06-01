@@ -17,6 +17,7 @@
 		ps = new PocketShader(id, {
 			autoStart: true,
 			speed: 1,
+			mouseSmoothing: 0.98,
 			fragment,
 		})
 
@@ -35,5 +36,4 @@
 
 <span><slot /></span>
 
-	<button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>Run</button>
-</section>
+<button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>Run</button>
