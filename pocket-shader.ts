@@ -220,7 +220,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	private _resizeObserver: ResizeObserver
 	private _canvasRectCache: DOMRectReadOnly
 	private _listeners = new Map<string, (data: { time: number; delta: number }) => void>()
-	private _l: (...args: any[]) => void
 
 	constructor(options?: PocketShaderOptions<T>)
 	constructor(
@@ -306,14 +305,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this._uniforms = options?.uniforms ?? ({} as T)
 
-		this._l = import.meta.env.DEV
-			? (fn: string, ...args: any[]) => {
-					const id = this.container?.id ?? ''
-					const color = idToColor(id)
-					console.log(`%c#${id} %c${fn}`, `color:${color}`, 'color:gray', ...args)
-			  }
-			: () => {}
-
 		if (this.container instanceof HTMLBodyElement) {
 			this.container = document.body
 			const w = window.innerWidth
@@ -351,7 +342,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * @throws If the {@link state} is already `disposed`.
 	 */
 	start(): this {
-		this._l('start()')
 		switch (this.state) {
 			case 'stopped':
 			case 'paused':
@@ -371,7 +361,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * Pauses the render loop.
 	 */
 	pause(): this {
-		this._l('pause()')
 		this.state = 'paused'
 		return this
 	}
@@ -380,7 +369,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * Stops the render loop and resets the time uniform to `0`.
 	 */
 	stop(): this {
-		this._l('stop()')
 		this.state = 'stopped'
 		this.time = 0
 		return this
@@ -391,7 +379,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * call {@link reload} to create a new one.
 	 */
 	restart(): this {
-		this._l('restart()')
 		switch (this.state) {
 			case 'running':
 				break
@@ -409,7 +396,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * Fully dipsoses the current WebGL context and creates a new one.
 	 */
 	reload() {
-		this._l('reload()')
 		const running = this.state === 'running'
 		if (running) {
 			this.pause()
@@ -428,7 +414,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * Resizes the canvas to fill the container.
 	 */
 	resize = () => {
-		this._l('resize()')
 		const width =
 			this.container instanceof HTMLBodyElement
 				? window.innerWidth
@@ -463,7 +448,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	render() {
-		this._l('render()')
 		let then = 0
 
 		const _render = (now: number) => {
@@ -541,8 +525,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 			if (this.state === 'running') {
 				requestAnimationFrame(_render)
-			} else {
-				this._l('render() - paused')
 			}
 		}
 
@@ -585,7 +567,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	compile() {
-		this._l('compile()')
 		this.ctx = this.canvas.getContext('webgl2')
 		if (!this.ctx) throw new Error('WebGL2 context not found.')
 
@@ -632,7 +613,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	private _setupCanvas(): void {
-		this._l('setupCanvas()')
 		if (!this.container) throw new Error('Container not found.')
 
 		this.canvas.addEventListener('mousemove', this.setMousePosition)
@@ -650,7 +630,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		vertex: WebGLShader,
 		fragment: WebGLShader,
 	): WebGLProgram {
-		this._l('createProgram()')
 		const program = gl.createProgram()!
 		gl.attachShader(program, vertex)
 		gl.attachShader(program, fragment)
@@ -667,7 +646,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	private _createShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
-		this._l('createShader()')
 		const shader = gl.createShader(type)!
 		gl.shaderSource(shader, source)
 		gl.compileShader(shader)
@@ -753,7 +731,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	private _cleanup(): void {
-		this._l('_cleanup()')
 		if (!this.container) throw new Error('Container not found.')
 		this.canvas.removeEventListener('mousemove', this.setMousePosition)
 		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
@@ -763,7 +740,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	dispose() {
-		this._l('dispose()')
 		this.state = 'disposed'
 
 		this._cleanup()
