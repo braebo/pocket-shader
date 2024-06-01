@@ -46,6 +46,7 @@
 		margin: 2rem auto 1.5rem auto;
 		font-size: 5rem;
 		padding: 0 1rem;
+		letter-spacing: -3px;
 	}
 
 	.description {
