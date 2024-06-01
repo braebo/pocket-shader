@@ -48,10 +48,10 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	speed?: number
 
 	/**
-	 * Whether to create common shadertoy uniforms.
-	 * @defaultValue `false`
+	 * The mouse smoothing factor.
+	 * @defaultValue `0.1`
 	 */
-	shadertoy?: boolean
+	mouseSmoothing?: number
 }
 
 const DEFAULT_UNIFORMS = {
@@ -122,6 +122,12 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * The WebGL program used to render the shader.
 	 */
 	program: WebGLProgram | false = false
+
+	/**
+	 * The mouse smoothing factor.
+	 * @defaultValue `0.1`
+	 */
+	mouseSmoothing = 0.1
 
 	/**
 	 * These uniforms are always available to the shader, and are updated automatically whenever
@@ -202,6 +208,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			container = document.body
 			options = arg1
 		}
+		this.mouseSmoothing = options?.mouseSmoothing ?? 0.1
 
 		if (options?.canvas) {
 			this.canvas = options.canvas
@@ -428,25 +435,107 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return this
 	}
 
-	mouse = {
-		x: 0,
-		y: 0,
+	render() {
+		this._l('render()')
+		let then = 0
+
+		const _render = (now: number) => {
+			if (this.state === 'disposed') return
+			if (!this.ctx) throw new Error('WebGL context lost.')
+
+			now *= 0.001 // convert to seconds
+			const elapsedTime = Math.min(now - then, 0.1)
+
+			if (this._listeners.size) {
+				this.emit(this.time, elapsedTime)
+			}
+
+			this.time += elapsedTime * this.speed
+			then = now
+
+			this.mouseSmoothed.x +=
+				(this.mouse.x - this.mouseSmoothed.x) * (1 - this.mouseSmoothing)
+			this.mouseSmoothed.y +=
+				(this.mouse.y - this.mouseSmoothed.y) * (1 - this.mouseSmoothing)
+
+			this.builtinUniforms.u_mouse[0] = this.mouseSmoothed.x
+			this.builtinUniforms.u_mouse[1] = this.mouseSmoothed.y
+
+			// Tell WebGL how to convert from clip space to pixels.
+			this.ctx.viewport(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+
+			// Tell it to use our program (pair of shaders).
+			this.ctx.useProgram(this.program)
+
+			const positionAttributeLocation = this._builtinUniformLocations.get('a_position')!
+			const resolutionLocation = this._builtinUniformLocations.get('u_resolution')!
+			const mouseLocation = this._builtinUniformLocations.get('u_mouse')!
+			const timeLocation = this._builtinUniformLocations.get('u_time')!
+
+			// Turn on the attribute.
+			this.ctx.enableVertexAttribArray(positionAttributeLocation as number)
+
+			// Bind the position buffer.
+			this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this._positionBuffer)
+
+			// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER).
+			this.ctx.vertexAttribPointer(
+				positionAttributeLocation as number,
+				2, // 2 components per iteration
+				this.ctx.FLOAT, // the data is 32bit floats
+				false, // don't normalize the data
+				0, // 0 = move forward size * sizeof(type) each iteration to get the next position
+				0, // start at the beginning of the buffer
+			)
+
+			// this.ctx.uniform2f(resolutionLocation, this.ctx.canvas.width, this.ctx.canvas.height)
+			this.ctx.uniform2f(
+				resolutionLocation,
+				this.builtinUniforms.u_resolution[0],
+				this.builtinUniforms.u_resolution[1],
+			)
+			this.ctx.uniform2f(
+				mouseLocation,
+				this.builtinUniforms.u_mouse[0],
+				this.builtinUniforms.u_mouse[1],
+			)
+			this.ctx.uniform1f(timeLocation, this.builtinUniforms.u_time)
+
+			// todo - Dynamic uniforms instead?
+			for (const [key, value] of this._uniformLocations) {
+				this._setUniform(this.ctx, value, this.uniforms[key])
+			}
+
+			this.ctx.drawArrays(
+				this.ctx.TRIANGLES,
+				0, // offset
+				6, // num vertices to process
+			)
+
+			if (this.state === 'running') {
+				requestAnimationFrame(_render)
+			} else {
+				this._l('render() - paused')
+			}
+		}
+
+		requestAnimationFrame(_render)
+
+		return this
 	}
-	mouseSmoothing = 0.1
 
+	/**
+	 * This method runs in the `mousemove` event listener on the canvas element, and:
+	 * 1. Calculates the mouse position relative to the canvas.
+	 * 1. Normalizes it to the range `[0, 1]`.
+	 * 1. Applies the {@link mouseSmoothing|`mouseSmoothing`} factor.
+	 * 1. Updates the `u_mouse` uniform.
+	 */
 	setMousePosition = (e: MouseEvent | Touch): void => {
-		const rect = this.canvas.getBoundingClientRect()
-		// this.builtinUniforms.u_mouse[0] = (e.clientX - rect.left) / rect.width
-		// this.builtinUniforms.u_mouse[1] = (rect.height - (e.clientY - rect.top) - 1) / rect.height
-
-		const targetX = (e.clientX - rect.left) / rect.width
-		const targetY = (rect.height - (e.clientY - rect.top) - 1) / rect.height
-
-		this.mouse.x += (targetX - this.mouse.x) * this.mouseSmoothing
-		this.mouse.y += (targetY - this.mouse.y) * this.mouseSmoothing
-
-		this.builtinUniforms.u_mouse[0] = this.mouse.x
-		this.builtinUniforms.u_mouse[1] = this.mouse.y
+		this.mouse.x = (e.clientX - this._canvasRectCache.left) / this._canvasRectCache.width
+		this.mouse.y =
+			(this._canvasRectCache.height - (e.clientY - this._canvasRectCache.top) - 1) /
+			this._canvasRectCache.height
 	}
 
 	setTouchPosition = (e: TouchEvent): void => {
@@ -552,87 +641,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		gl.deleteShader(shader)
 
 		return false
-	}
-
-	private _render() {
-		this._l('render()')
-		let then = 0
-
-		const render = (now: number) => {
-			if (this.state === 'disposed') return
-			if (!this.ctx) throw new Error('WebGL context lost.')
-
-			now *= 0.001 // convert to seconds
-			const elapsedTime = Math.min(now - then, 0.1)
-
-			if (this._listeners.size) {
-				this.emit(this.time, elapsedTime)
-			}
-
-			this.time += elapsedTime * this.speed
-			then = now
-
-			// Tell WebGL how to convert from clip space to pixels.
-			this.ctx.viewport(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
-
-			// Tell it to use our program (pair of shaders).
-			this.ctx.useProgram(this.program)
-
-			const positionAttributeLocation = this._builtinUniformLocations.get('a_position')!
-			const resolutionLocation = this._builtinUniformLocations.get('u_resolution')!
-			const mouseLocation = this._builtinUniformLocations.get('u_mouse')!
-			const timeLocation = this._builtinUniformLocations.get('u_time')!
-
-			// Turn on the attribute.
-			this.ctx.enableVertexAttribArray(positionAttributeLocation as number)
-
-			// Bind the position buffer.
-			this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this._positionBuffer)
-
-			// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER).
-			this.ctx.vertexAttribPointer(
-				positionAttributeLocation as number,
-				2, // 2 components per iteration
-				this.ctx.FLOAT, // the data is 32bit floats
-				false, // don't normalize the data
-				0, // 0 = move forward size * sizeof(type) each iteration to get the next position
-				0, // start at the beginning of the buffer
-			)
-
-			// this.ctx.uniform2f(resolutionLocation, this.ctx.canvas.width, this.ctx.canvas.height)
-			this.ctx.uniform2f(
-				resolutionLocation,
-				this.builtinUniforms.u_resolution[0],
-				this.builtinUniforms.u_resolution[1],
-			)
-			this.ctx.uniform2f(
-				mouseLocation,
-				this.builtinUniforms.u_mouse[0],
-				this.builtinUniforms.u_mouse[1],
-			)
-			this.ctx.uniform1f(timeLocation, this.builtinUniforms.u_time)
-
-			// todo - Dynamic uniforms instead?
-			for (const [key, value] of this._uniformLocations) {
-				this._setUniform(this.ctx, value, this.uniforms[key])
-			}
-
-			this.ctx.drawArrays(
-				this.ctx.TRIANGLES,
-				0, // offset
-				6, // num vertices to process
-			)
-
-			if (this.state === 'running') {
-				requestAnimationFrame(render)
-			} else {
-				this._l('render() - paused')
-			}
-		}
-
-		requestAnimationFrame(render)
-
-		return this
 	}
 
 	private _initializeUniforms(userUniforms: T | undefined): T {
