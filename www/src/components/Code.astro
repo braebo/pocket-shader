@@ -4,6 +4,7 @@ import { Code as AstroCode } from 'astro:components'
 import { dedent } from '../utils/dedent.ts'
 import Copy from './Copy.svelte'
 import {
+	transformerNotationWordHighlight,
 	transformerNotationHighlight,
 	transformerNotationFocus,
 	transformerNotationDiff,
@@ -16,6 +17,7 @@ interface Props {
 	lang?: string
 	fontSize?: string
 	lineHeight?: string
+	title?: string
 }
 
 const {
@@ -25,23 +27,36 @@ const {
 	lang = 'ts',
 	fontSize = 'var(--font-sm)',
 	lineHeight = 'var(--ling-height-sm)',
+	title = '',
 } = Astro.props
-
-
-
-
 ---
 
-<div class="code-container" id={id}>
-	<div class="code-padding"></div>
-	
-	<div class="code-container-inner" style=`font-size:${fontSize};line-height:${lineHeight}`>
-		<div class="copy-button-container">
-			<Copy text={code} client:load />
-		</div>
+<div class="outer">
+	{title && <label>{title}</label>}
+	<div class="code-container" id={id}>
+		<div class="code-padding"></div>
 
-		{codes.length ? (
-				codes.map(({lang, code, trim = true}, i) => (
+		<div class="inner" style=`font-size:${fontSize};line-height:${lineHeight}`>
+			<div class="copy-button-container">
+				<Copy text={code} client:load />
+			</div>
+
+			{codes.length ? (
+					codes.map(({lang, code, trim = false}) => (
+						<!-- @ts-ignore -->
+						<AstroCode
+							lang={lang}
+							theme="poimandres"
+							transformers={[
+								transformerNotationFocus(),
+								transformerNotationDiff(),
+								transformerNotationHighlight(),
+								transformerNotationWordHighlight(),
+							]}
+							code={trim ? dedent(code) : code}
+						/>
+					))
+			) : (
 					<!-- @ts-ignore -->
 					<AstroCode
 						lang={lang}
@@ -50,31 +65,26 @@ const {
 							transformerNotationFocus(),
 							transformerNotationDiff(),
 							transformerNotationHighlight(),
-						]}
-						code={trim ? dedent(code) : code}
-					/>
-				))
-		) : (
-				<!-- @ts-ignore -->
-				<AstroCode
-					lang={lang}
-					theme="poimandres"
-					transformers={[
-						transformerNotationFocus(),
-						transformerNotationDiff(),
-						transformerNotationHighlight(),
+							transformerNotationWordHighlight()
 					]}
-					code={dedent(code)}
-				/>
-		)
-		}
+						code={dedent(code)}
+					/>
+			)
+			}
+		</div>
+		<div class="code-padding"></div>
 	</div>
-	<div class="code-padding"></div>
 </div>
 
 <style is:global>
 	.astro-code {
 		background-color: transparent !important;
+	}
+	.outer {
+		position: relative;
+		width: fit-content;
+		max-width: 100%;
+		margin: auto;
 	}
 	div.code-container {
 		--bg: #1b1e28;
@@ -103,7 +113,13 @@ const {
 		font-variation-settings: 'wght' 200;
 		line-height: var(--line-height-sm);
 
-		div.code-container-inner {
+		div.inner {
+		}
+	}
+	.outer:has(label) {
+		margin-top: 1rem;
+		.code-container {
+			border-top-left-radius: 0;
 		}
 	}
 	.code-padding {
@@ -113,7 +129,7 @@ const {
 		z-index: -1;
 	}
 
-	.code-container-inner {
+	.inner {
 		z-index: 0;
 	}
 
@@ -124,14 +140,34 @@ const {
 		filter: blur(0);
 	}
 
-	.has-highlighted .line {
-		opacity: 0.75;
-		filter: brightness(0.7) saturate(0.7) contrast(0.9);
+	.has-highlighted {
+		.line {
+			opacity: 0.75;
+			filter: brightness(0.7) saturate(0.7);
+
+			&:has(.highlighted-word) {
+				opacity: 1;
+				filter: brightness(1) saturate(1);
+
+				.highlighted-word {
+					opacity: 1;
+					filter: brightness(1.25) saturate(1.25);
+					font-variation-settings: 'wght' 500;
+				}
+
+				&:not(.highlighted) span:not(.highlighted-word) {
+					opacity: 0.75;
+					filter: brightness(0.7) saturate(0.7);
+				}
+			}
+		}
+
+		.highlighted {
+			opacity: 1;
+			filter: brightness(1.2) saturate(1.2);
+		}
 	}
-	.has-highlighted .highlighted {
-		opacity: 1;
-		filter: brightness(1.2) saturate(1.2) contrast(1.1);
-	}
+	
 
 	pre.astro-code code {
 		position: relative;
@@ -158,5 +194,20 @@ const {
 	code,
 	pre {
 		overflow: visible;
+	}
+
+	label {
+		position: absolute;
+		top: -1.5rem;
+		background: #11131a;
+		color: var(--fg-d);
+		color: #707887;
+		padding: 0.25rem 0.75rem;
+		font-size: 0.8rem;
+		font-variation-settings: 'wght' 100;
+		font-family: var(--font-mono);
+		border-radius: 0.25rem;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
 	}
 </style>
