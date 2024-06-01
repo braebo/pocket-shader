@@ -4,7 +4,7 @@
 	let hovering = false
 </script>
 
-<div style="height:3rem"></div>
+<!-- <div style="height:3rem"></div> -->
 <h1 class="hero-text text-gradient-animated">Pocket Shader</h1>
 
 <p class="description gradient-outline">
@@ -43,7 +43,7 @@
 
 <style lang="scss">
 	.hero-text {
-		margin: 2rem auto 1rem auto;
+		margin: 2rem auto 1.5rem auto;
 		font-size: 5rem;
 		padding: 0 1rem;
 	}
