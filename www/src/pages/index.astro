@@ -4,8 +4,10 @@ import HeroSection from '../components/HeroSection.svelte'
 import Layout from '../layouts/Layout.astro'
 import Code from '../components/Code.astro'
 
+import MouseSmoothing from '../components/sections/MouseSmoothing.svelte'
 import Playback from '../components/sections/Playback.svelte'
 import Uniforms from '../components/sections/Uniforms.svelte'
+import Shaders from '../components/sections/Shaders.svelte'
 import Speed from '../components/sections/Speed.svelte'
 import Dpr from '../components/sections/Dpr.svelte'
 ---
@@ -86,7 +88,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 		if (target.textContent === 'Run') {
 			if (ps4?.state !== 'disposed') {
 				fadeText(target, 'Dispose')
-				ps4 ||= new PocketShader('#codeblock3-3', {
+				ps4 ||= new PocketShader('#codeblock3-4', {
 					autoStart: true,
 					fragment: dedent(`
                     uniform float u_time;
@@ -129,12 +131,12 @@ import Dpr from '../components/sections/Dpr.svelte'
 	})
 
 	let ps10: PocketShader | null = null
-	document.querySelector('#run10')?.addEventListener('click', e => {
+	document.querySelector('#run11')?.addEventListener('click', e => {
 		const target = e.target as HTMLButtonElement
 		if (target.textContent === 'Run') {
 			target.classList.add('active')
 			fadeText(target, 'Dispose')
-			ps10 = new PocketShader('#codeblock10', {
+			ps10 = new PocketShader('#codeblock11', {
 				speed: 2,
 				autoStart: true,
 				uniforms: {
@@ -159,103 +161,90 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 <Layout title="pocket-shader">
 	<div class="page">
+		<main>
+			<br />
 
-		<HeroSection client:load />
+			<HeroSection client:load />
+		</main>
 
-		<!-- <div style="height:10rem;"></div> -->
-	</main>
+		<h2 id="usage">Usage</h2>
 
-	<!-- <ul class="toc">
-        <li class="toc-item">
-            <a href="#usage">Usage</a>
-        </li>
-        <li class="toc-item">
-            <a href="#usage">ShaderToy</a>
-        </li>
-    </ul> -->
+		<section>
+			<p>
+				By default, <code>PocketShader</code> will create a fullscreen canvas element and append
+				it to the body.
+			</p>
 
-	<h2 id="usage">Usage</h2>
-
-	<section>
-		<p>
-			By default, <code>PocketShader</code> will create a fullscreen canvas element and append
-			it to the body.
-		</p>
-
-		<Code
-			id="ps1"
-			code={/*js*/ `
+			<Code
+				id="ps1"
+				code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
 
                 new PocketShader()
             `}
-		/>
+			/>
 
-		<button class="btn" id="run1">Run</button>
-	</section>
+			<button class="btn" id="run1">Run</button>
+		</section>
 
-	<section>
-		<p>To render to a specific container, pass an element or selector.</p>
+		<section>
+			<p>To render to a specific container, pass an element or selector.</p>
 
-		<Code
-			id="codeblock2"
-			code={/*js*/ `
+			<Code
+				id="codeblock2"
+				code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
 
                 new PocketShader('#codeblock2')
             `}
-		/>
+			/>
 
-		<button class="btn" id="run2">Run</button>
-	</section>
+			<button class="btn" id="run2">Run</button>
+		</section>
 
-	<section style="max-width: 30rem;">
-		<p>
-			Shaders can be passed into the <code>fragment</code> and/or
-			<code>vertex</code> options.
-		</p>
+		<section>
+			<p>
+				Shaders can be passed into the <code>fragment</code> and/or
+				<code>vertex</code> options.
+			</p>
 
-		<Code
-			id="codeblock3-3"
-			code=""
-			fontSize="0.8rem"
-			code={`new PocketShader('#codeblock3', { // [!code highlight]
-              vertex: ${'`'} // [!code highlight]
-                // The default vertex shader if none is provided. // [!code highlight]
-                in vec4 a_position;
-                out vec2 vUv;
-                void main() {
-                  vUv = a_position.xy;
-                  gl_Position = a_position;
-                } // [!code highlight]
-              ${'`'},
-              fragment: ${'`'} // [!code highlight]
-                // These 3 uniforms are always available. // [!code highlight]
-                uniform float u_time;
-                uniform vec2 u_mouse;
-                uniform vec2 u_resolution;
-                
-                in vec2 vUv;
-                out vec4 color;
-                
-                void main() {
-                  vec2 p = vUv - 0.5;
-                  vec2 m = u_mouse - 0.5;
-                  float angle = atan(p.y, p.x) - atan(m.y, m.x);
-                  color = vec4(0.5 + 0.5 * cos(angle), m.x + 0.5, m.y + 0.5, 1.0);
-                }
-              ${'`'}
-            })`}
-		/>
+			<Shaders id="#codeblock3-3" client:load>
+				<Code
+					id="codeblock3-3"
+					slot="default"
+					code={/*ts*/ `import { PocketShader } from 'pocket-shader'
 
-		<button class="btn" id="run4">Run</button>
-	</section>
+                  const ps = new PocketShader('#codeblock3', { // [!code highlight]
+                    fragment: ${'`'} // [!code highlight]
+                      uniform float u_time;
+                      uniform vec2 u_mouse;
 
-	<Importing client:load id="#codeblock4">
-		<Code
-			slot="code4"
-			id="codeblock4"
-			code={/*glsl*/ `
+                      in vec2 vUv;
+                      out vec4 color;
+
+                      void main() {
+                        vec2 p = vUv - 0.5, m = u_mouse - 0.5;
+                        float a = atan(p.y, p.x) - atan(m.y, m.x);
+                        float c = 0.5 + 0.5 * cos(a);
+                        color = vec4(c, m.x + 0.5 * c, m.y + 0.5 * c, 1.0);
+                      }
+                    ${'`'} // [!code highlight]
+                  })
+                `}
+				/>
+			</Shaders>
+		</section>
+
+		<section>
+			<p>
+				Bundlers like <code>vite</code> make it easy to import your shaders directly from
+				<code>.glsl</code> files.
+			</p>
+			<Importing client:load id="#codeblock4">
+				<Code
+					slot="default"
+					id="codeblock4"
+					code={/*glsl*/ `
                     import { PocketShader } from 'pocket-shader'
                     import myShader from './clouds.glsl?raw' // [!code highlight]
 
@@ -264,63 +253,99 @@ import Dpr from '../components/sections/Dpr.svelte'
                         fragment: myShader // [!code highlight]
                     })
                 `}
-		/>
-	</Importing>
+				/>
+			</Importing>
+		</section>
 
-	<h2 id="animation">Animation</h2>
+		<section>
+			<p>The default shader values are:</p>
 
-	<section>
-		<p>The <code>autoStart</code> option will automatically start an animation loop.</p>
+			<Code
+				id="default-vert"
+				title="default.vert"
+				lang="glsl"
+				code={/*glsl*/ `in vec4 a_position;
+              out vec2 vUv;
+              
+              void main() {
+                  vUv = a_position.xy;
+                  gl_Position = a_position;
+              }`}
+			/>
 
-		<Code
-			id="codeblock5"
-			code={/*js*/ `
+			<Code
+				id="default-frag"
+				title="default.frag"
+				lang="glsl"
+				code={/*glsl*/ `#version 300 es
+                precision mediump float;
+
+                in vec2 vUv;
+                out vec4 color;
+
+                uniform float u_time;
+
+                void main() {
+                    color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
+                }`}
+			/>
+
+			<p>
+				<em>note:</em>
+				<code>#version</code> and <code>precision</code> are automatically injected
+				<em>(if missing)</em>.
+			</p>
+		</section>
+
+		<h2 id="animation">Animation</h2>
+
+		<section>
+			<p>The <code>autoStart</code> option will automatically start an animation loop.</p>
+
+			<Code
+				id="codeblock5"
+				code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
 
                 new PocketShader('#codeblock5', {
                     autoStart: true // [!code highlight]
                 })
             `}
-		/>
+			/>
 
-		<button class="btn" id="run5">Run</button>
-	</section>
+			<button class="btn" id="run5">Run</button>
+		</section>
 
-	<section>
-		<p>
-			The animation loop can be controlled with methods like <code>start()</code>
-			and <code>stop()</code>.
-		</p>
-		<Playback client:load id="#codeblock6">
-			<Code
-				slot="code"
-				id="codeblock6"
-				code={/*js*/ `
+		<section>
+			<p>
+				The animation loop can be controlled with methods like <code>start()</code>
+				and <code>stop()</code>.
+			</p>
+			<Playback client:load id="#codeblock6">
+				<Code
+					slot="default"
+					id="codeblock6"
+					code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
 
                 const ps = new PocketShader('#codeblock6')
               
                 ps.start() // [!code highlight]
             `}
-			/>
-		</Playback>
-		<!-- <p>
-            <em>
-                Notice that calling <code>stop()</code> resets <code>time</code> to <code>0</code>.
-            </em>
-        </p> -->
-	</section>
+				/>
+			</Playback>
+		</section>
 
-	<section>
-		<p>
-			The <code>speed</code> can be passed as an option, or adjusted freely on each instance.
-		</p>
+		<section>
+			<p>
+				The <code>speed</code> can be passed as an option, or adjusted freely on each instance.
+			</p>
 
-		<Speed speed={2} id="#codeblock7" client:idle>
-			<Code
-				id="codeblock7"
-				slot="code"
-				code={/*js*/ `
+			<Speed speed={2} id="#codeblock7" client:idle>
+				<Code
+					id="codeblock7"
+					slot="code"
+					code={/*js*/ `
                     import { PocketShader } from 'pocket-shader'
 
                     new PocketShader('#codeblock7', {
@@ -328,26 +353,26 @@ import Dpr from '../components/sections/Dpr.svelte'
                         speed: 2 // [!code highlight]
                     })
                 `}
-			/>
-		</Speed>
-	</section>
+				/>
+			</Speed>
+		</section>
 
-	<section>
-		<p>
-			The <code>maxPixelRatio</code> will limit the pixel ratio of the canvas, which is determined
-			by the device's pixel ratio by default.
-		</p>
+		<section>
+			<p>
+				The <code>maxPixelRatio</code> will limit the pixel ratio of the canvas, which is determined
+				by the device's pixel ratio by default.
+			</p>
 
-		<p>
-			Lowering this can increse performance significantly depending on the size of the canvas
-			/ DPI of the screen.
-		</p>
+			<p>
+				Lowering this can increse performance significantly depending on the size of the
+				canvas / DPI of the screen.
+			</p>
 
-		<Dpr dpr={0.1} id="#codeblock8" client:idle>
-			<Code
-				id="codeblock8"
-				slot="code"
-				code={/*js*/ `
+			<Dpr dpr={0.1} id="#codeblock8" client:idle>
+				<Code
+					id="codeblock8"
+					slot="default"
+					code={/*js*/ `
                     import myShader from './dyingUniverse.glsl?raw'
                     import { PocketShader } from 'pocket-shader'
 
@@ -357,23 +382,42 @@ import Dpr from '../components/sections/Dpr.svelte'
                         autoStart: true,
                     })
                 `}
-			/>
-		</Dpr>
-	</section>
+				/>
+			</Dpr>
+		</section>
 
-	<h2 id="uniforms">Uniforms</h2>
+		<h2 id="uniforms">Uniforms</h2>
 
-	<section>
-		<p>
-			The <code>uniforms</code> option allows you to specify custom uniforms. They can be accessed
-			anytime with <code>ps.uniforms</code>, and will auto-update in the shader when changed.
-		</p>
+		<section>
+			<p>The built-in uniforms are always available:</p>
 
-		<Uniforms id="#codeblock9" client:idle>
 			<Code
-				id="codeblock9"
-				slot="code"
-				code={/*js*/ `
+				id="uniforms"
+				lang="glsl"
+				code={/*glsl*/ `
+                    uniform vec2  u_resolution;
+                    uniform float u_time;
+                    uniform vec2  u_mouse;
+                    
+                    in vec2 vUv;
+                `}
+			/>
+
+			<br />
+
+			<p>
+				The <code>uniforms</code> option accepts custom uniforms.
+			</p>
+			<p>
+				They can be accessed anytime with <code>ps.uniforms</code> and will auto-update in the
+				shader when changed.
+			</p>
+
+			<Uniforms id="#codeblock9" client:idle>
+				<Code
+					id="codeblock9"
+					slot="code"
+					code={/*js*/ `
                     import { PocketShader } from 'pocket-shader'
                     import myShader from './clouds.glsl?raw'
 
@@ -388,38 +432,122 @@ import Dpr from '../components/sections/Dpr.svelte'
                         } // [!code highlight]
                     })
 
-                    ps.uniforms.octave = 4 // [!code highlight]
-                    ps.uniforms.zoom = 1 // [!code highlight]
+                    // Update them later // [!code highlight]
+                    ps.uniforms.octave.value = 4 // [!code highlight]
+                    ps.uniforms.zoom.value = 1 // [!code highlight]
+                `}
+				/>
+			</Uniforms>
+
+			<br />
+
+			<p class="note" style="text-wrap: pretty">
+				For now, <code>uniforms</code> must be <code>&#123;type,value&#125;</code> objects.&nbsp;&nbsp;In
+				the future, it will accept primitive values and infer the <code>type</code> internally.
+				<br /><em>(just ran out of time for now...)</em>
+			</p>
+		</section>
+
+		<section>
+			<h3 id="mouse-position">Mouse Position</h3>
+			<p>
+				The mouse position is available in the uniform <code>u_mouse</code>, normalized to
+				<code>vec2(0-1)</code>.
+			</p>
+
+			<Code
+				id="mousePosition"
+				slot="code"
+				code={`const ps = new PocketShader({ // [!code highlight]
+                  fragment: ${'`'} // [!code highlight]
+                  // [!code word:u_resolution:1]
+                    uniform vec2 u_resolution; // [!code highlight]
+                    // [!code word:u_mouse:1]
+                    uniform vec2 u_mouse; // [!code highlight]
+
+                    in vec2 vUv;
+                    out vec4 color;
+                    
+                    void main() {
+                      vec2 uv = vUv * u_resolution;
+                      float size = u_resolution.x * 0.05;
+
+                      // [!code word:mousePos:1]
+                      vec2 mousePos = u_mouse * u_resolution; // [!code highlight]
+
+                      float dist = length(uv - mousePos);
+                      float circle = smoothstep(size, size - 0.1, dist);
+                      float glowEffect = exp(-dist * 0.1);
+
+                      color = vec4(vec3(circle * glowEffect), 1.0);
+                    }
+                  ${'`'}, // [!code highlight]
+                }) // [!code highlight]
+            `}
+			/>
+
+			<p>
+				It can be manually updated on the instance with <code>ps.mouse</code>.
+			</p>
+
+			<Code
+				id="mousePosition"
+				slot="code"
+				code={`
+                /**
+                 * Always keep the mouse position updated,
+                 * even while outside the canvas bounds.
+                 */
+                window.addEventListener('mousemove', e => {
+                  ps.mouse = {
+                    x: e.clientX
+                    y: e.clientY
+                  }
+                })
                 `}
 			/>
-		</Uniforms>
 
-		<br />
+			<!-- <h3 id="mouse-smoothing">Mouse Smoothing</h3> -->
 
-		<p class="note" style="text-wrap: pretty">
-			For now, <code>uniforms</code> must be <code>&#123;type,value&#125;</code> objects.&nbsp;&nbsp;In
-			the future, it will accept primitive values and infer the <code>type</code> internally.
-			<br /><em>(just ran out of time for now...)</em>
-		</p>
-	</section>
+			<p>
+				<code>mouseSmoothing</code> can be passed in as an option, and/or updated on an instance.
+			</p>
+			<p>
+				It ranges from 0-1, where 0 is no smoothing, and 1 is infinite smoothing.
+			</p>
 
-	<section>
+			<MouseSmoothing id="#codeblock10" client:idle smoothing={0.95}>
+				<Code
+					id="codeblock10"
+					slot="code"
+					fontSize="0.8rem"
+					code={`const ps = new PocketShader('#codeblock10', {
+                  mouseSmoothing: 0.8, // [!code highlight]
+                  fragment: ${'`'}... // [!code highlight]
+                })
+
+                ps.mouseSmoothing = 0.95 // [!code highlight]
+                `}
+				/>
+			</MouseSmoothing>
+		</section>
+
 		<h2 id="events">Events</h2>
+		<section>
+			<p>
+				The <code>on</code> method allows you to listen for the <code>'render'</code> event,
+				which fires before each frame. This is useful for updating uniforms or other properties
+				before the frame is drawn.
+			</p>
 
-		<p>
-			The <code>on</code> method allows you to listen for the <code>'render'</code> event, which
-			fires before each frame. This is useful for updating uniforms or other properties before
-			the frame is drawn.
-		</p>
-
-		<Code
-			id="codeblock10"
-			fontSize="0.75rem"
-			code={/*js*/ `
+			<Code
+				id="codeblock11"
+				fontSize="0.75rem"
+				code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
                 import fragment from './kirby.frag?raw'
 
-                const ps = new PocketShader('#codeblock10', {
+                const ps = new PocketShader('#codeblock11', {
                     fragment,
                     autoStart: true,
                     uniforms: { // [!code highlight]
@@ -431,10 +559,12 @@ import Dpr from '../components/sections/Dpr.svelte'
                     ps.uniforms.u_jump.value = Math.sin(time) // [!code highlight]
                 }) // [!code highlight]
             `}
-		/>
+			/>
 
-		<button class="btn" id="run10">Run</button>
+			<button class="btn" id="run11">Run</button>
 
+			<p>More events will likely be added in the future.</p>
+		</section>
 	</div>
 
 	<style>

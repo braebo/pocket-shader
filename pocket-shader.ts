@@ -88,17 +88,44 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 	/**
 	 * The vertex shader used by this instance.
+	 * @default
+	 * ```glsl
+	 * #version 300 es
+	 * in vec4 a_position;
+	 * out vec2 vUv;
+	 * void main() {
+	 *   vUv = a_position.xy * 0.5 + 0.5;
+	 *   gl_Position = a_position;
+	 * }
+	 * ```
 	 */
 	vertex: string
 
 	/**
 	 * The fragment shader used by this instance.
+	 * @default
+	 * ```glsl
+	 * #version 300 es
+	 * precision mediump float;
+	 *
+	 * in vec2 vUv;
+	 * out vec4 color;
+	 *
+	 * uniform float u_time;
+	 * uniform float u_mouse;
+	 * uniform vec2 u_resolution;
+	 *
+	 * void main() {
+	 *   color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
+	 * }
+	 *```
 	 */
 	fragment: string
 
 	/**
 	 * The maximum resolution multiplier, determined by the device pixel
 	 * ratio by default.
+	 * @defaultValue `window.devicePixelRatio || 1`
 	 */
 	maxPixelRatio: number
 
@@ -110,6 +137,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 	/**
 	 * The current state of the renderer.
+	 * @defaultValue `'stopped'`
 	 */
 	state: 'running' | 'paused' | 'stopped' | 'disposed' = 'stopped'
 
@@ -124,6 +152,18 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	program: WebGLProgram | false = false
 
 	/**
+	 * The current mouse position normalized, to the range `[0, 1]`.
+	 * @defaultValue `{ x: 0.5, y: 0.5 }`
+	 */
+	mouse = { x: 0.5, y: 0.5 }
+
+	/**
+	 * The current _smoothed_ mouse position, normalized to the range `[0, 1]`.
+	 * @defaultValue `{ x: 0.5, y: 0.5 }`
+	 */
+	mouseSmoothed = { x: 0.5, y: 0.5 }
+
+	/**
 	 * The mouse smoothing factor.
 	 * @defaultValue `0.1`
 	 */
@@ -132,6 +172,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * These uniforms are always available to the shader, and are updated automatically whenever
 	 * the shader state is `running`.
+	 * @defaultValue `{ u_time: 0, u_resolution: [0, 0], u_mouse: [0.5, 0.5] }`
 	 */
 	builtinUniforms = {
 		u_time: 0,
@@ -139,12 +180,28 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		u_mouse: [0.5, 0.5] as [number, number],
 	}
 
+	private _positionBuffer: WebGLBuffer | null = null
 	private _builtinUniformLocations = new Map<string, WebGLUniformLocation>()
 	private _uniformLocations = new Map<string, WebGLUniformLocation>()
-
-	private _listeners = new Map<string, (data: { time: number; delta: number }) => void>()
-	private _positionBuffer: WebGLBuffer | null = null
-	private _l: (...args: any[]) => void
+	private _uniforms: { [K in keyof T]: T[K] }
+	/**
+	 * A record of uniform values to pass to the shader.
+	 */
+	get uniforms() {
+		return new Proxy(this._uniforms, {
+			set: (target, property, value) => {
+				// @ts-expect-error
+				target[property] = value
+				if (this.state.match(/paused|stopped/)) {
+					this.render()
+				}
+				return true
+			},
+		})
+	}
+	set uniforms(value: T) {
+		this._uniforms = value
+	}
 
 	private _time = 0
 	/**
@@ -160,25 +217,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.builtinUniforms.u_time = value
 	}
 
-	private _uniforms: { [K in keyof T]: T[K] }
-	/**
-	 * A record of uniform values to pass to the shader.
-	 */
-	get uniforms() {
-		return new Proxy(this._uniforms, {
-			set: (target, property, value) => {
-				// @ts-expect-error
-				target[property] = value
-				if (this.state.match(/paused|stopped/)) {
-					this._render()
-				}
-				return true
-			},
-		})
-	}
-	set uniforms(value: T) {
-		this._uniforms = value
-	}
+	private _resizeObserver: ResizeObserver
+	private _canvasRectCache: DOMRectReadOnly
+	private _listeners = new Map<string, (data: { time: number; delta: number }) => void>()
+	private _l: (...args: any[]) => void
 
 	constructor(options?: PocketShaderOptions<T>)
 	constructor(
@@ -208,7 +250,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			container = document.body
 			options = arg1
 		}
+
+		this.opts = options ?? {}
+		this.speed = options?.speed ?? 1
 		this.mouseSmoothing = options?.mouseSmoothing ?? 0.1
+		this.maxPixelRatio = options?.maxPixelRatio ?? (globalThis.window?.devicePixelRatio || 1)
 
 		if (options?.canvas) {
 			this.canvas = options.canvas
@@ -217,36 +263,34 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			this.canvas = document.createElement('canvas')
 		}
 
-		this.opts = options ?? {}
-		this.speed = options?.speed ?? 1
-		this.maxPixelRatio = options?.maxPixelRatio ?? (globalThis.window?.devicePixelRatio || 1)
 		this.container = container ?? document.body
+		this._canvasRectCache = this.canvas.getBoundingClientRect()
 
 		this.vertex =
 			options?.vertex ??
 			dedent(/*glsl*/ `
-				#version 300 es
+                #version 300 es
 
-        		in vec4 a_position;
-        		out vec2 vUv;
+                in vec4 a_position;
+                out vec2 vUv;
 
-				void main() {
-        		    vUv = a_position.xy * 0.5 + 0.5;
-        		    gl_Position = a_position;
-        		}
+                void main() {
+                    vUv = a_position.xy * 0.5 + 0.5;
+                    gl_Position = a_position;
+                }
             `)
 
 		this.fragment =
 			options?.fragment ??
 			dedent(/*glsl*/ `
-				#version 300 es
+                #version 300 es
                 precision mediump float;
 
-				uniform float u_time;
-				in vec2 vUv;
-				out vec4 color;
+                uniform float u_time;
+                in vec2 vUv;
+                out vec4 color;
 
-				void main() {
+                void main() {
                     color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
                 }
             `)
@@ -254,7 +298,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		if (!this.vertex.startsWith('#version')) {
 			this.vertex = '#version 300 es\n' + this.vertex
 		}
-
+		// Fill in `#version` / `precision` directives if missing.
 		const parts = this.fragment.split('\n')
 		const prepends = [parts[0].startsWith('#version') ? parts.shift() : '#version 300 es']
 		if (!this.fragment.includes('precision')) prepends.push('precision mediump float;\n')
@@ -288,6 +332,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 
 		this._setupCanvas()
+
+		this._resizeObserver = new ResizeObserver(this.resize)
+		this._resizeObserver.observe(this.canvas)
+
 		this.compile()
 
 		if (options?.autoStart === true) {
@@ -295,29 +343,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		} else {
 			this.resize()
 		}
-	}
-
-	private _setupCanvas(): void {
-		this._l('setupCanvas()')
-		if (!this.container) throw new Error('Container not found.')
-
-		this.canvas.addEventListener('mousemove', this.setMousePosition)
-		this.canvas.addEventListener('touchmove', this.setTouchPosition, { passive: false })
-
-		if (!Array.from(this.container.children).includes(this.canvas)) {
-			this.container.appendChild(this.canvas)
-		}
-
-		window.addEventListener('resize', this.resize)
-	}
-
-	private _removeListeners(): void {
-		this._l('_removeListeners()')
-		if (!this.container) throw new Error('Container not found.')
-		this.canvas.removeEventListener('mousemove', this.setMousePosition)
-		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
-		window.removeEventListener('resize', this.resize)
-		this._listeners.clear()
 	}
 
 	/**
@@ -332,7 +357,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			case 'paused':
 				this.state = 'running'
 				this.resize()
-				this._render()
+				this.render()
 				break
 			case 'running':
 				break
@@ -428,8 +453,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			this.builtinUniforms.u_resolution[1] = height * this.maxPixelRatio
 		}
 
+		this._canvasRectCache = this.canvas.getBoundingClientRect()
+
 		if (this.state.match(/paused|stopped/)) {
-			this._render()
+			this.render()
 		}
 
 		return this
@@ -604,6 +631,20 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		)
 	}
 
+	private _setupCanvas(): void {
+		this._l('setupCanvas()')
+		if (!this.container) throw new Error('Container not found.')
+
+		this.canvas.addEventListener('mousemove', this.setMousePosition)
+		this.canvas.addEventListener('touchmove', this.setTouchPosition, { passive: false })
+
+		if (!Array.from(this.container.children).includes(this.canvas)) {
+			this.container.appendChild(this.canvas)
+		}
+
+		// window.addEventListener('resize', this.resize)
+	}
+
 	private _createProgram(
 		gl: WebGL2RenderingContext,
 		vertex: WebGLShader,
@@ -672,9 +713,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			case 'float':
 				ctx.uniform1f(location, value as number)
 				break
-			case 'int':
-				ctx.uniform1i(location, value as number)
-				break
 			case 'vec2':
 				ctx.uniform2fv(location, value as any as Float32Array)
 				break
@@ -683,6 +721,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 				break
 			case 'vec4':
 				ctx.uniform4fv(location, value as any as Float32Array)
+				break
+			case 'int':
+				ctx.uniform1i(location, value as number)
 				break
 			default:
 				throw new Error(`Unsupported uniform type: ${type}`)
@@ -711,11 +752,21 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return this
 	}
 
+	private _cleanup(): void {
+		this._l('_cleanup()')
+		if (!this.container) throw new Error('Container not found.')
+		this.canvas.removeEventListener('mousemove', this.setMousePosition)
+		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
+		window.removeEventListener('resize', this.resize)
+		this._resizeObserver.disconnect()
+		this._listeners.clear()
+	}
+
 	dispose() {
 		this._l('dispose()')
 		this.state = 'disposed'
 
-		this._removeListeners()
+		this._cleanup()
 
 		this._builtinUniformLocations.clear()
 		this._uniformLocations.clear()
