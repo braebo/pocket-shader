@@ -59,7 +59,7 @@
 	}
 </script>
 
-<slot name="code" />
+<span><slot /></span>
 
 <button bind:this={btnEl} class="btn" class:active={!disabled} on:click={run}>Run</button>
 

@@ -35,7 +35,7 @@
 	}
 </script>
 
-<slot name="code" />
+<span><slot /></span>
 
 <button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>
 	{disabled ? 'Run' : 'Dispose'}

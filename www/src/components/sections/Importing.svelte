@@ -33,13 +33,7 @@
 	}
 </script>
 
-<section>
-	<p>
-		Bundlers like <code>vite</code> make it easy to import your shaders directly from
-		<code>.glsl</code> files.
-	</p>
-
-	<slot name="code4" />
+<span><slot /></span>
 
 	<button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>Run</button>
 </section>
