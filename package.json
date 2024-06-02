@@ -16,10 +16,6 @@
 	"type": "module",
 	"scripts": {
 		"dev": "cd www && pnpm dev",
-		"lint": "publint",
-		"release": "pnpm lint && pnpx jsr publish"
-	},
-	"devDependencies": {
-		"publint": "^0.2.8"
+		"release": "pnpx jsr publish"
 	}
 }
