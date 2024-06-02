@@ -8,7 +8,7 @@
 <h1 class="hero-text text-gradient-animated">Pocket Shader</h1>
 
 <p class="description gradient-outline">
-	A typescript package that makes it easy to render WebGL shaders.
+	A javascript package that makes it easy to render WebGL shaders.
 </p>
 
 <div
