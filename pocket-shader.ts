@@ -754,13 +754,16 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 /**
  * Creates a throttled, debounced version of a function.
- * @param callback - The function to throttle and debounce.
+ * @param fn - The function to throttle and debounce.
  * @param throttleMs - The time in milliseconds to wait in between calls.
  * @param debounceMs - The time in milliseconds to wait before running the function after the last call.
  * @returns A new function that will only run once every `throttleMs` milliseconds, and will wait `debounceMs` milliseconds after the last call before running.
  */
 function throttledDebounce(
-	callback: (...args: any[]) => void,
+	/**
+	 * The function to throttle and debounce.
+	 */
+	fn: (...args: any[]) => void,
 	/**
 	 * The time in milliseconds to wait in between calls.
 	 * @defaultValue `50`
@@ -781,11 +784,11 @@ function throttledDebounce(
 
 		if (now - lastExecution >= throttleMs) {
 			lastExecution = now
-			callback(...args)
+			fn(...args)
 		}
 
 		debounceTimeout = setTimeout(() => {
-			callback(...args)
+			fn(...args)
 		}, debounceMs)
 	}
 }
