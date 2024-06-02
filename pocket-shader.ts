@@ -311,7 +311,16 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		if (options?.autoStart === true) {
 			this.start()
 		} else {
-			this.resize()
+
+		if (
+			import.meta?.env?.DEV &&
+			(this.container.clientWidth === 0 || this.container.clientHeight === 0)
+		) {
+			console.error(
+				`PocketShader container has a width or height of 0px.  The canvas will not be visible until the container has a non-zero size size.`,
+				this.container,
+				this,
+			)
 		}
 	}
 
