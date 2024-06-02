@@ -1,8 +1,10 @@
-<center>
+<div align="center">
 
 ![img](./.github/hero.svg)
 
-</center>
+</div>
+
+<br />
 
 - ✅ Fully Typed
 - 👌 Zero Dependencies
