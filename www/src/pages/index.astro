@@ -456,7 +456,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 			<Uniforms id="#codeblock9" client:idle>
 				<Code
 					id="codeblock9"
-					slot="code"
+					slot="default"
 					code={/*js*/ `
                     import { PocketShader } from 'pocket-shader'
                     import myShader from './clouds.glsl?raw'
@@ -552,8 +552,6 @@ import Dpr from '../components/sections/Dpr.svelte'
                 })
                 `}
 			/>
-
-			<!-- <h3 id="mouse-smoothing">Mouse Smoothing</h3> -->
 
 			<p>
 				<code>mouseSmoothing</code> can be passed in as an option, and/or updated on an instance.
