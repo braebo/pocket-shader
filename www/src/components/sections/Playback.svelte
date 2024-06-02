@@ -65,35 +65,48 @@
 
 <div class="flex">
 	<button
-		class="code"
+		class="code plain"
 		class:gradient-outline={!disabled && state !== 'running'}
 		class:active={state === 'running'}
 		disabled={disabled || state === 'running'}
-		on:click={start}>ps.start()</button
+		on:click={start}><span class="g-red">ps</span>.<span class="g-blue">start</span>()</button
 	>
 	<button
-		class="code"
+		class="code plain"
 		class:gradient-outline={!disabled && state !== 'paused'}
 		class:active={state === 'paused'}
 		disabled={disabled || state !== 'running'}
-		on:click={pause}>ps.pause()</button
+		on:click={pause}><span class="g-red">ps</span>.<span class="g-blue">pause</span>()</button
 	>
 	<button
-		class="code"
+		class="code plain"
 		class:gradient-outline={!disabled && state !== 'stopped'}
 		class:active={state === 'stopped'}
 		disabled={disabled || state !== 'running'}
-		on:click={stop}>ps.stop()</button
+		on:click={stop}><span class="g-red">ps</span>.<span class="g-blue">stop</span>()</button
 	>
 </div>
 
 <div>
 	<div class="kv" class:disabled>
-		<div class="key"><code>ps.state</code></div>
+		<div class="key">
+			<code class="plain">
+				<span class="g-red">ps</span>
+				.
+				<span class="g-blue">state</span>
+			</code>
+		</div>
 		<div class="value" class:disabled bind:this={stateTextEl}>{state}</div>
 	</div>
+
 	<div class="kv" class:disabled>
-		<div class="key"><code>ps.time</code></div>
+		<div class="key">
+			<code class="plain">
+				<span class="g-red">ps</span>
+				.
+				<span class="g-blue">time</span>
+			</code>
+		</div>
 		<div class="value" class:disabled>{t}</div>
 	</div>
 </div>
