@@ -1,0 +1,51 @@
+.astro-code {
+	background-color: transparent !important;
+}
+
+.has-focused .line {
+	filter: blur(0.095rem);
+}
+.has-focused .focused {
+	filter: blur(0);
+}
+
+.has-highlighted {
+	.line {
+		opacity: 0.75;
+		filter: brightness(0.7) saturate(0.7);
+
+		&:has(.highlighted-word) {
+			opacity: 1;
+			filter: brightness(1) saturate(1);
+
+			.highlighted-word {
+				opacity: 1;
+				filter: brightness(1.25) saturate(1.25);
+				font-variation-settings: 'wght' 500;
+			}
+
+			&:not(.highlighted) span:not(.highlighted-word) {
+				opacity: 0.75;
+				filter: brightness(0.7) saturate(0.7);
+			}
+		}
+	}
+
+	.highlighted {
+		opacity: 1;
+		filter: brightness(1.2) saturate(1.2);
+	}
+}
+
+pre.astro-code code {
+	position: relative;
+
+	width: fit-content;
+
+	overflow: visible;
+}
+
+code,
+pre {
+	overflow: visible;
+}
