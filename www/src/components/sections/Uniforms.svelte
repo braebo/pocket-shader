@@ -66,7 +66,7 @@
 	}
 </script>
 
-<slot name="code" />
+<span><slot /></span>
 
 <button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>
 	{disabled ? 'Run' : 'Dispose'}
@@ -144,19 +144,22 @@
 
 <style lang="scss">
 	div {
+		box-sizing: border-box;
+
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		margin: auto;
-		box-sizing: border-box;
-		max-width: min(30rem, 100vw);;
+
 		width: 100%;
+		max-width: min(30rem, 100vw);
+		margin: auto;
 
 		.left {
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
-			width: 10rem;
+
+			width: 12rem;
 
 			span {
 				color: var(--fg-b);
@@ -164,14 +167,16 @@
 			}
 
 			.label {
+				box-sizing: content-box;
+
 				display: flex;
 				justify-content: center;
 				align-items: center;
 
-				width: 1.85rem;
+				width: 2rem;
 				height: 1.1rem;
 				margin: 0;
-				padding: 0.05rem 0.3rem;
+				padding: 0.1rem 0.5rem 0 0.5rem;
 
 				background: var(--bg-a);
 				border-radius: 0.2rem;
@@ -179,8 +184,8 @@
 
 				font-size: var(--font-xs);
 				font-variation-settings: 'wght' 100;
-				text-align: center;
 				font-family: var(--font-mono);
+				text-align: center;
 				line-height: 1rem;
 			}
 		}
