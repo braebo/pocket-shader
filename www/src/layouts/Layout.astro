@@ -26,12 +26,47 @@ const { title } = Astro.props
 	<body>
 		<Github />
 		<slot />
-		<div style="height: 10rem"></div>
+		<footer>
+			<p>
+				Made with 💙 by
+				<a
+					href="https://github.com/braebo"
+					class="made-by text-gradient"
+					target="_blank"
+					rel="noopener"
+				>
+					braebo
+				</a>
+			</p>
+		</footer>
 	</body>
-</html>
 
-<style is:global>
-	h1 {
-		font-family: var(--font-b);
-	}
-</style>
+	<style>
+		footer {
+			text-align: center;
+			margin-top: 10rem;
+			margin-bottom: 2rem;
+			font-family: var(--font-b);
+		}
+
+		a.made-by {
+			color: var(--fg-b);
+
+			font-size: 1rem;
+			letter-spacing: -1px;
+			font-family: var(--font-mono);
+			font-variation-settings: 'wght' 200;
+
+			text-decoration-color: var(--bg-d);
+			text-decoration-thickness: 2px;
+			text-decoration-style: wavy;
+
+			transition: 0.2s;
+		}
+		a.made-by:hover {
+			color: var(--fg-a);
+			text-decoration-thickness: 4px;
+			text-decoration-style: dashed;
+		}
+	</style>
+</html>

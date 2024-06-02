@@ -52,6 +52,7 @@ section {
 }
 
 h1 {
+	font-family: var(--font-b);
 	font-size: 4rem;
 	font-weight: 00;
 	line-height: 1;
