@@ -617,7 +617,7 @@ void main() {
 			this.container.appendChild(this.canvas)
 		}
 
-		// window.addEventListener('resize', this.resize)
+		window.addEventListener('resize', this.resize)
 	}
 
 	private _createProgram(
