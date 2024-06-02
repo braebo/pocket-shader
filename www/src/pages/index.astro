@@ -171,8 +171,9 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 		<section>
 			<p>
-				By default, <code>PocketShader</code> will create a fullscreen canvas element and append
-				it to the body.
+				By default, the <code class="g-red">PocketShader</code> class creates a canvas and appends
+				it to the
+				<code>body</code> with css <code>position: fixed</code>.
 			</p>
 
 			<Code
@@ -188,7 +189,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
-			<p>To render to a specific container, pass an element or selector.</p>
+			<p>To use a specific container, pass an element or selector as the first argument.</p>
 
 			<Code
 				id="codeblock2"
@@ -198,6 +199,11 @@ import Dpr from '../components/sections/Dpr.svelte'
                 new PocketShader('#codeblock2')
             `}
 			/>
+
+			<p>
+				To control the size, size your container with responsive css. The canvas will always
+				grow to fill its container.
+			</p>
 
 			<button class="btn" id="run2">Run</button>
 		</section>
@@ -258,7 +264,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
-			<p>The default shader values are:</p>
+			<p>Default vertex shader:</p>
 
 			<Code
 				id="default-vert"
@@ -272,6 +278,8 @@ import Dpr from '../components/sections/Dpr.svelte'
                   gl_Position = a_position;
               }`}
 			/>
+
+			<p>Default fragment shader:</p>
 
 			<Code
 				id="default-frag"
@@ -318,8 +326,10 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 		<section>
 			<p>
-				The animation loop can be controlled with methods like <code>start()</code>
-				and <code>stop()</code>.
+				The animation loop can be controlled with methods like <code
+					>start<span class="grey">()</span></code
+				>
+				and <code>stop<span class="grey">()</span></code>.
 			</p>
 			<Playback client:load id="#codeblock6">
 				<Code
@@ -334,6 +344,36 @@ import Dpr from '../components/sections/Dpr.svelte'
             `}
 				/>
 			</Playback>
+		</section>
+
+		<section>
+			<p>
+				The <code>on</code> method allows you to listen for the <code>'render'</code> event,
+				which fires before each frame.
+			</p>
+
+			<Code
+				id="codeblock11"
+				fontSize="0.75rem"
+				code={/*js*/ `
+                import { PocketShader } from 'pocket-shader'
+                import fragment from './kirby.frag?raw'
+
+                const ps = new PocketShader('#codeblock11', {
+                    fragment,
+                    autoStart: true,
+                    uniforms: { // [!code highlight]
+                        u_jump: { type: 'float', value: 0 } // [!code highlight]
+                    }, // [!code highlight]
+                })
+
+                ps.on('render', ({ time }) => { // [!code highlight]
+                    ps.uniforms.u_jump.value = Math.sin(time) // [!code highlight]
+                }) // [!code highlight]
+            `}
+			/>
+
+			<button class="btn" id="run11">Run</button>
 		</section>
 
 		<section>
@@ -409,8 +449,8 @@ import Dpr from '../components/sections/Dpr.svelte'
 				The <code>uniforms</code> option accepts custom uniforms.
 			</p>
 			<p>
-				They can be accessed anytime with <code>ps.uniforms</code> and will auto-update in the
-				shader when changed.
+				They can be accessed anytime with <code><span class="g-red">ps</span>.uniforms</code
+				> and will auto-update in the shader when changed.
 			</p>
 
 			<Uniforms id="#codeblock9" client:idle>
@@ -467,7 +507,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 
                     in vec2 vUv;
                     out vec4 color;
-                    
+
                     void main() {
                       vec2 uv = vUv * u_resolution;
                       float size = u_resolution.x * 0.05;
@@ -487,7 +527,9 @@ import Dpr from '../components/sections/Dpr.svelte'
 			/>
 
 			<p>
-				It can be manually updated on the instance with <code>ps.mouse</code>.
+				It can be manually updated on the instance with <code
+					><span class="g-red">ps</span>.mouse</code
+				>.
 			</p>
 
 			<Code
@@ -499,6 +541,10 @@ import Dpr from '../components/sections/Dpr.svelte'
                  * even while outside the canvas bounds.
                  */
                 window.addEventListener('mousemove', e => {
+                  // normalized to 0-1
+                  ps.setMousePosition(e)
+
+                  // or, raw dogged
                   ps.mouse = {
                     x: e.clientX
                     y: e.clientY
@@ -512,9 +558,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 			<p>
 				<code>mouseSmoothing</code> can be passed in as an option, and/or updated on an instance.
 			</p>
-			<p>
-				It ranges from 0-1, where 0 is no smoothing, and 1 is infinite smoothing.
-			</p>
+			<p>It ranges from 0-1, where 0 is no smoothing, and 1 is infinite smoothing.</p>
 
 			<MouseSmoothing id="#codeblock10" client:idle smoothing={0.95}>
 				<Code
@@ -523,47 +567,13 @@ import Dpr from '../components/sections/Dpr.svelte'
 					fontSize="0.8rem"
 					code={`const ps = new PocketShader('#codeblock10', {
                   mouseSmoothing: 0.8, // [!code highlight]
-                  fragment: ${'`'}... // [!code highlight]
+                  fragment: ${'`'}...${'`'}
                 })
 
                 ps.mouseSmoothing = 0.95 // [!code highlight]
                 `}
 				/>
 			</MouseSmoothing>
-		</section>
-
-		<h2 id="events">Events</h2>
-		<section>
-			<p>
-				The <code>on</code> method allows you to listen for the <code>'render'</code> event,
-				which fires before each frame. This is useful for updating uniforms or other properties
-				before the frame is drawn.
-			</p>
-
-			<Code
-				id="codeblock11"
-				fontSize="0.75rem"
-				code={/*js*/ `
-                import { PocketShader } from 'pocket-shader'
-                import fragment from './kirby.frag?raw'
-
-                const ps = new PocketShader('#codeblock11', {
-                    fragment,
-                    autoStart: true,
-                    uniforms: { // [!code highlight]
-                        u_jump: { type: 'float', value: 0 } // [!code highlight]
-                    }, // [!code highlight]
-                })
-
-                ps.on('render', ({ time }) => { // [!code highlight]
-                    ps.uniforms.u_jump.value = Math.sin(time) // [!code highlight]
-                }) // [!code highlight]
-            `}
-			/>
-
-			<button class="btn" id="run11">Run</button>
-
-			<p>More events will likely be added in the future.</p>
 		</section>
 	</div>
 
@@ -575,9 +585,13 @@ import Dpr from '../components/sections/Dpr.svelte'
 		}
 
 		.note {
+			box-sizing: border-box;
 			position: relative;
 
+			max-width: 26rem;
 			padding: 1rem;
+
+			font-size: var(--font-xs);
 
 			background: rgba(136, 158, 186, 0.05);
 			border-radius: var(--radius);
@@ -598,7 +612,6 @@ import Dpr from '../components/sections/Dpr.svelte'
 				color: rgba(136, 148, 186, 0.5);
 
 				font-size: 1.5rem;
-				/* font-weight: bold; */
 			}
 		}
 
