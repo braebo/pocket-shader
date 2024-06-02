@@ -8,7 +8,15 @@
 		"dev": "cd www && pnpm dev",
 		"release": "pnpx publint && pnpx jsr publish"
 	},
-	"keywords": [],
+	"keywords": [
+		"webgl",
+		"shaders",
+		"typescript",
+		"javascript",
+		"animation",
+		"glsl",
+		"jsr"
+	],
 	"author": "braebo",
 	"license": "MIT",
 	"exports": {
