@@ -1,6 +1,6 @@
 <script lang="ts">
-	import fragment from '../../shaders/glass.glsl?raw'
 	import { fadeText } from '../../utils/animations.ts'
+	import fragment from '../../shaders/glass.glsl?raw'
 	import { PocketShader } from 'pocket-shader'
 	import Range from '../Range.svelte'
 
@@ -37,7 +37,7 @@
 		if (!disabled) return dispose()
 
 		ps = new PocketShader(id, {
-			vertex: `#version 300 es
+			vertex: /*glsl*/ `#version 300 es
                 in vec4 a_position;
                 void main() {
                     gl_Position = a_position;
@@ -64,8 +64,6 @@
 		ps = null
 		fadeText(btnEl, 'Run')
 	}
-
-	const types = []
 </script>
 
 <slot name="code" />
@@ -106,6 +104,16 @@
 
 <div class:disabled>
 	<div class="left">
+		<span>refraction</span>
+		<div class="label">{refr_index.toFixed(2)}</div>
+	</div>
+	<div class="right">
+		<Range min={0.1} max={1} step={0.01} bind:value={refr_index} />
+	</div>
+</div>
+
+<div class:disabled>
+	<div class="left">
 		<span>U</span>
 		<div class="label">{poly_U.toFixed(2)}</div>
 	</div>
@@ -134,49 +142,46 @@
 	</div>
 </div>
 
-<div class:disabled>
-	<div class="left">
-		<span>refraction idx</span>
-		<div class="label">{refr_index.toFixed(2)}</div>
-	</div>
-	<div class="right">
-		<Range min={0.1} max={1} step={0.01} bind:value={refr_index} />
-	</div>
-</div>
-
 <style lang="scss">
 	div {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 		margin: auto;
+		box-sizing: border-box;
+		max-width: min(30rem, 100vw);;
+		width: 100%;
 
 		.left {
 			display: flex;
 			justify-content: flex-end;
 			align-items: center;
 			width: 10rem;
+
 			span {
-				// font-size: var(--font-sm);
 				color: var(--fg-b);
 				font-variation-settings: 'wght' 100;
 			}
+
 			.label {
-				width: 1.85rem;
-				height: 1.1rem;
-				margin: 0;
-				font-size: var(--font-xs);
-				font-variation-settings: 'wght' 100;
-				text-align: center;
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				border-radius: 0.2rem;
+
+				width: 1.85rem;
+				height: 1.1rem;
+				margin: 0;
 				padding: 0.05rem 0.3rem;
-				line-height: 1rem;
-				font-family: var(--font-mono);
-				outline: 1px solid var(--bg-d);
+
 				background: var(--bg-a);
+				border-radius: 0.2rem;
+				outline: 1px solid var(--bg-d);
+
+				font-size: var(--font-xs);
+				font-variation-settings: 'wght' 100;
+				text-align: center;
+				font-family: var(--font-mono);
+				line-height: 1rem;
 			}
 		}
 
