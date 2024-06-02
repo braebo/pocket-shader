@@ -456,7 +456,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			const elapsedTime = Math.min(now - then, 0.1)
 
 			if (this._listeners.size) {
-				this.emit(this.time, elapsedTime)
+				this._emit(this.time, elapsedTime)
 			}
 
 			// Only update the time if the shader is running.
@@ -554,12 +554,17 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.setMousePosition(e.touches[0])
 	}
 
+	/**
+	 * Listen for events emitted by the renderer.
+	 * @param event The event to listen for.  Currently, only `'render'` is supported, which runs _before_ each render.
+	 * @param listener The callback to run when the event is emitted.
+	 */
 	on = (event: 'render', listener: (data: { time: number; delta: number }) => void): this => {
 		this._listeners.set(event, listener)
 		return this
 	}
 
-	emit = (time: number, delta: number): void => {
+	private _emit = (time: number, delta: number): void => {
 		for (const [event, listener] of this._listeners) {
 			switch (event) {
 				case 'render':
@@ -670,21 +675,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return false
 	}
 
-	private _initializeUniforms(userUniforms: T | undefined): T {
-		const uniforms: Record<string, Uniform> = {}
-
-		for (const [name, uniform] of Object.entries(userUniforms || {})) {
-			uniforms[name] = {
-				type: uniform.type,
-				value: Array.isArray(uniform.value)
-					? (new Float32Array(uniform.value) as any as number[])
-					: uniform.value,
-			}
-		}
-
-		return uniforms as T
-	}
-
 	test = 0
 	private _setUniform(
 		ctx: WebGL2RenderingContext,
@@ -739,7 +729,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	private _cleanup(): void {
-		if (!this.container) throw new Error('Container not found.')
 		this.canvas.removeEventListener('mousemove', this.setMousePosition)
 		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
 		window.removeEventListener('resize', this.resize)
