@@ -285,7 +285,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this._uniforms = options?.uniforms ?? ({} as T)
 
 		if (this.container instanceof HTMLBodyElement) {
-			this.container = document.body
 			const w = window.innerWidth
 			const h = window.innerHeight
 			this.canvas.style.setProperty('width', `${w}px`)
@@ -460,7 +459,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 				this.emit(this.time, elapsedTime)
 			}
 
-			this.time += elapsedTime * this.speed
+			// Only update the time if the shader is running.
+			if (this.state === 'running') {
+				this.time += elapsedTime * this.speed
+			}
+
 			then = now
 
 			this.mouseSmoothed.x +=
