@@ -1,13 +1,7 @@
 {
 	"name": "pocket-shader",
 	"version": "0.1.0",
-	"description": "",
-	"type": "module",
-	"main": "pocket-shader.ts",
-	"scripts": {
-		"dev": "cd www && pnpm dev",
-		"release": "pnpx publint && pnpx jsr publish"
-	},
+	"description": "A typescript package that makes it easy to render WebGL shaders in the browser.",
 	"keywords": [
 		"webgl",
 		"shaders",
@@ -17,13 +11,19 @@
 		"glsl",
 		"jsr"
 	],
-	"author": "braebo",
 	"license": "MIT",
+	"author": "braebo",
+	"type": "module",
 	"exports": {
 		".": {
 			"types": "./pocket-shader.ts",
 			"default": "./pocket-shader.ts"
 		},
 		"./package.json": "./package.json"
+	},
+	"main": "pocket-shader.ts",
+	"scripts": {
+		"dev": "cd www && pnpm dev",
+		"release": "pnpx publint && pnpx jsr publish"
 	}
 }
