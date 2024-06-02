@@ -35,7 +35,7 @@
 		appearance: none;
 		width: calc($height / 3);
 		height: $height;
-		background: linear-gradient(to top, var(--theme-a, #33c5f4) 50%, #000 84%);
+		background: linear-gradient(to top, var(--theme-a, #33c5f4) 71%, #000 90%);
 		cursor: pointer;
 		z-index: 1;
 	}
