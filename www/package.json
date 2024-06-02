@@ -1,37 +1,37 @@
 {
-  "name": "site",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.7.0",
-    "@astrojs/solid-js": "^4.2.0",
-    "@astrojs/svelte": "^5.4.0",
-    "astro": "^4.9.1",
-    "solid-js": "^1.8.17",
-    "svelte": "^4.2.17",
-    "typescript": "^5.4.5"
-  },
-  "devDependencies": {
-    "@shikijs/transformers": "^1.6.0",
-    "@vitest/ui": "^1.6.0",
-    "picocolors": "^1.0.1",
-    "pocket-shader": "link:..",
-    "prettier": "^3.2.5",
-    "prettier-plugin-astro": "^0.14.0",
-    "sass": "^1.77.2",
-    "shiki": "^1.6.1",
-    "vitest": "^1.6.0"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "astro@4.9.2": "patches/astro@4.9.2.patch"
-    }
-  }
+	"name": "pocket-shader_www",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.7.0",
+		"@astrojs/solid-js": "^4.2.0",
+		"@astrojs/svelte": "^5.4.0",
+		"astro": "^4.9.1",
+		"solid-js": "^1.8.17",
+		"svelte": "^4.2.17",
+		"typescript": "^5.4.5"
+	},
+	"devDependencies": {
+		"@shikijs/transformers": "^1.6.0",
+		"@vitest/ui": "^1.6.0",
+		"picocolors": "^1.0.1",
+		"pocket-shader": "link:..",
+		"prettier": "^3.2.5",
+		"prettier-plugin-astro": "^0.14.0",
+		"sass": "^1.77.2",
+		"shiki": "^1.6.1",
+		"vitest": "^1.6.0"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"astro@4.9.2": "patches/astro@4.9.2.patch"
+		}
+	}
 }
