@@ -9,6 +9,7 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	 * @defaultValue A new canvas element.
 	 */
 	canvas?: HTMLCanvasElement
+
 	/**
 	 * The vertex shader source code.
 	 */
@@ -181,6 +182,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	private _positionBuffer: WebGLBuffer | null = null
 	private _builtinUniformLocations = new Map<string, WebGLUniformLocation>()
 	private _uniformLocations = new Map<string, WebGLUniformLocation>()
+
 	private _uniforms: { [K in keyof T]: T[K] }
 	/**
 	 * A record of uniform values to pass to the shader.
@@ -265,28 +267,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this.vertex =
 			options?.vertex ??
-			/*glsl*/ `#version 300 es
-
-in vec4 a_position;
-out vec2 vUv;
-
-void main() {
-	vUv = a_position.xy * 0.5 + 0.5;
-	gl_Position = a_position;
-}`
+			`#version 300 es\nin vec4 a_position;out vec2 vUv;void main() {vUv = a_position.xy * 0.5 + 0.5;gl_Position = a_position;}`
 
 		this.fragment =
 			options?.fragment ??
-			/*glsl*/ `#version 300 es
-precision mediump float;
-
-uniform float u_time;
-in vec2 vUv;
-out vec4 color;
-
-void main() {
-	color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
-}`
+			`#version 300 es\nprecision mediump float;uniform float u_time;in vec2 vUv;out vec4 color;void main() {color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);}`
 
 		if (!this.vertex.startsWith('#version')) {
 			this.vertex = '#version 300 es\n' + this.vertex
