@@ -29,7 +29,6 @@
 @property --theme-b {
 	syntax: '<color>';
 	inherits: true;
-	/* initial-value: #69cb81; */
 	initial-value: #a269cb;
 }
 @property --angle {
@@ -43,9 +42,9 @@
 	--font-b: 'Caveat', system-ui, sans-serif;
 	--font-mono: 'Monaspace', monospace;
 
-	--font: clamp(0.75rem, calc(0.75rem + 1vw), 1.25rem);
+	--font: clamp(0.75rem, calc(0.75rem + 1vw), 1.1rem);
 	--font-sm: clamp(10px, calc(8px + 1vw), 14px);
-	--font-xs: clamp(9px, calc(6px + 1vw), 12px);
+	--font-xs: clamp(12px, calc(6px + 1vw), 14px);
 	--line-height-sm: clamp(1rem, calc(0.5rem + 1vw), 1.25rem);
 
 	--bg-a: black;
@@ -58,12 +57,12 @@
 	--fg-c: #c6c6c6;
 	--fg-d: #a8a8a8;
 
-	--outline: 1px solid #fff5;
+	--outline: 1px solid #fff3;
 	--radius: 0.5rem;
-	--gradient: linear-gradient(
+	--gradient: linear-gradient(in lab
 		var(--deg, 45deg),
 		var(--theme-a, #33c5f4),
-		var(--theme-b, #a269cb) 100%
+		var(--theme-b, #a269cb) 120%
 	);
 	/* prettier-ignore */
 	--shadow: 0rem 0.0469rem 0.0625rem rgb(0, 0, 0, 0.115),
