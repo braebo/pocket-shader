@@ -308,12 +308,15 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this._resizeObserver = new ResizeObserver(this.resize)
 		this._resizeObserver.observe(this.canvas)
+		this._resizeObserver.observe(this.container)
 
 		this.compile()
 
 		if (options?.autoStart === true) {
 			this.start()
 		} else {
+			this._resize()
+		}
 
 		if (
 			import.meta?.env?.DEV &&
@@ -337,7 +340,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			case 'stopped':
 			case 'paused':
 				this.state = 'running'
-				this.resize()
+				this._resize()
 				this.render()
 				break
 			case 'running':
@@ -394,7 +397,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.dispose()
 		this.state = 'stopped'
 		this.compile()
-		this.resize()
+		this._resize()
 		if (running) {
 			this.start()
 		}
@@ -404,7 +407,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * Resizes the canvas to fill the container.
 	 */
-	resize = (): this => {
+	_resize = (): this => {
 		const width =
 			this.container instanceof HTMLBodyElement
 				? window.innerWidth
@@ -437,6 +440,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		return this
 	}
+
+	/**
+	 * A throttled, debounced {@link _resize}.  Resizes the canvas to fill the container.
+	 */
+	resize = throttledDebounce(this._resize)
 
 	render(): this {
 		let then = 0
@@ -746,15 +754,40 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 }
 
-function idToColor(id: string): string {
-	let hash = 0
-	for (let i = 0; i < id.length; i++) {
-		hash = id.charCodeAt(i) + ((hash << 5) - hash)
+/**
+ * Creates a throttled, debounced version of a function.
+ * @param callback - The function to throttle and debounce.
+ * @param throttleMs - The time in milliseconds to wait in between calls.
+ * @param debounceMs - The time in milliseconds to wait before running the function after the last call.
+ * @returns A new function that will only run once every `throttleMs` milliseconds, and will wait `debounceMs` milliseconds after the last call before running.
+ */
+function throttledDebounce(
+	callback: (...args: any[]) => void,
+	/**
+	 * The time in milliseconds to wait in between calls.
+	 * @defaultValue `50`
+	 */
+	throttleMs = 50,
+	/**
+	 * The time in milliseconds to wait before running the function after the last call.
+	 * @defaultValue `75`
+	 */
+	debounceMs = 75,
+): (...args: any[]) => void {
+	let debounceTimeout: ReturnType<typeof setTimeout>
+	let lastExecution = 0
+
+	return function (...args: any[]) {
+		const now = performance.now()
+		clearTimeout(debounceTimeout)
+
+		if (now - lastExecution >= throttleMs) {
+			lastExecution = now
+			callback(...args)
+		}
+
+		debounceTimeout = setTimeout(() => {
+			callback(...args)
+		}, debounceMs)
 	}
-	let color = '#'
-	for (let i = 0; i < 3; i++) {
-		const value = (hash >> (i * 8)) & 0xff
-		color += value.toString(16).padStart(2, '0')
-	}
-	return color
 }
