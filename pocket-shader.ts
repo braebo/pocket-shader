@@ -626,7 +626,12 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 
 		window.addEventListener('resize', this.resize)
+		window.addEventListener('scroll', this._updateRectCache)
 	}
+
+	private _updateRectCache = throttledDebounce((): void => {
+		this._canvasRectCache = this.canvas.getBoundingClientRect()
+	})
 
 	private _createProgram(
 		gl: WebGL2RenderingContext,
@@ -738,6 +743,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.canvas.removeEventListener('mousemove', this.setMousePosition)
 		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
 		window.removeEventListener('resize', this.resize)
+		window.removeEventListener('scroll', this._updateRectCache)
 		this._resizeObserver.disconnect()
 		this._listeners.clear()
 	}
