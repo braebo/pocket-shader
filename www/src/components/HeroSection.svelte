@@ -7,7 +7,7 @@
 <h1 class="hero-text text-gradient-animated">Pocket Shader</h1>
 
 <p class="description gradient-outline">
-	A javascript package that makes it easy to render WebGL shaders.
+	A javascript package that makes it easy to render WebGL shaders
 </p>
 
 <div
@@ -15,7 +15,7 @@
 	on:pointerover={() => (hovering = true)}
 	on:pointerout={() => (hovering = false)}
 >
-	<code class="install">
+	<code class="install plain">
 		<div style="color:#cf8f8f">npx</div>
 		<div style="color:#dcdca5">jsr add</div>
 		<div class="text-gradient">@braebo/pocket-shader</div>
@@ -55,6 +55,7 @@
 		padding: 1rem;
 		padding-top: 1.25rem;
 		padding-bottom: 2.25rem;
+		max-width: 27rem;
 
 		background: var(--bg-b);
 		border-radius: var(--radius);
