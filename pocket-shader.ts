@@ -288,17 +288,20 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			this.container = document.body
 			const w = window.innerWidth
 			const h = window.innerHeight
-			this.canvas.style.setProperty('width', w + 'px')
-			this.canvas.style.setProperty('height', h + 'px')
+			this.canvas.style.setProperty('width', `${w}px`)
+			this.canvas.style.setProperty('height', `${h}px`)
 			this.canvas.style.setProperty('position', 'fixed')
 			this.canvas.style.setProperty('inset', '0')
 			this.canvas.style.setProperty('zIndex', '0')
 		} else {
-			this.canvas.style.setProperty('width', this.container.offsetWidth + 'px')
-			this.canvas.style.setProperty('height', this.container.offsetHeight + 'px')
+			this.canvas.style.setProperty('width', `${this.container.clientWidth}px`)
+			this.canvas.style.setProperty('height', `${this.container.clientHeight}px`)
 			this.canvas.style.setProperty('position', 'absolute')
 			this.canvas.style.setProperty('inset', '0')
 			this.canvas.style.setProperty('zIndex', '1')
+			if (this.container.style.position === '') {
+				this.container.style.position = 'relative'
+			}
 		}
 
 		this._setupCanvas()
