@@ -5,7 +5,7 @@ on:
     types: [created]
 
 jobs:
-  publish-jsr:
+  publish:
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,6 +21,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+
+      - name: Lint
+        run: pnpm lint
 
       - name: Publish to jsr
         run: npx -y jsr publish
