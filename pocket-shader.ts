@@ -3,8 +3,6 @@
  * @module
  */
 
-import { dedent } from './www/src/utils/dedent.js'
-
 export interface PocketShaderOptions<T extends Record<string, any> = Record<string, any>> {
 	/**
 	 * The canvas element to render the shader on.
@@ -267,32 +265,28 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this.vertex =
 			options?.vertex ??
-			dedent(/*glsl*/ `
-                #version 300 es
+			/*glsl*/ `#version 300 es
 
-                in vec4 a_position;
-                out vec2 vUv;
+in vec4 a_position;
+out vec2 vUv;
 
-                void main() {
-                    vUv = a_position.xy * 0.5 + 0.5;
-                    gl_Position = a_position;
-                }
-            `)
+void main() {
+	vUv = a_position.xy * 0.5 + 0.5;
+	gl_Position = a_position;
+}`
 
 		this.fragment =
 			options?.fragment ??
-			dedent(/*glsl*/ `
-                #version 300 es
-                precision mediump float;
+			/*glsl*/ `#version 300 es
+precision mediump float;
 
-                uniform float u_time;
-                in vec2 vUv;
-                out vec4 color;
+uniform float u_time;
+in vec2 vUv;
+out vec4 color;
 
-                void main() {
-                    color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
-                }
-            `)
+void main() {
+	color = vec4(vUv, 0.5 + 0.5 * sin(u_time), 1.0);
+}`
 
 		if (!this.vertex.startsWith('#version')) {
 			this.vertex = '#version 300 es\n' + this.vertex
