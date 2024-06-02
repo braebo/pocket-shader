@@ -14,14 +14,6 @@
 	"license": "MIT",
 	"author": "braebo",
 	"type": "module",
-	"exports": {
-		".": {
-			"types": "./pocket-shader.ts",
-			"default": "./pocket-shader.ts"
-		},
-		"./package.json": "./package.json"
-	},
-	"main": "pocket-shader.ts",
 	"scripts": {
 		"dev": "cd www && pnpm dev",
 		"release": "pnpx publint && pnpx jsr publish"
