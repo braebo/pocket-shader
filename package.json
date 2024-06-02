@@ -23,6 +23,6 @@
 	},
 	"scripts": {
 		"dev": "cd www && pnpm dev",
-		"release": "pnpx publint && pnpx jsr publish"
+		"release": "pnpx jsr publish"
 	}
 }
