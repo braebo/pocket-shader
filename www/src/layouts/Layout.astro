@@ -1,27 +1,44 @@
 ---
+import Github from '../components/Github.astro'
 import '../styles/variables.css'
 import '../styles/utilities.css'
 import '../styles/elements.css'
-import Github from '../components/Github.astro'
-
-interface Props {
-	title: string
-}
-
-const { title } = Astro.props
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<!-- ignore dark-reader extension -->
 		<meta charset="UTF-8" />
-		<meta name="description" content="pocket-shader - render a shader" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+		<!-- Disable Dark Reader -->
 		<meta name="darkreader-lock" />
-		<title>{title}</title>
+		<title>Pocket Shader</title>
+		<meta name="title" content="Pocket Shader" />
+		<meta
+			name="description"
+			content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser."
+		/>
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://pocket-shader.braebo.dev" />
+		<meta property="og:title" content="Pocket Shader" />
+		<meta
+			property="og:description"
+			content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser."
+		/>
+		<meta property="og:image" content="https://pocket-shader.braebo.dev/pocket-shader.png" />
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://pocket-shader.braebo.dev" />
+		<meta property="twitter:title" content="Pocket Shader" />
+		<meta
+			property="twitter:description"
+			content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser."
+		/>
+		<meta
+			property="twitter:image"
+			content="https://pocket-shader.braebo.dev/pocket-shader.png"
+		/>
 	</head>
 	<body>
 		<Github />
