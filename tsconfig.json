@@ -7,6 +7,7 @@
 		"moduleResolution": "NodeNext",
 		"skipLibCheck": true,
 		"allowJs": false,
-		"noEmit": true
+		"noEmit": true,
+		"noImplicitReturns": true
 	}
 }
