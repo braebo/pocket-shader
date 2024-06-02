@@ -18,7 +18,7 @@
 
 	input[type='range'] {
 		-webkit-appearance: none;
-		width: 20rem;
+		width: clamp(5rem, 100%, 20rem);
 		height: $height;
 		margin: auto;
 
