@@ -17,14 +17,14 @@ body {
 }
 
 p {
-	width: clamp(20ch, 26rem, 100%);
+	width: clamp(20ch, 42rem, 100%);
 	margin: auto;
 
 	font-variation-settings: 'wght' 300;
-	letter-spacing: 0.4px;
+	font-size: var(--font);
+	text-wrap: balance;
 	text-align: center;
 	line-height: 1.5;
-	text-wrap: balance;
 }
 
 em {
@@ -96,12 +96,6 @@ button,
 	cursor: pointer;
 }
 
-@property --shade {
-	syntax: '<color>';
-	inherits: true;
-	initial-value: var(--bg-a);
-}
-
 .btn {
 	position: relative;
 	color: var(--fg-a);
@@ -109,14 +103,13 @@ button,
 
 	--theme-a: var(--bg-a);
 	--theme-b: var(--bg-a);
-	--shade: var(--bg-a);
 
 	background: radial-gradient(
 			circle at -25% 50%,
-			var(--shade, white) -20%,
+			var(--bg-a) -20%,
 			var(--theme-b, #a269cb),
 			var(--theme-a, #33c5f4) 80%,
-			var(--shade, white) 120%
+			var(--bg-a) 120%
 		)
 		top right / 200% 200%;
 
@@ -182,7 +175,8 @@ code,
 
 :not(pre) > code,
 .code {
-	padding: 0.1rem 0.4rem;
+	/* padding: 0.1rem 0.4rem; */
+	padding: 0.1rem 0.25rem 0rem 0.25rem;
 
 	background: #1b1e28;
 	border-radius: 0.2rem;
@@ -195,6 +189,40 @@ code,
 	font-size: var(--font-xs);
 	line-height: var(--line-height-sm);
 	vertical-align: middle;
+
+	&:not(.plain) {
+		background-image: var(--gradient);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		-webkit-text-fill-color: transparent;
+	}
+}
+
+.g-red:not(.plain) {
+	/* prettier-ignore */
+	background-image: linear-gradient(
+		in lch 90deg, #ff8d45 -30%,
+		#ff4e86 40%,
+		#ff72f8 140%
+	);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
+.g-blue {
+	background-image: var(--gradient);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
+.grey {
+	-webkit-text-fill-color: var(--fg-d);
+	/* background-image: linear-gradient(in lch 90deg, #d3d3d3 -20%, #b3b3b3, #d3d3d3 120%); */
 }
 
 br {
