@@ -185,7 +185,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * A record of uniform values to pass to the shader.
 	 */
-	get uniforms() {
+	get uniforms(): T {
 		return new Proxy(this._uniforms, {
 			set: (target, property, value) => {
 				// @ts-expect-error
@@ -207,10 +207,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * {@link start|`start()`}, and is reset to `0` when {@link stop|`stop()`} is called.  You can
 	 * also set this value yourself if you prefer to control the time uniform manually.
 	 */
-	get time() {
+	get time(): number {
 		return this._time
 	}
-	set time(value) {
+	set time(value: number) {
 		this._time = value
 		this.builtinUniforms.u_time = value
 	}
@@ -389,7 +389,7 @@ void main() {
 	/**
 	 * Fully dipsoses the current WebGL context and creates a new one.
 	 */
-	reload() {
+	reload(): this {
 		const running = this.state === 'running'
 		if (running) {
 			this.pause()
@@ -407,7 +407,7 @@ void main() {
 	/**
 	 * Resizes the canvas to fill the container.
 	 */
-	resize = () => {
+	resize = (): this => {
 		const width =
 			this.container instanceof HTMLBodyElement
 				? window.innerWidth
@@ -441,7 +441,7 @@ void main() {
 		return this
 	}
 
-	render() {
+	render(): this {
 		let then = 0
 
 		const _render = (now: number) => {
@@ -546,11 +546,12 @@ void main() {
 		this.setMousePosition(e.touches[0])
 	}
 
-	on = (event: 'render', listener: (data: { time: number; delta: number }) => void) => {
+	on = (event: 'render', listener: (data: { time: number; delta: number }) => void): this => {
 		this._listeners.set(event, listener)
+		return this
 	}
 
-	emit = (time: number, delta: number) => {
+	emit = (time: number, delta: number): void => {
 		for (const [event, listener] of this._listeners) {
 			switch (event) {
 				case 'render':
