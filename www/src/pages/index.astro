@@ -162,7 +162,10 @@ import Nav from '../components/Nav.svelte'
 
 <Layout>
 	<div class="page">
-		<Nav client:load />
+		<span class="nav">
+			<Nav client:visible />
+		</span>
+
 		<main>
 			<br />
 
@@ -668,6 +671,12 @@ import Nav from '../components/Nav.svelte'
 			}
 			&:not(:last-of-type) {
 				margin-bottom: 0;
+			}
+		}
+
+		@media (max-width: 900px) {
+			.nav {
+				display: none;
 			}
 		}
 	</style>
