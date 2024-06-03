@@ -18,6 +18,7 @@ interface Props {
 	fontSize?: string
 	lineHeight?: string
 	title?: string
+	width?: string
 }
 
 const {
@@ -28,11 +29,13 @@ const {
 	fontSize = 'var(--font-sm)',
 	lineHeight = 'var(--ling-height-sm)',
 	title = '',
+	width = '',
 } = Astro.props
 ---
 
 <div class="outer">
 	{title && <label>{title}</label>}
+	
 	<div class="code-container" id={id}>
 		<div class="code-padding"></div>
 
@@ -76,23 +79,22 @@ const {
 	</div>
 </div>
 
-<style is:global>
-	.astro-code {
-		background-color: transparent !important;
-	}
+<style define:vars={{ width }}>
 	.outer {
 		position: relative;
-		width: fit-content;
+		/* width: fit-content; */
+		width: var(--width, fit-content);
 		max-width: 100%;
 		margin: auto;
 	}
+	
 	div.code-container {
 		--bg: #1b1e28;
 
 		position: relative;
 		display: flex;
 
-		width: fit-content;
+		/* width: fit-content; */
 		max-width: 100%;
 		margin: auto;
 
@@ -116,12 +118,14 @@ const {
 		div.inner {
 		}
 	}
+	
 	.outer:has(label) {
 		margin-top: 1rem;
 		.code-container {
 			border-top-left-radius: 0;
 		}
 	}
+	
 	.code-padding {
 		min-width: 1rem;
 		min-height: 100%;
@@ -133,49 +137,8 @@ const {
 		z-index: 0;
 	}
 
-	.has-focused .line {
-		filter: blur(0.095rem);
-	}
-	.has-focused .focused {
-		filter: blur(0);
-	}
-
-	.has-highlighted {
-		.line {
-			opacity: 0.75;
-			filter: brightness(0.7) saturate(0.7);
-
-			&:has(.highlighted-word) {
-				opacity: 1;
-				filter: brightness(1) saturate(1);
-
-				.highlighted-word {
-					opacity: 1;
-					filter: brightness(1.25) saturate(1.25);
-					font-variation-settings: 'wght' 500;
-				}
-
-				&:not(.highlighted) span:not(.highlighted-word) {
-					opacity: 0.75;
-					filter: brightness(0.7) saturate(0.7);
-				}
-			}
-		}
-
-		.highlighted {
-			opacity: 1;
-			filter: brightness(1.2) saturate(1.2);
-		}
-	}
 	
 
-	pre.astro-code code {
-		position: relative;
-
-		width: fit-content;
-
-		overflow: visible;
-	}
 
 	.copy-button-container {
 		position: absolute;
@@ -191,10 +154,6 @@ const {
 		transform: scale(1) translate3d(0, 0, 1px);
 	}
 
-	code,
-	pre {
-		overflow: visible;
-	}
 
 	label {
 		position: absolute;
