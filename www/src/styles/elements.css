@@ -62,25 +62,33 @@ h1 {
 
 h2 {
 	scroll-margin-top: 2rem;
-	
+
 	z-index: 1;
-	
+
 	margin-top: 4rem;
 	margin-bottom: 0rem;
-	
+
 	font-size: 3rem;
 	text-align: center;
 	font-weight: 500;
 	font-variation-settings: 'wght' 100;
+
+	a {
+		text-decoration: transparent solid underline;
+		transition: 0.2s;
+		&:hover {
+			text-decoration-color: var(--bg-d);
+		}
+	}
 }
 
 h3 {
 	scroll-margin-top: 2rem;
-	
+
 	position: relative;
-	
+
 	margin: 0 auto;
-	
+
 	font-size: 2rem;
 	font-family: var(--font-b);
 	font-variation-settings: 'wght' 100;
