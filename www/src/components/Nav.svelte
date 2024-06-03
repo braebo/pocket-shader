@@ -57,14 +57,18 @@
 		return () => observer.disconnect()
 	})
 
-	const offset = 0.15
+	const stagger = 0.1
 </script>
 
 <nav bind:this={nav}>
 	{#each sections?.values() ?? [] as h2, i}
-		<a style:animation-delay="{i * offset}s" class="h2" href="/#{h2.id}">{h2.title}</a>
+		<a style:animation-delay="{i * stagger}s" class="h2" href="/#{h2.id}">{h2.title}</a>
 		{#each h2.children as h3, j}
-			<a class="h3" href="/#{h3.id}" style:animation-delay="{i * offset + j * (offset / 2)}s">
+			<a
+				class="h3"
+				href="/#{h3.id}"
+				style:animation-delay="{i * stagger + j * (stagger / 2)}s"
+			>
 				{h3.title}
 			</a>
 		{/each}
@@ -89,16 +93,16 @@
 
 	.h2 {
 		font-size: var(--font);
-        height: 2rem;
-        &:not(:first-of-type) {
-            margin-top: 1rem;
-        }
+		height: 2rem;
+		&:not(:first-of-type) {
+			margin-top: 1rem;
+		}
 	}
 
 	.h3 {
 		font-size: var(--font-sm);
 		padding-left: 1rem;
-        height: 1.5rem;
+		height: 1.5rem;
 	}
 
 	.h2,
@@ -110,9 +114,9 @@
 		text-decoration: none;
 		color: color-mix(in lch, var(--fg-d), var(--bg-d));
 
-        &:hover {
-            color: var(--fg-a) !important;
-        }
+		&:hover {
+			color: var(--fg-a) !important;
+		}
 	}
 
 	nav:hover {
