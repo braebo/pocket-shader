@@ -109,6 +109,10 @@
 		transition: color 0.2s;
 		text-decoration: none;
 		color: color-mix(in lch, var(--fg-d), var(--bg-d));
+
+        &:hover {
+            color: var(--fg-a) !important;
+        }
 	}
 
 	nav:hover {
