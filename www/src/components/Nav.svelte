@@ -80,7 +80,7 @@
 
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		// gap: 0.5rem;
 
 		width: fit-content;
 		height: fit-content;
@@ -89,11 +89,16 @@
 
 	.h2 {
 		font-size: var(--font);
+        height: 2rem;
+        &:not(:first-of-type) {
+            margin-top: 1rem;
+        }
 	}
 
 	.h3 {
 		font-size: var(--font-sm);
 		padding-left: 1rem;
+        height: 1.5rem;
 	}
 
 	.h2,
@@ -116,7 +121,7 @@
 	@keyframes flyIn {
 		from {
 			opacity: 0;
-			transform: translateX(-2rem);
+			transform: translateX(-1rem);
 		}
 		to {
 			opacity: 1;
