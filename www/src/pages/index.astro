@@ -10,6 +10,7 @@ import Uniforms from '../components/sections/Uniforms.svelte'
 import Shaders from '../components/sections/Shaders.svelte'
 import Speed from '../components/sections/Speed.svelte'
 import Dpr from '../components/sections/Dpr.svelte'
+import Nav from '../components/Nav.svelte'
 ---
 
 <script>
@@ -161,6 +162,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 <Layout>
 	<div class="page">
+		<Nav client:load />
 		<main>
 			<br />
 
@@ -623,6 +625,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 	<style>
 		.page {
+			position: relative;
 			display: flex;
 			flex-direction: column;
 			gap: 5rem;
