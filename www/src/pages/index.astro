@@ -170,6 +170,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 		<h2 id="usage">Usage</h2>
 
 		<section>
+			<h3 id="fullscreen"><a href="/#fullscreen">Fullscreen</a></h3>
 			<p>
 				By default, the <code class="g-red">PocketShader</code> class creates a canvas and appends
 				it to the
@@ -189,6 +190,7 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
+			<h3 id="sizing"><a href="/#sizing">Sizing</a></h3>
 			<p>To use a specific container, pass an element or selector as the first argument.</p>
 
 			<Code
@@ -201,14 +203,15 @@ import Dpr from '../components/sections/Dpr.svelte'
 			/>
 
 			<p>
-				To control the size, size your container with responsive css. The canvas will always
-				grow to fill its container.
+				The canvas will always grow to fill its container, remaining responsive and resizing
+				automatically.
 			</p>
 
 			<button class="btn" id="run2">Run</button>
 		</section>
 
 		<section>
+			<h3 id="shaders"><a href="/#shaders">Shaders</a></h3>
 			<p>
 				Shaders can be passed into the <code>fragment</code> and/or
 				<code>vertex</code> options.
@@ -242,44 +245,24 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
-			<p>
-				Bundlers like <code>vite</code> make it easy to import your shaders directly from
-				<code>.glsl</code> files.
-			</p>
-			<Importing client:load id="#codeblock4">
-				<Code
-					slot="default"
-					id="codeblock4"
-					code={/*glsl*/ `
-                    import { PocketShader } from 'pocket-shader'
-                    import myShader from './clouds.glsl?raw' // [!code highlight]
+			<p>The default <code>vertex</code> and <code>fragment</code> shaders:</p>
 
-                    new PocketShader('#codeblock4', {
-                        autoStart: true,
-                        fragment: myShader // [!code highlight]
-                    })
-                `}
-				/>
-			</Importing>
-		</section>
-
-		<section>
-			<p>Default vertex shader:</p>
+			<br />
 
 			<Code
 				id="default-vert"
+				width="480px"
 				title="default.vert"
 				lang="glsl"
 				code={/*glsl*/ `in vec4 a_position;
-              out vec2 vUv;
-              
-              void main() {
-                  vUv = a_position.xy;
-                  gl_Position = a_position;
-              }`}
+                    out vec2 vUv;
+                    
+                    void main() {
+                        vUv = a_position.xy;
+                        gl_Position = a_position;
+                    }
+				`}
 			/>
-
-			<p>Default fragment shader:</p>
 
 			<Code
 				id="default-frag"
@@ -305,10 +288,38 @@ import Dpr from '../components/sections/Dpr.svelte'
 			</p>
 		</section>
 
+		<section>
+			<h3 id="raw-imports"><a href="/#raw-imports">Raw Imports</a></h3>
+			<p>
+				Bundlers like <code>vite</code> make it easy to import your shaders directly from
+				<code>.glsl</code> files.
+			</p>
+			<Importing client:load id="#codeblock4">
+				<Code
+					slot="default"
+					id="codeblock4"
+					code={/*glsl*/ `
+                    import { PocketShader } from 'pocket-shader'
+                    import myShader from './clouds.glsl?raw' // [!code highlight]
+
+                    new PocketShader('#codeblock4', {
+                        autoStart: true,
+                        fragment: myShader // [!code highlight]
+                    })
+                `}
+				/>
+			</Importing>
+		</section>
+
 		<h2 id="animation">Animation</h2>
 
 		<section>
-			<p>The <code>autoStart</code> option will automatically start an animation loop.</p>
+			<h3 id="render-loop"><a href="/#render-loop">Render Loop</a></h3>
+
+			<p>
+				The <code>autoStart</code> option will start a render loop as soon as the canvas has
+				been appended to its container.
+			</p>
 
 			<Code
 				id="codeblock5"
@@ -322,28 +333,6 @@ import Dpr from '../components/sections/Dpr.svelte'
 			/>
 
 			<button class="btn" id="run5">Run</button>
-		</section>
-
-		<section>
-			<p>
-				The animation loop can be controlled with methods like <code
-					>start<span class="grey">()</span></code
-				>
-				and <code>stop<span class="grey">()</span></code>.
-			</p>
-			<Playback client:load id="#codeblock6">
-				<Code
-					slot="default"
-					id="codeblock6"
-					code={/*js*/ `
-                import { PocketShader } from 'pocket-shader'
-
-                const ps = new PocketShader('#codeblock6')
-              
-                ps.start() // [!code highlight]
-            `}
-				/>
-			</Playback>
 		</section>
 
 		<section>
@@ -377,6 +366,29 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
+			<h3 id="playback-controls"><a href="/#playback-controls">Playback Controls</a></h3>
+			<p>
+				The animation loop can be controlled with methods like <code
+					>start<span class="grey">()</span></code
+				>
+				and <code>stop<span class="grey">()</span></code>.
+			</p>
+			<Playback client:load id="#codeblock6">
+				<Code
+					slot="default"
+					id="codeblock6"
+					code={/*js*/ `
+                import { PocketShader } from 'pocket-shader'
+
+                const ps = new PocketShader('#codeblock6')
+              
+                ps.start() // [!code highlight]
+            `}
+				/>
+			</Playback>
+		</section>
+
+		<section>
 			<p>
 				The <code>speed</code> can be passed as an option, or adjusted freely on each instance.
 			</p>
@@ -398,6 +410,8 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
+			<h3 id="max-pixel-ratio"><a href="/#max-pixel-ratio">Max Pixel Ratio</a></h3>
+
 			<p>
 				The <code>maxPixelRatio</code> will limit the pixel ratio of the canvas, which is determined
 				by the device's pixel ratio by default.
@@ -429,7 +443,8 @@ import Dpr from '../components/sections/Dpr.svelte'
 		<h2 id="uniforms">Uniforms</h2>
 
 		<section>
-			<p>The built-in uniforms are always available:</p>
+			<h3 id="built-in-uniforms"><a href="/#built-in-uniforms">Built-in Uniforms</a></h3>
+			<p>The following built-in uniforms are always available:</p>
 
 			<Code
 				id="uniforms"
@@ -445,14 +460,38 @@ import Dpr from '../components/sections/Dpr.svelte'
 
 			<br />
 
+			<div style="text-align:center;margin-bottom:-1rem;"><code>u_resolution</code></div>
+			<p style="max-width: 30rem;margin-bottom:1rem;">
+				The canvas resolution is determined by the container size and the
+				<code><a href="#max-pixel-ratio">maxPixelRatio</a></code>.
+			</p>
+
+			<div style="text-align:center;margin-bottom:-1rem;"><code>u_time</code></div>
+			<p style="max-width: 30rem;margin-bottom:1rem;">
+				The time in seconds since the shader started. This can be controlled directly with
+				<code><span class="g-red">ps</span>.time</code>. See
+				<a href="#playback-controls">Playback Controls</a>.
+			</p>
+
+			<div style="text-align:center;margin-bottom:-1rem;"><code>u_mouse</code></div>
+			<p style="max-width: 30rem;margin-bottom:1rem;">
+				The mouse position, normalized to <code>vec2(0-1)</code>. See
+				<a href="#mouse-position">Mouse Position</a>.
+			</p>
+		</section>
+
+		<section>
+			<h3 id="custom-uniforms"><a href="/#custom-uniforms">Custom Uniforms</a></h3>
+
 			<p>
 				The <code>uniforms</code> option accepts custom uniforms.
 			</p>
-			<p>
-				They can be accessed anytime with <code><span class="g-red">ps</span>.uniforms</code
-				> and will auto-update in the shader when changed.
-			</p>
 
+			<p>
+				They can be accessed anytime with
+				<code><span class="g-red">ps</span>.uniforms</code> and will auto-update in the shader
+				when changed.
+			</p>
 			<Uniforms id="#codeblock9" client:idle>
 				<Code
 					id="codeblock9"
@@ -489,10 +528,14 @@ import Dpr from '../components/sections/Dpr.svelte'
 		</section>
 
 		<section>
-			<h3 id="mouse-position">Mouse Position</h3>
+			<h3 id="mouse-position"><a href="/#mouse-position">Mouse Position</a></h3>
 			<p>
-				The mouse position is available in the uniform <code>u_mouse</code>, normalized to
-				<code>vec2(0-1)</code>.
+				The mouse position is available in the uniform <code>u_mouse</code>.
+			</p>
+
+			<p>
+				The position is normalized to <code>vec2(0-1)</code>, where <code>[0, 0]</code> is the
+				bottom left corner of the canvas <em>(bottom is 0 in GLSL)</em>.
 			</p>
 
 			<Code
@@ -552,7 +595,10 @@ import Dpr from '../components/sections/Dpr.svelte'
                 })
                 `}
 			/>
+		</section>
 
+		<section>
+			<h3 id="mouse-smoothing"><a href="/#mouse-smoothing">Mouse Smoothing</a></h3>
 			<p>
 				<code>mouseSmoothing</code> can be passed in as an option, and/or updated on an instance.
 			</p>

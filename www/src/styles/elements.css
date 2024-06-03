@@ -71,11 +71,41 @@ h2 {
 }
 
 h3 {
+	position: relative;
 	font-size: 2rem;
 	font-weight: 500;
 	font-variation-settings: 'wght' 100;
 	text-align: center;
-	margin-top: 4rem;
+	margin: 0 auto;
+	font-family: var(--font-b);
+
+	&::before {
+		content: '#';
+		color: var(--bg-d);
+		font-size: 1rem;
+		position: absolute;
+		left: -0.75rem;
+		top: 0.5rem;
+	}
+	&:hover::before {
+		color: color-mix(in lch, var(--bg-d), var(--fg-d));
+	}
+
+	a {
+		text-decoration: transparent solid underline;
+		text-decoration-thickness: 1px;
+
+		transition: 0.1s;
+		&:hover {
+			text-decoration-color: color-mix(in lch, var(--bg-d), var(--fg-d));
+		}
+	}
+}
+
+a {
+	color: var(--fg-c);
+	text-decoration: var(--fg-d) dotted underline;
+	text-decoration-thickness: 1px;
 }
 
 button,
@@ -85,7 +115,6 @@ button,
 	margin: auto;
 	padding: 0.5rem 1rem;
 
-	/* background: var(--gradient); */
 	border: none;
 	border-radius: 0.75rem;
 
@@ -171,6 +200,12 @@ code,
 		Bitstream Vera Sans Mono,
 		Courier New,
 		monospace;
+
+	a {
+		color: var(--fg-a);
+		text-decoration: #22639c dotted underline;
+		text-decoration-thickness: 1px;
+	}
 }
 
 :not(pre) > code,
@@ -222,7 +257,6 @@ code,
 
 .grey {
 	-webkit-text-fill-color: var(--fg-d);
-	/* background-image: linear-gradient(in lch 90deg, #d3d3d3 -20%, #b3b3b3, #d3d3d3 120%); */
 }
 
 br {
