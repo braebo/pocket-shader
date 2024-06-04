@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fadeText } from '../../utils/animations.ts'
-	import fragment from '../../shaders/glass.glsl?raw'
+	import fragment from '../../shaders/glass.frag?raw'
 	import { PocketShader } from 'pocket-shader'
 	import Range from '../Range.svelte'
 
@@ -37,12 +37,6 @@
 		if (!disabled) return dispose()
 
 		ps = new PocketShader(id, {
-			vertex: /*glsl*/ `#version 300 es
-                in vec4 a_position;
-                void main() {
-                    gl_Position = a_position;
-                }
-            `,
 			fragment,
 			autoStart: true,
 			uniforms: {
