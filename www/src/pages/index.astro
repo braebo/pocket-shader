@@ -15,9 +15,11 @@ import Nav from '../components/Nav.svelte'
 
 <script>
 	import { fadeText } from '../utils/animations.ts'
-	import kirby from '../shaders/kirby.frag?raw'
 	import { PocketShader } from 'pocket-shader'
 	import { dedent } from '../utils/dedent.ts'
+	
+	import kirby from '../shaders/kirby.frag?raw'
+	import bruh from '../shaders/bruh.frag?raw'
 
 	let ps1: PocketShader | null = null
 	document.querySelector('#run1')?.addEventListener('click', e => {
@@ -120,6 +122,7 @@ import Nav from '../components/Nav.svelte'
 			target.classList.add('active')
 			fadeText(target, 'Dispose')
 			ps5 = new PocketShader('#codeblock5', {
+				fragment: bruh,
 				speed: 2,
 				autoStart: true,
 			})
@@ -217,12 +220,13 @@ import Nav from '../components/Nav.svelte'
 
 		<section>
 			<h3 id="shaders"><a href="/#shaders">Shaders</a></h3>
+
 			<p>
 				Shaders can be passed into the <code>fragment</code> and/or
 				<code>vertex</code> options.
 			</p>
 
-			<Shaders id="#codeblock3-3" client:load>
+			<Shaders id="#codeblock3-3" client:visible>
 				<Code
 					id="codeblock3-3"
 					slot="default"
@@ -330,8 +334,10 @@ import Nav from '../components/Nav.svelte'
 				id="codeblock5"
 				code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
+                import fragment from './bruh.frag?raw'
 
                 new PocketShader('#codeblock5', {
+                    fragment,
                     autoStart: true // [!code highlight]
                 })
             `}
@@ -348,7 +354,6 @@ import Nav from '../components/Nav.svelte'
 
 			<Code
 				id="codeblock11"
-				fontSize="0.75rem"
 				code={/*js*/ `
                 import { PocketShader } from 'pocket-shader'
                 import fragment from './kirby.frag?raw'
@@ -373,10 +378,9 @@ import Nav from '../components/Nav.svelte'
 		<section>
 			<h3 id="playback-controls"><a href="/#playback-controls">Playback Controls</a></h3>
 			<p>
-				The animation loop can be controlled with methods like <code
-					>start<span class="grey">()</span></code
-				>
-				and <code>stop<span class="grey">()</span></code>.
+				The animation loop can be controlled with methods like
+				<code class="g-red">start<span class="grey">()</span></code>
+				and <code class="g-red">stop<span class="grey">()</span></code>.
 			</p>
 			<Playback client:load id="#codeblock6">
 				<Code
@@ -503,7 +507,7 @@ import Nav from '../components/Nav.svelte'
 					slot="default"
 					code={/*js*/ `
                     import { PocketShader } from 'pocket-shader'
-                    import myShader from './clouds.glsl?raw'
+                    import myShader from './glass.frag?raw'
 
                     const ps = new PocketShader('#codeblock9', {
                         fragment: myShader,
@@ -613,7 +617,6 @@ import Nav from '../components/Nav.svelte'
 				<Code
 					id="codeblock10"
 					slot="code"
-					fontSize="0.8rem"
 					code={`const ps = new PocketShader('#codeblock10', {
                   mouseSmoothing: 0.8, // [!code highlight]
                   fragment: ${'`'}...${'`'}
