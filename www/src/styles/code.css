@@ -1,5 +1,15 @@
-.astro-code {
-	background-color: transparent !important;
+:root {
+	--shiki-foreground: #b2bde8;
+	--shiki-background: transparent;
+	--shiki-token-string: #773c00;
+	--shiki-token-comment: #4d5774;
+	--shiki-token-keyword: #33a7f4;
+	--shiki-token-constant: #4685ec;
+	--shiki-token-function: #ff3b86;
+	--shiki-token-parameter: #00aaa2;
+	--shiki-token-string-expression: #89a4e4;
+	--shiki-token-punctuation: #89a4e4;
+	--shiki-token-link: #a269cb;
 }
 
 .has-focused .line {
@@ -48,4 +58,54 @@ pre.astro-code code {
 code,
 pre {
 	overflow: visible;
+}
+
+code,
+.code {
+	font-family: var(--font-mono);
+	a {
+		color: var(--fg-a);
+		text-decoration: #22639c dotted underline;
+		text-decoration-thickness: 1px;
+	}
+}
+
+:not(pre) > code,
+.code {
+	position: relative;
+	/* padding: 0.1rem 0.4rem; */
+	padding: 0.1rem 0.25rem 0rem 0.25rem;
+
+	background: #1b1e28;
+	border-radius: 0.2rem;
+	outline: var(--outline);
+
+	display: inline-flex;
+	align-items: center;
+	width: fit-content;
+
+	font-size: var(--font-xs);
+	line-height: var(--line-height-sm);
+	vertical-align: middle;
+
+	&:not(.plain):not(.g-red) {
+		background-image: var(--gradient);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		-webkit-text-fill-color: transparent;
+	}
+
+	&::before {
+		/* used for the background fill color since text fill prevents a main background color */
+		content: '';
+		position: absolute;
+		inset: 0;
+		display: inline-block;
+		z-index: -1;
+		border-radius: inherit;
+		width: 100%;
+		height: 100%;
+		background-color: var(--bg-a);
+	}
 }

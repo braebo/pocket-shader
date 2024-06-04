@@ -3,6 +3,8 @@ html {
 	background: var(--bg-b);
 	color: var(--fg-a);
 	font-size: 1rem;
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 }
 
 body {
@@ -80,6 +82,10 @@ h2 {
 			text-decoration-color: var(--bg-d);
 		}
 	}
+
+	&:not(:first-of-type) {
+		margin-top: 8rem;
+	}
 }
 
 h3 {
@@ -149,8 +155,8 @@ button,
 	--theme-b: var(--bg-a);
 
 	background: radial-gradient(
-			circle at -25% 50%,
-			var(--bg-a) -20%,
+			in lch circle at -25% 50%,
+			var(--bg-a) -50%,
 			var(--theme-b, #a269cb),
 			var(--theme-a, #33c5f4) 80%,
 			var(--bg-a) 120%
@@ -168,9 +174,9 @@ button,
 	font-weight: 900;
 
 	&.active {
-		--theme-a: #30d84c;
-		--theme-b: #ff0051;
-		background-position: 25% 50%;
+		--theme-a: #ff0051;
+		--theme-b: #ff833b;
+		background-position: 60% 50%;
 		outline-color: var(--bg-a);
 		outline-width: 2px;
 	}
@@ -180,7 +186,7 @@ button,
 		color: var(--fg-a);
 
 		&:not(.active) {
-			background-position: 25% 50%;
+			background-position: 0% 50%;
 			--theme-a: #33c5f4;
 			--theme-b: #a269cb;
 		}
@@ -201,77 +207,6 @@ button,
 
 		background-image: var(--gradient);
 	}
-}
-
-code,
-.code {
-	font-family:
-		Monaspace,
-		Menlo,
-		Monaco,
-		Lucida Console,
-		Liberation Mono,
-		DejaVu Sans Mono,
-		Bitstream Vera Sans Mono,
-		Courier New,
-		monospace;
-
-	a {
-		color: var(--fg-a);
-		text-decoration: #22639c dotted underline;
-		text-decoration-thickness: 1px;
-	}
-}
-
-:not(pre) > code,
-.code {
-	/* padding: 0.1rem 0.4rem; */
-	padding: 0.1rem 0.25rem 0rem 0.25rem;
-
-	background: #1b1e28;
-	border-radius: 0.2rem;
-	outline: var(--outline);
-
-	display: inline-flex;
-	align-items: center;
-	width: fit-content;
-
-	font-size: var(--font-xs);
-	line-height: var(--line-height-sm);
-	vertical-align: middle;
-
-	&:not(.plain) {
-		background-image: var(--gradient);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-		-webkit-text-fill-color: transparent;
-	}
-}
-
-.g-red:not(.plain) {
-	/* prettier-ignore */
-	background-image: linear-gradient(
-		in lch 90deg, #ff8d45 -30%,
-		#ff4e86 40%,
-		#ff72f8 140%
-	);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-	-webkit-text-fill-color: transparent;
-}
-
-.g-blue {
-	background-image: var(--gradient);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-	-webkit-text-fill-color: transparent;
-}
-
-.grey {
-	-webkit-text-fill-color: var(--fg-d);
 }
 
 br {

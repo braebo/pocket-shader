@@ -1,7 +1,8 @@
 ---
-// import type { ThemeInput } from 'shiki'
 import { Code as AstroCode } from 'astro:components'
+import { createCssVariablesTheme } from 'shiki'
 import { dedent } from '../utils/dedent.ts'
+import { nanoid } from '../utils/nanoid'
 import Copy from './Copy.svelte'
 import {
 	transformerNotationWordHighlight,
@@ -31,25 +32,34 @@ const {
 	title = '',
 	width = '',
 } = Astro.props
+
+const theme = createCssVariablesTheme({
+	name: 'pocket-shader',
+	fontStyle: true
+})
+
+const copyId = 'copyId-' + nanoid(8)
 ---
 
 <div class="outer">
 	{title && <label>{title}</label>}
-	
+
 	<div class="code-container" id={id}>
 		<div class="code-padding"></div>
 
-		<div class="inner" style=`font-size:${fontSize};line-height:${lineHeight}`>
+		<div class="inner" id={copyId} style=`font-size:${fontSize};line-height:${lineHeight}`>
 			<div class="copy-button-container">
-				<Copy text={code} client:load />
+				<Copy text={() => document.getElementById(copyId)?.innerText} client:load />
 			</div>
+
+			<div id={copyId}>
 
 			{codes.length ? (
 					codes.map(({lang, code, trim = false}) => (
 						<!-- @ts-ignore -->
 						<AstroCode
 							lang={lang}
-							theme="poimandres"
+							theme={theme}
 							transformers={[
 								transformerNotationFocus(),
 								transformerNotationDiff(),
@@ -63,17 +73,19 @@ const {
 					<!-- @ts-ignore -->
 					<AstroCode
 						lang={lang}
-						theme="poimandres"
+						theme={theme}
 						transformers={[
 							transformerNotationFocus(),
 							transformerNotationDiff(),
 							transformerNotationHighlight(),
 							transformerNotationWordHighlight()
-					]}
+						]}
+						
 						code={dedent(code)}
 					/>
 			)
 			}
+			</div>
 		</div>
 		<div class="code-padding"></div>
 	</div>
@@ -82,7 +94,6 @@ const {
 <style define:vars={{ width }}>
 	.outer {
 		position: relative;
-		/* width: fit-content; */
 		width: var(--width, fit-content);
 		max-width: 100%;
 		margin: auto;
@@ -94,7 +105,6 @@ const {
 		position: relative;
 		display: flex;
 
-		/* width: fit-content; */
 		max-width: 100%;
 		margin: auto;
 
@@ -114,9 +124,6 @@ const {
 		font-size: var(--font-sm);
 		font-variation-settings: 'wght' 200;
 		line-height: var(--line-height-sm);
-
-		div.inner {
-		}
 	}
 	
 	.outer:has(label) {
@@ -137,9 +144,6 @@ const {
 		z-index: 0;
 	}
 
-	
-
-
 	.copy-button-container {
 		position: absolute;
 		right: 0;
@@ -153,7 +157,6 @@ const {
 		transition: 0.2s;
 		transform: scale(1) translate3d(0, 0, 1px);
 	}
-
 
 	label {
 		position: absolute;
