@@ -1,6 +1,8 @@
 <div align="center">
 
-<img src="./www/public/pocket-shader-transparent.svg" width="500">
+<a href="https://pocket-shader.braebo.dev" target="_blank" rel="noopener">
+    <img src="./www/public/pocket-shader-transparent.svg" width="600">
+</a>
 
 </div>
 
