@@ -26,6 +26,66 @@
 	}
 }
 
+.gradient-outline {
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		display: inline-block;
+		z-index: -1;
+		border-radius: inherit;
+		width: 100%;
+		height: 100%;
+		padding: 1px;
+		left: -1px;
+		top: -1px;
+
+		background-image: linear-gradient(
+			var(--deg, 45deg),
+			color-mix(in lch, var(--theme-a, #33c5f4) 25%, transparent),
+			color-mix(in lch, var(--theme-b, #913bff) 25%, transparent) 100%
+		);
+
+		animation: gradient-animation 5s infinite alternate;
+	}
+
+	&:hover {
+		background-color: var(--gradient);
+	}
+}
+
+@keyframes gradient-animation {
+	from {
+		--theme-a: #33c5f4;
+		--angle: 0deg;
+	}
+	to {
+		--theme-a: #f44d4d;
+		--angle: 360deg;
+	}
+}
+
+.g-red:not(.plain) {
+	/* prettier-ignore */
+	background-image: var(--ps-gradient);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
+.g-blue {
+	background-image: var(--gradient);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
+.grey {
+	-webkit-text-fill-color: var(--fg-d);
+}
+
 .card {
 	width: fit-content;
 	margin: auto;
