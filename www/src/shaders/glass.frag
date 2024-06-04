@@ -2,6 +2,7 @@
 precision mediump float;
 
 out vec4 fragColor;
+in vec2 vUv;
 
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
@@ -23,13 +24,6 @@ uniform float poly_zoom;
 // Tinker with these parameters to create different solids
 // -------------------------------------------------------
 const float rotation_speed = 0.25f;
-// const float poly_U = 1.f;   // [0, inf]
-// const float poly_V = 0.5f;  // [0, inf]
-// const float poly_W = 1.0f;  // [0, inf]
-// const int octave = 3;    // [2, 5]
-// const float inner_sphere = 1.f;
-// const float refr_index = 0.9f;
-// const float poly_zoom = 2.0f;
 
 #define MAX_BOUNCES2        6
 // -------------------------------------------------------
@@ -382,8 +376,7 @@ vec3 effect(vec2 p, vec2 pp) {
 }
 
 void main() {
-    vec2 fragCoord = gl_FragCoord.xy;
-    vec2 q = fragCoord / RESOLUTION.xy;
+    vec2 q = vUv;
     vec2 p = -1.0f + 2.0f * q;
     vec2 pp = p;
     p.x *= RESOLUTION.x / RESOLUTION.y;

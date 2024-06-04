@@ -197,10 +197,10 @@ void main() {
     #else
             const float AA = 1.f, x = 0.f, y = 0.f;
     #endif
-            // vec2 uv = (2.f * (fragCoord + vec2(x, y)) - u_resolution.xy) / u_resolution.y;
+            // vec2 uv = (2.f * (vUv + vec2(x, y)) - u_resolution.xy) / u_resolution.y;
             vec2 uv = vUv;
             const float shutter_speed = 1.25f; // for motion blur
-            float dt = fract(texture(iChannel0, float(AA) * (fragCoord + vec2(x, y)) / iChannelResolution[0].xy).r + u_time) * shutter_speed;
+            float dt = fract(texture(iChannel0, float(AA) * (vUv + vec2(x, y)) / iChannelResolution[0].xy).r + u_time) * shutter_speed;
             // float dt = fract(hash21(float(AA) * (vUv + vec2(x, y))) + u_time) * shutter_speed;
             jTime = mod(u_time - dt * u_timeDelta, 4000.f);
             vec3 ro = vec3(0.f, 1, (-20000.f + jTime * speed));
