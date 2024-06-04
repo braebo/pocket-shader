@@ -1,6 +1,6 @@
 <div align="center">
 
-![img](./www/public/pocket-shader-transparent.svg)
+<img src="./www/public/pocket-shader-transparent.svg" width="500">
 
 </div>
 
@@ -8,8 +8,9 @@
 
 - ✅ Fully Typed
 - 👌 Zero Dependencies
-- 🐭 Lightweight - _2.63 kB_
 - 📦 Simple API
+- 🌐 ESM Only
+- 🐭 Lightweight - _2.63 kB_
 
 <br />
 
