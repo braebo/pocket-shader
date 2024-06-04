@@ -69,21 +69,21 @@
 		class:gradient-outline={!disabled && state !== 'running'}
 		class:active={state === 'running'}
 		disabled={disabled || state === 'running'}
-		on:click={start}><span class="g-red">ps</span>.<span class="g-blue">start</span>()</button
+		on:click={start}><span class="g-blue">ps</span>.<span class="g-red">start</span>()</button
 	>
 	<button
 		class="code plain"
 		class:gradient-outline={!disabled && state !== 'paused'}
 		class:active={state === 'paused'}
 		disabled={disabled || state !== 'running'}
-		on:click={pause}><span class="g-red">ps</span>.<span class="g-blue">pause</span>()</button
+		on:click={pause}><span class="g-blue">ps</span>.<span class="g-red">pause</span>()</button
 	>
 	<button
 		class="code plain"
 		class:gradient-outline={!disabled && state !== 'stopped'}
 		class:active={state === 'stopped'}
 		disabled={disabled || state !== 'running'}
-		on:click={stop}><span class="g-red">ps</span>.<span class="g-blue">stop</span>()</button
+		on:click={stop}><span class="g-blue">ps</span>.<span class="g-red">stop</span>()</button
 	>
 </div>
 
@@ -91,9 +91,9 @@
 	<div class="kv" class:disabled>
 		<div class="key">
 			<code class="plain">
-				<span class="g-red">ps</span>
+				<span class="g-blue">ps</span>
 				.
-				<span class="g-blue">state</span>
+				<span class="g-red">state</span>
 			</code>
 		</div>
 		<div class="value" class:disabled bind:this={stateTextEl}>{state}</div>
@@ -102,9 +102,9 @@
 	<div class="kv" class:disabled>
 		<div class="key">
 			<code class="plain">
-				<span class="g-red">ps</span>
+				<span class="g-blue">ps</span>
 				.
-				<span class="g-blue">time</span>
+				<span class="g-red">time</span>
 			</code>
 		</div>
 		<div class="value" class:disabled>{t}</div>
