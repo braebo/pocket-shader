@@ -1,5 +1,5 @@
 <script lang="ts">
-	import fragment from '../shaders/retro.glsl?raw'
+	import fragment from '../shaders/retro.frag?raw'
 	import { PocketShader } from 'pocket-shader'
 	import { onMount } from 'svelte'
 
