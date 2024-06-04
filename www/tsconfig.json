@@ -5,13 +5,15 @@
 		"lib": ["DOM", "ESNext"],
 		"target": "ESNext",
 		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
+		"moduleResolution": "Bundler",
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"skipLibCheck": true,
 		"allowJs": true,
 		"checkJs": false,
-		"noEmit": true
+		"noEmit": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	},
 	"exclude": ["node_modules", "dist"]
 }

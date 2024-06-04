@@ -8,6 +8,8 @@
 		"skipLibCheck": true,
 		"allowJs": false,
 		"noEmit": true,
-		"noImplicitReturns": true
+		"noImplicitReturns": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	}
 }
