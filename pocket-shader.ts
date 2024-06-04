@@ -51,6 +51,14 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	 * @defaultValue `0.1`
 	 */
 	mouseSmoothing?: number
+
+	/**
+	 * When true, the instance will automatically initialize itself.  Otherwise, you will need to
+	 * call the {@link PocketShader.init|`init`} method manually.  This is useful for server-side
+	 * rendering, or when you need to perform additional setup before initializing the instance.
+	 * @defaultValue `true`
+	 */
+	autoInit?: boolean
 }
 
 const DEFAULT_UNIFORMS = {
@@ -74,12 +82,12 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * The container for the canvas element is used to determine the size of the canvas.
 	 */
-	container: HTMLElement | null
+	container!: HTMLElement | null
 
 	/**
 	 * The canvas element used to render the shader.
 	 */
-	canvas: HTMLCanvasElement
+	canvas!: HTMLCanvasElement
 
 	/**
 	 * The WebGL2 rendering context.
@@ -99,7 +107,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * }
 	 * ```
 	 */
-	vertex: string
+	vertex!: string
 
 	/**
 	 * The fragment shader used by this instance.
@@ -120,20 +128,20 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 * }
 	 *```
 	 */
-	fragment: string
+	fragment!: string
 
 	/**
-	 * The maximum resolution multiplier, determined by the device pixel
-	 * ratio by default.
-	 * @defaultValue `window.devicePixelRatio || 1`
+	 * The maximum resolution multiplier.  By default, this value is set to `2` to avoid nuking
+	 * high-dpi phones with expensive shaders _(iPhone is `3` for example, so 3x more expensive)_.
+	 * @defaultValue `2`
 	 */
-	maxPixelRatio: number
+	maxPixelRatio!: number
 
 	/**
 	 * A time multiplier.
 	 * @defaultValue `1`
 	 */
-	speed: number
+	speed!: number
 
 	/**
 	 * The current state of the renderer.
@@ -144,7 +152,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * The options used to create this instance.
 	 */
-	opts: PocketShaderOptions<NoInfer<T>>
+	opts!: PocketShaderOptions<NoInfer<T>>
 
 	/**
 	 * The WebGL program used to render the shader.
@@ -184,24 +192,18 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	private _builtinUniformLocations = new Map<string, WebGLUniformLocation>()
 	private _uniformLocations = new Map<string, WebGLUniformLocation>()
 
-	private _uniforms: { [K in keyof T]: T[K] }
+	private _uniforms!: { [K in keyof T]: T[K] }
 	/**
 	 * A record of uniform values to pass to the shader.
 	 */
 	get uniforms(): T {
-		return new Proxy(this._uniforms, {
-			set: (target, property, value) => {
-				// @ts-expect-error
-				target[property] = value
-				if (this.state.match(/paused|stopped/)) {
-					this.render()
-				}
-				return true
-			},
-		})
+		return this._uniforms
 	}
 	set uniforms(value: T) {
 		this._uniforms = value
+		if (this.state.match(/paused|stopped/)) {
+			this.render()
+		}
 	}
 
 	private _time = 0
@@ -218,9 +220,12 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.builtinUniforms.u_time = value
 	}
 
-	private _resizeObserver: ResizeObserver
-	private _canvasRectCache: DOMRectReadOnly
+	private _resizeObserver!: ResizeObserver
+	private _canvasRectCache!: DOMRectReadOnly
 	private _listeners = new Map<string, (data: { time: number; delta: number }) => void>()
+
+	private _arg1: ConstructorParameters<typeof PocketShader>[0]
+	private _arg2: ConstructorParameters<typeof PocketShader>[1]
 
 	constructor(options?: PocketShaderOptions<T>)
 	constructor(
@@ -237,18 +242,64 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		arg1?: HTMLElement | string | PocketShaderOptions<T>,
 		arg2?: PocketShaderOptions<T>,
 	) {
+		this._arg1 = arg1 as ConstructorParameters<typeof PocketShader>[0]
+		this._arg2 = arg2
+
+		let init = true
+		if (typeof arg1 === 'object' && 'autoInit' in arg1 && arg1.autoInit === false) {
+			init = false
+		}
+		if (typeof arg2 === 'object' && 'autoInit' in arg2 && arg2.autoInit === false) {
+			init = false
+		}
+
+		if (init) {
+			if (typeof globalThis.window === 'undefined') {
+				if (import.meta.env?.DEV) {
+					console.warn(
+						'PocketShader is not running in a browser environment.  Aborting automatic initialization.',
+					)
+				}
+				return
+			}
+
+			// todo - figure out how to stop HMR from spamming new instances / crashing the browser with expensive shaders.
+			// if (import.meta.env?.DEV && import.meta.hot) {
+			// 	import.meta.hot.dispose(() => {
+			// 		console.warn('HMR detected.  Cleaning up webgl context.')
+			// 		this.dispose()
+			// 	})
+			// }
+			// if (import.meta.env?.DEV && import.meta.hot) {
+			// 	import.meta.hot.on('vite:beforeUpdate', () => {
+			// 		this.dispose()
+			// 		console.warn('HMR detected.  Cleaning up webgl context.')
+			// 	})
+			// }
+
+			if (globalThis.document?.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', this.init)
+			} else {
+				this.init()
+			}
+		}
+	}
+
+	init(): this {
+		if (!import.meta.env?.DEV && !import.meta.hot) return this
+
 		let container: HTMLElement | null
 		let options: PocketShaderOptions<T> | undefined
 
-		if (arg1 instanceof Element) {
-			container = arg1
-			options = arg2
-		} else if (typeof arg1 === 'string') {
-			container = document.querySelector(arg1)
-			options = arg2
+		if (this._arg1 instanceof Element) {
+			container = this._arg1
+			options = this._arg2 as PocketShaderOptions<T>
+		} else if (typeof this._arg1 === 'string') {
+			container = document.querySelector(this._arg1)
+			options = this._arg2 as PocketShaderOptions<T>
 		} else {
 			container = document.body
-			options = arg1
+			options = this._arg1
 		}
 
 		this.opts = options ?? {}
@@ -268,7 +319,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this.vertex =
 			options?.vertex ??
-			`#version 300 es\nin vec4 a_position;out vec2 vUv;void main() {vUv = a_position.xy * 0.5 + 0.5;gl_Position = a_position;}`
+			`#version 300 es\nlayout(location = 0) in vec4 a_position;out vec2 vUv;void main() {vUv = a_position.xy * 0.5 + 0.5;gl_Position = a_position;}`
 
 		this.fragment =
 			options?.fragment ??
@@ -277,10 +328,20 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		if (!this.vertex.startsWith('#version')) {
 			this.vertex = '#version 300 es\n' + this.vertex
 		}
+
 		// Fill in `#version` / `precision` directives if missing.
+
 		const parts = this.fragment.split('\n')
-		const prepends = [parts[0].startsWith('#version') ? parts.shift() : '#version 300 es']
-		if (!this.fragment.includes('precision')) prepends.push('precision mediump float;\n')
+		// prettier-ignore
+		const prepends = [
+			parts[0].startsWith('#version')
+				? parts.shift()
+				: '#version 300 es'
+		]
+		if (!this.fragment.includes('precision')) {
+			prepends.push('precision mediump float;\n')
+		}
+
 		this.fragment = prepends.concat(parts).join('\n')
 
 		this._uniforms = options?.uniforms ?? ({} as T)
@@ -319,15 +380,20 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 
 		if (
-			import.meta?.env?.DEV &&
+			import.meta.env?.DEV &&
 			(this.container.clientWidth === 0 || this.container.clientHeight === 0)
 		) {
 			console.error(
 				`PocketShader container has a width or height of 0px.  The canvas will not be visible until the container has a non-zero size size.`,
-				this.container,
-				this,
+				{
+					container: this.container,
+					canvas: this.canvas,
+					this: this,
+				},
 			)
 		}
+
+		return this
 	}
 
 	/**
@@ -502,7 +568,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 				0, // start at the beginning of the buffer
 			)
 
-			// this.ctx.uniform2f(resolutionLocation, this.ctx.canvas.width, this.ctx.canvas.height)
 			this.ctx.uniform2f(
 				resolutionLocation,
 				this.builtinUniforms.u_resolution[0],
@@ -729,7 +794,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return this
 	}
 
-	private _cleanup(): void {
+	private _cleanupListeners(): void {
 		this.canvas.removeEventListener('mousemove', this.setMousePosition)
 		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
 		window.removeEventListener('resize', this.resize)
@@ -741,7 +806,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	dispose() {
 		this.state = 'disposed'
 
-		this._cleanup()
+		this._cleanupListeners()
 
 		this._builtinUniformLocations.clear()
 		this._uniformLocations.clear()
