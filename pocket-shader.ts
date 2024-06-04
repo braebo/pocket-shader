@@ -69,6 +69,7 @@ interface Uniform {
  *
  * @param container The element to append the canvas to.  Can be an HTMLElement or a string selector.
  */
+@LogMethods()
 export class PocketShader<T extends Record<string, Uniform> = Record<string, Uniform>> {
 	/**
 	 * The container for the canvas element is used to determine the size of the canvas.
@@ -790,5 +791,47 @@ function throttledDebounce(
 		debounceTimeout = setTimeout(() => {
 			fn(...args)
 		}, debounceMs)
+	}
+}
+
+/**
+ * Generates a hex color from a string.
+ */
+function hashHex(
+	name: string,
+	/**
+	 * A weight factor to adjust the hash.  Higher values will result in more variation.
+	 * @defaultValue
+	 */
+	weightFactor = 42,
+): string {
+	return (
+		'#' +
+		(
+			0x1000000 +
+			(name.split('').reduce((acc, c) => acc + c.charCodeAt(0) * weightFactor, 0) & 0xffffff)
+		)
+			.toString(16)
+			.slice(1)
+			.replace(/^./, 'F')
+	)
+}
+
+function LogMethods(): ClassDecorator {
+	return function (target: Function) {
+		for (const key of Object.getOwnPropertyNames(target.prototype)) {
+			const method = target.prototype[key]
+			if (key !== 'constructor' && typeof method === 'function') {
+				const color = hashHex(key)
+				target.prototype[key] = function (...args: any[]) {
+					if (import.meta.env?.DEV) {
+						console.log(`%c${key}%c()`, `color:${color}`, `color:inherit`, {
+							this: this,
+						})
+					}
+					return method.apply(this, args)
+				}
+			}
+		}
 	}
 }
