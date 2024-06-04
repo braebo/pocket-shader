@@ -6,21 +6,25 @@
 
 <h1 class="hero-text text-gradient-animated">Pocket Shader</h1>
 
-<p class="description gradient-outline">
-	A javascript package that makes it easy to render WebGL shaders
-</p>
+<p class="description">A pocket-sized javascript library for easy WebGL shader rendering.</p>
 
+<br />
 <div
 	class="install-wrapper"
 	on:pointerover={() => (hovering = true)}
 	on:pointerout={() => (hovering = false)}
 >
-	<code class="install plain">
-		<div style="color:#cf8f8f">npx</div>
-		<div style="color:#dcdca5">jsr add</div>
-		<div class="text-gradient">@braebo/pocket-shader</div>
-		<br />
+	<code class="install plain gradient-outline">
+		<div style="color:#e24e69">npx</div>
+		<div class="jsr-add" style="color:#d1d1d1">jsr add</div>
+		<div class="namespace">
+			<span class="braebo text-gradient">@braebo</span>
+			<span class="slash">/</span>
+			<span class="pocket-shader text-gradient">pocket-shader</span>
+			<br />
+		</div>
 	</code>
+
 	<span class="copy">
 		<Copy
 			text="npx jsr add @braebo/pocket-shader"
@@ -32,7 +36,7 @@
 					position: absolute;
 					inset: 0;
 					margin: 0;
-					padding: .5rem;
+					padding: .6rem;
 					width: 100%;
 					height: 100%;
 				"
@@ -42,8 +46,8 @@
 
 <style lang="scss">
 	.hero-text {
-		margin: 2rem auto 1.5rem auto;
-		font-size: 5rem;
+		margin: 0 auto;
+		font-size: 5.5rem;
 		padding: 0 1rem;
 		letter-spacing: -3px;
 	}
@@ -57,10 +61,15 @@
 		padding-bottom: 2.25rem;
 		max-width: 27rem;
 
-		background: var(--bg-b);
+		// background: var(--bg-b);
 		border-radius: var(--radius);
 
 		text-wrap: balance;
+
+		font-size: 1.15rem;
+		font-variation-settings: 'wght' 200;
+		letter-spacing: 0.3px;
+		word-spacing: 2px;
 	}
 
 	.install-wrapper {
@@ -82,21 +91,63 @@
 	code.install {
 		position: relative;
 		display: flex;
-		gap: 0.75rem;
+		justify-content: center;
+		align-items: center;
 
-		padding: 0.5rem 0.75rem;
+		padding: 0.75rem 1.5rem;
 		margin: auto;
 
-		background: var(--bg-b);
+		background: color-mix(in lch, var(--bg-a), var(--bg-b) 75%);
+		border-radius: 1rem;
 		outline: none;
 
 		font-size: var(--font-sm);
+		font-size: 1rem;
 		transition: opacity 0.2s;
+
+		@media (max-width: 600px) {
+			gap: 0.5rem;
+			white-space: nowrap;
+			font-size: min(1.1rem, 3.5vw);
+		}
+
+		&::before {
+			animation: none;
+			background-image: linear-gradient(to right, #111, #111, #222, #292929, #111);
+			box-shadow:
+				0 3px 5px #0004,
+				0 5px 10px #0002,
+				0 10px 20px #0001;
+		}
+
+		div {
+			filter: saturate(0.75);
+		}
 	}
 
-	/* firefox fallback */
-	.text-gradient {
+	.jsr-add {
+		margin: 0 0.75rem;
+		opacity: 0.75;
+	}
+
+	.namespace {
+		display: flex;
+	}
+
+	.braebo {
+		display: inline-block;
+		background-image: linear-gradient(to right, #0094b5, #4f6bff);
+		/* firefox fallback */
 		color: rgb(65, 143, 221);
+	}
+	.slash {
+		color: #7037ff;
+	}
+	.pocket-shader {
+		display: inline-block;
+		background-image: var(--ps-gradient);
+		/* firefox fallback */
+		color: #7037ff;
 	}
 
 	.copy {
@@ -108,27 +159,41 @@
 
 		color: var(--fg-a);
 		background: transparent;
+		border-radius: 1rem;
 		opacity: 0;
 
 		font-family: var(--font-mono);
 
-		transition: opacity 0.2s;
+		backdrop-filter: blur(0px);
+		transition:
+			opacity 0.2s,
+			backdrop-filter 0.2s;
+
 		z-index: 2;
 	}
 
 	.install-wrapper:hover {
-		code {
-			opacity: 0.25;
-		}
 		div {
 			cursor: pointer;
 			z-index: 0;
+		}
+
+		code.install {
+			background: var(--bg-a);
+
+			&::before {
+				box-shadow:
+					0 3px 5px #0004,
+					0 5px 10px #0002,
+					0 10px 20px #0001;
+			}
 		}
 
 		.copy {
 			pointer-events: all;
 			opacity: 1;
 			z-index: 1;
+			backdrop-filter: blur(2px);
 		}
 	}
 
@@ -138,6 +203,6 @@
 		transform: translate(15%, 15%);
 	}
 	:global(.install-wrapper:hover .icon.copy:not(.active) .back) {
-		transform: translate(0, 0);
+		transform: translate(0, 0) scale(0.9);
 	}
 </style>
