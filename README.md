@@ -1,6 +1,6 @@
 <div align="center">
 
-![img](./.github/hero.svg)
+![img](./www/public/pocket-shader-transparent.svg)
 
 </div>
 
