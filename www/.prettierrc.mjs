@@ -1,5 +1,6 @@
-{
-	"plugins": ["prettier-plugin-astro"],
+import astro from "prettier-plugin-astro";
+export default {
+	"plugins": [astro],
 	"overrides": [
 	  {
 		"files": "*.astro",

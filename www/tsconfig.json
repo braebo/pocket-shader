@@ -1,13 +1,12 @@
 {
 	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
+		"baseUrl": ".",
 		"strict": true,
 		"lib": ["DOM", "ESNext"],
 		"target": "ESNext",
-		"module": "NodeNext",
+		"module": "ESNext",
 		"moduleResolution": "Bundler",
-		"jsx": "preserve",
-		"jsxImportSource": "solid-js",
 		"skipLibCheck": true,
 		"allowJs": true,
 		"checkJs": false,
