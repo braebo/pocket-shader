@@ -67,8 +67,11 @@ h2 {
 
 	z-index: 1;
 
+	width: fit-content;
 	margin-top: 4rem;
+	margin-right: auto;
 	margin-bottom: 0rem;
+	margin-left: auto;
 
 	font-size: 3rem;
 	text-align: center;
