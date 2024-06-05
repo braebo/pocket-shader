@@ -107,7 +107,7 @@ import bruh from '../shaders/bruh.frag?raw'
 				/>
 			<!-- </Shaders> -->
 			<Example
-				client:only
+				client:load
 				opts={['#codeblock3', {
 					autoStart: true,
 					mousePosition: {x: 0.5, y: 0.1},
@@ -261,7 +261,6 @@ import bruh from '../shaders/bruh.frag?raw'
             `}
 			/>
 
-			<button class="btn" id="run11">Run</button>
 			<Example client:load opts={['#codeblock11', {
 				fragment: kirby,
 				speed: 2,
