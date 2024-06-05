@@ -214,32 +214,8 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	private _uniformLocations = new Map<string, WebGLUniformLocation>()
 
 	private _uniforms!: { [K in keyof T]: T[K] }
-	/**
-	 * A record of uniform values to pass to the shader.
-	 */
-	get uniforms(): T {
-		return this._uniforms
-	}
-	set uniforms(value: T) {
-		this._uniforms = value
-		if (this.state.match(/paused|stopped/)) {
-			this.render()
-		}
-	}
 
 	private _time = 0
-	/**
-	 * The current time in seconds.  This value is updated automatically after calling
-	 * {@link start|`start()`}, and is reset to `0` when {@link stop|`stop()`} is called.  You can
-	 * also set this value yourself if you prefer to control the time uniform manually.
-	 */
-	get time(): number {
-		return this._time
-	}
-	set time(value: number) {
-		this._time = value
-		this.builtinUniforms.u_time = value
-	}
 
 	private _resizeObserver!: ResizeObserver
 	private _canvasRectCache!: DOMRectReadOnly
@@ -266,6 +242,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this._arg1 = arg1 as ConstructorParameters<typeof PocketShader>[0]
 		this._arg2 = arg2
 
+		// this.resolution = this.resolution.bind(this)
+		// Cannot assign to 'resolution' because it is a read-only property.ts(2540)
+		// Property 'bind' does not exist on type '{ width: number; height: number; }'.ts(2339)
+
 		let init = true
 		if (typeof arg1 === 'object' && 'autoInit' in arg1 && arg1.autoInit === false) {
 			init = false
@@ -284,25 +264,44 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 				return
 			}
 
-			// todo - figure out how to stop HMR from spamming new instances / crashing the browser with expensive shaders.
-			// if (import.meta.env?.DEV && import.meta.hot) {
-			// 	import.meta.hot.dispose(() => {
-			// 		console.warn('HMR detected.  Cleaning up webgl context.')
-			// 		this.dispose()
-			// 	})
-			// }
-			// if (import.meta.env?.DEV && import.meta.hot) {
-			// 	import.meta.hot.on('vite:beforeUpdate', () => {
-			// 		this.dispose()
-			// 		console.warn('HMR detected.  Cleaning up webgl context.')
-			// 	})
-			// }
-
 			if (globalThis.document?.readyState === 'loading') {
 				document.addEventListener('DOMContentLoaded', this.init)
 			} else {
 				this.init()
 			}
+		}
+	}
+
+	/**
+	 * A record of uniform values to pass to the shader.
+	 */
+	get uniforms(): T {
+		return this._uniforms
+	}
+	set uniforms(value: T) {
+		this._uniforms = value
+		if (this.state.match(/paused|stopped/)) {
+			this.render()
+		}
+	}
+
+	/**
+	 * The current time in seconds.  This value is updated automatically after calling
+	 * {@link start|`start()`}, and is reset to `0` when {@link stop|`stop()`} is called.  You can
+	 * also set this value yourself if you prefer to control the time uniform manually.
+	 */
+	get time(): number {
+		return this._time
+	}
+	set time(value: number) {
+		this._time = value
+		this.builtinUniforms.u_time = value
+	}
+
+	get resolution(): { width: number; height: number } {
+		return {
+			width: this.canvas?.width,
+			height: this.canvas?.height,
 		}
 	}
 
@@ -607,7 +606,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			)
 			this.ctx.uniform1f(timeLocation, this.builtinUniforms.u_time)
 
-			// todo - Dynamic uniforms instead?
 			for (const [key, value] of this._uniformLocations) {
 				this._setUniform(this.ctx, value, this.uniforms[key])
 			}
@@ -822,7 +820,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		let match
 		while ((match = uniformRegex.exec(source)) !== null) {
-			const [, type, name] = match
+			const [, , name] = match
 
 			if (
 				[...this._builtinUniformLocations.keys(), ...Object.keys(this.uniforms)].some(

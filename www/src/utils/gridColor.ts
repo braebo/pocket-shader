@@ -13,3 +13,8 @@ export const gridColor = tweened(gridColors.greyscale, {
 	duration: 1500,
 	easing: quintOut,
 })
+
+export const gridYeet = tweened(1.0, {
+	duration: 1500,
+	easing: quintOut,
+})

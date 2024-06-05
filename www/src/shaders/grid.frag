@@ -6,8 +6,8 @@ uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse;
 uniform float u_parallax;
-uniform float u_greyscale;
 uniform vec3 u_color;
+uniform float u_yeet;
 
 in vec2 vUv;
 out vec4 fragColor;
@@ -71,13 +71,13 @@ void main() {
     vec2 mouse = u_mouse;
 
     // uv = gl_FragCoord.xy / u_resolution.xy;
-    vec2 uv = vec2(vUv.x * aspect, vUv.y - u_parallax);
+    vec2 uv = vec2(vUv.x * aspect, vUv.y - (u_parallax * aspect));
     
     //? Zoom out.
     uv *= -10.0;
     
     float brightness =
-        0.15 *
+        0.15 * u_yeet *
         //? Vignette that follows the mouse.
         exp(
             -9.5 * length(vUv - u_mouse)
@@ -86,6 +86,8 @@ void main() {
     //? Subtle, slow blink effect.
     float blink = 1.8 + sin(time * 6.5) * 0.5;
     brightness *= blink;
+
+    
 
 	//? Add some noise octaves.
     float a = 0.25;
@@ -133,13 +135,19 @@ void main() {
     // vec3 grid = themeA * 14.;
     // vec3 grid = themeA * 14.;
     vec3 grid = u_color * 14.;
+
    
     grid *= pow(brightness, 14.1);
+    
+    grid = clamp(grid, 0., 1.);
+    brightness = clamp(brightness, 0., 1.);
 
     // vec3 greyscale = vec3(pow(brightness, grid.x), pow(brightness, grid.y), pow(brightness, grid.z)) * 2.0
     vec3 greyscale = vec3(pow(brightness, 0.1), pow(brightness, 0.1), pow(brightness, 1.0)) * 2.0;
 
-    vec3 color = mix(grid, greyscale, u_greyscale);
+    // greyscale = clamp(greyscale, 0., 1.);
+
+    vec3 color = grid;
 
     fragColor = vec4(color, (color.r + color.g + color.b) / 3.0);
 }
