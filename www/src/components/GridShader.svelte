@@ -17,16 +17,22 @@
 	}
 
 	const subs = [] as (() => void)[]
-	subs.push(gridColor.subscribe((value) => {
-		if (ps) {
-			ps.uniforms.u_color.value = value
-		}
-	}))
-	subs.push(gridYeet.subscribe((value) => {
-		if (ps) {
-			ps.uniforms.u_yeet.value = value
-		}
-	}))
+
+	subs.push(
+		gridColor.subscribe(value => {
+			if (ps) {
+				ps.uniforms.u_color.value = value
+			}
+		}),
+	)
+
+	subs.push(
+		gridYeet.subscribe(value => {
+			if (ps) {
+				ps.uniforms.u_yeet.value = value
+			}
+		}),
+	)
 
 	onMount(() => {
 		ps = new PocketShader({
@@ -51,8 +57,8 @@
 
 	let yeetCooldown: ReturnType<typeof setTimeout>
 	const yeet = async () => {
-		// gridYeet.set(1.75, { duration: 50 })
-		gridYeet.set(2, { duration: 50 })
+		gridYeet.set(1.75, { duration: 50 })
+		// gridYeet.set(2, { duration: 50 })
 		clearTimeout(yeetCooldown)
 		yeetCooldown = setTimeout(() => {
 			gridYeet.set(1, { duration: 1000, easing: quadIn })
@@ -74,10 +80,6 @@
 	}
 </script>
 
-<div class="yeet-progress" style="width: {($gridYeet / 1.75) * 100}%; height: 2rem; position:fixed; top: 2rem;">
-	{($gridYeet / 1.75) * 100}%
-</div>
-
 <svelte:window
 	on:scroll={() => {
 		if (ps) {
@@ -87,6 +89,3 @@
 	on:pointerdown={yeet}
 	on:keydown={setYeet}
 />
-	<!-- on:pointerup={() => {
-		gridYeet.set(1)
-	}} -->
