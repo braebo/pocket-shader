@@ -60,6 +60,12 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	mouseSmoothing?: number
 
 	/**
+	 * The initial mouse position, normalized to the range `[0, 1]`.
+	 * @defaultValue `[0, 0]`
+	 */
+	mousePosition?: { x: number; y: number }
+
+	/**
 	 * Where to listen for mouse events.  By default, the renderer listens for mouse events on the
 	 * canvas element.  You can also listen for mouse events on the container element, or the window
 	 * with this option.
@@ -167,7 +173,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * The options used to create this instance.
 	 */
-	opts!: PocketShaderOptions<NoInfer<T>>
+	opts = {} as PocketShaderOptions<NoInfer<T>>
 
 	/**
 	 * The WebGL program used to render the shader.
@@ -389,6 +395,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this._resizeObserver.observe(this.container)
 
 		this.compile()
+
+		if (options?.mousePosition) {
+			this.mouse = options.mousePosition
+		}
 
 		if (options?.autoStart === true) {
 			this.start()
