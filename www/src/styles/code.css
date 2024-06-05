@@ -21,7 +21,7 @@
 
 .has-highlighted {
 	.line {
-		opacity: 0.75;
+		opacity: 0.9;
 		filter: brightness(0.7) saturate(0.7);
 
 		&:has(.highlighted-word) {
