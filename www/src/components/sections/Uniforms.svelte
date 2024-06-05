@@ -72,7 +72,7 @@
 		<div class="label">{octave}</div>
 	</div>
 	<div class="right">
-		<Range min={2} max={5} step={1} bind:value={octave} />
+		<Range min={2} max={5} step={1} bind:value={octave} {disabled} />
 	</div>
 </div>
 
@@ -82,7 +82,7 @@
 		<div class="label">{poly_zoom.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0.1} max={5} step={0.01} bind:value={poly_zoom} />
+		<Range min={0.1} max={5} step={0.01} bind:value={poly_zoom} {disabled} />
 	</div>
 </div>
 
@@ -92,7 +92,7 @@
 		<div class="label">{inner_sphere.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0} max={2.5} step={0.01} bind:value={inner_sphere} />
+		<Range min={0} max={2.5} step={0.01} bind:value={inner_sphere} {disabled} />
 	</div>
 </div>
 
@@ -102,7 +102,7 @@
 		<div class="label">{refr_index.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0.1} max={1} step={0.01} bind:value={refr_index} />
+		<Range min={0.1} max={1} step={0.01} bind:value={refr_index} {disabled} />
 	</div>
 </div>
 
@@ -112,7 +112,7 @@
 		<div class="label">{poly_U.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0} max={5} step={0.01} bind:value={poly_U} />
+		<Range min={0} max={5} step={0.01} bind:value={poly_U} {disabled} />
 	</div>
 </div>
 
@@ -122,7 +122,7 @@
 		<div class="label">{poly_V.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0} max={10} step={0.01} bind:value={poly_V} />
+		<Range min={0} max={10} step={0.01} bind:value={poly_V} {disabled} />
 	</div>
 </div>
 
@@ -132,7 +132,7 @@
 		<div class="label">{poly_W.toFixed(2)}</div>
 	</div>
 	<div class="right">
-		<Range min={0.5} max={15} step={0.01} bind:value={poly_W} />
+		<Range min={0.5} max={15} step={0.01} bind:value={poly_W} {disabled} />
 	</div>
 </div>
 
