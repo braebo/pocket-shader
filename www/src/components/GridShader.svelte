@@ -4,9 +4,10 @@
  -->
 
 <script lang="ts">
-	import { gridColor } from '../utils/gridColor'
+	import { gridColor, gridYeet } from '../utils/gridColor'
 	import { PocketShader } from 'pocket-shader'
 	import grid from '../shaders/grid.frag?raw'
+	import { quadIn } from 'svelte/easing'
 	import { onMount } from 'svelte'
 
 	let ps: PocketShader
@@ -15,26 +16,77 @@
 		ps.uniforms.u_color.value = $gridColor
 	}
 
+	const subs = [] as (() => void)[]
+	subs.push(gridColor.subscribe((value) => {
+		if (ps) {
+			ps.uniforms.u_color.value = value
+		}
+	}))
+	subs.push(gridYeet.subscribe((value) => {
+		if (ps) {
+			ps.uniforms.u_yeet.value = value
+		}
+	}))
+
 	onMount(() => {
 		ps = new PocketShader({
 			autoStart: true,
 			fragment: grid,
-			mouseListener: 'window',
-
+			mouseTarget: 'window',
 			uniforms: {
 				u_parallax: { type: 'float', value: 0 },
 				u_greyscale: { type: 'float', value: 0 },
 				u_color: { type: 'vec3', value: $gridColor },
+				u_yeet: { type: 'float', value: 1.0 },
 			},
 		})
 
-		return () => ps.stop().dispose()
+		return () => {
+			ps.stop().dispose()
+			for (const unsub of subs) {
+				unsub()
+			}
+		}
 	})
+
+	let yeetCooldown: ReturnType<typeof setTimeout>
+	const yeet = async () => {
+		// gridYeet.set(1.75, { duration: 50 })
+		gridYeet.set(2, { duration: 50 })
+		clearTimeout(yeetCooldown)
+		yeetCooldown = setTimeout(() => {
+			gridYeet.set(1, { duration: 1000, easing: quadIn })
+		}, 50)
+	}
+
+	const setYeet = (e: KeyboardEvent) => {
+		let num: number
+		try {
+			num = parseInt(e.key)
+			if (typeof num === 'number' && !isNaN(num)) {
+				gridYeet.set(1 + num * 0.2, { duration: 50 })
+			}
+		} catch (e) {}
+		console.log(e.key)
+		if (e.key === ' ') {
+			gridYeet.set(1.75, { duration: 50 })
+		}
+	}
 </script>
 
+<div class="yeet-progress" style="width: {($gridYeet / 1.75) * 100}%; height: 2rem; position:fixed; top: 2rem;">
+	{($gridYeet / 1.75) * 100}%
+</div>
+
 <svelte:window
-	on:scroll={() =>
-		ps &&
-		// todo - really need to expose resolution lol
-		(ps.uniforms.u_parallax.value = (window.scrollY / ps.canvas.height) * ps.maxPixelRatio)}
+	on:scroll={() => {
+		if (ps) {
+			ps.uniforms.u_parallax.value = window.scrollY / ps.resolution.height
+		}
+	}}
+	on:pointerdown={yeet}
+	on:keydown={setYeet}
 />
+	<!-- on:pointerup={() => {
+		gridYeet.set(1)
+	}} -->
