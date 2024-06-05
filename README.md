@@ -6,6 +6,8 @@
 
 </div>
 
+### _This project is still early-alpha, so the API is unstable.  I'd love to hear your feedback / ideas!_
+
 <br />
 
 - 📦 Simple API
