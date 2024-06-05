@@ -1,3 +1,10 @@
+const hexColorHash = (name: string): string =>
+	'#' +
+	(0x1000000 + (name.split('').reduce((acc, c) => acc + c.charCodeAt(0) * 42, 0) & 0xffffff))
+		.toString(16)
+		.slice(1)
+		.replace(/^./, 'F')
+
 /**
  * A simple webgl shader renderer.
  * @module
@@ -859,35 +866,12 @@ function throttledDebounce(
 	}
 }
 
-/**
- * Generates a hex color from a string.
- */
-function hashHex(
-	name: string,
-	/**
-	 * A weight factor to adjust the hash.  Higher values will result in more variation.
-	 * @defaultValue
-	 */
-	weightFactor = 42,
-): string {
-	return (
-		'#' +
-		(
-			0x1000000 +
-			(name.split('').reduce((acc, c) => acc + c.charCodeAt(0) * weightFactor, 0) & 0xffffff)
-		)
-			.toString(16)
-			.slice(1)
-			.replace(/^./, 'F')
-	)
-}
-
 function LogMethods(): ClassDecorator {
 	return function (target: Function) {
 		for (const key of Object.getOwnPropertyNames(target.prototype)) {
 			const method = target.prototype[key]
 			if (key !== 'constructor' && typeof method === 'function') {
-				const color = hashHex(key)
+				const color = hexColorHash(key)
 				target.prototype[key] = function (...args: any[]) {
 					if (import.meta.env?.DEV) {
 						console.log(`%c${key}%c()`, `color:${color}`, `color:inherit`, {
