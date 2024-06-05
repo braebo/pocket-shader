@@ -17,12 +17,12 @@
 		active = !active
 
 		if (active) {
-			fadeText(target, 'Run')
+			fadeText(target, 'Dispose')
 			pocketShader = new PocketShader(...opts)
-
+			
 			afterRun(pocketShader)
 		} else {
-			fadeText(target, 'Dispose')
+			fadeText(target, 'Run')
 			pocketShader?.dispose()
 			pocketShader = null
 		}
