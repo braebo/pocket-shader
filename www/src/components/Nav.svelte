@@ -89,6 +89,8 @@
 		width: fit-content;
 		height: fit-content;
 		margin: auto 0;
+
+		z-index: 10;
 	}
 
 	.h2 {
