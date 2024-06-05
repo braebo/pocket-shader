@@ -94,6 +94,7 @@
 	}
 
 	.h2 {
+		letter-spacing: 1px;
 		font-size: var(--font);
 		height: 2rem;
 		&:not(:first-of-type) {
@@ -103,6 +104,7 @@
 
 	.h3 {
 		font-size: var(--font-sm);
+		font-variation-settings: 'wght' 200;
 		padding-left: 1rem;
 		height: 1.5rem;
 	}
