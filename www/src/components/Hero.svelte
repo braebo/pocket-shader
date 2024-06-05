@@ -4,34 +4,37 @@
 	let hovering = false
 </script>
 
-<h1 class="hero-text text-gradient-animated">Pocket Shader</h1>
+<main>
+	<br />
 
-<p class="description">A pocket-sized javascript library for easy WebGL shader rendering.</p>
+	<h1 class="hero-text text-gradient-animated">Pocket Shader</h1>
 
-<br />
-<div
-	class="install-wrapper"
-	on:pointerover={() => (hovering = true)}
-	on:pointerout={() => (hovering = false)}
->
-	<code class="install plain gradient-outline">
-		<div style="color:#e24e69">npx</div>
-		<div class="jsr-add" style="color:#d1d1d1">jsr add</div>
-		<div class="namespace">
-			<span class="braebo text-gradient">@braebo</span>
-			<span class="slash">/</span>
-			<span class="pocket-shader text-gradient">pocket-shader</span>
-			<br />
-		</div>
-	</code>
+	<p class="description">A pocket-sized javascript library for easy WebGL shader rendering.</p>
 
-	<span class="copy">
-		<Copy
-			text="npx jsr add @braebo/pocket-shader"
-			--bg-active="transparent"
-			--bg-hover="transparent"
-			--blur="0"
-			style="
+	<br />
+	<div
+		class="install-wrapper"
+		on:pointerover={() => (hovering = true)}
+		on:pointerout={() => (hovering = false)}
+	>
+		<code class="install plain gradient-outline">
+			<div style="color:#e24e69">npx</div>
+			<div class="jsr-add" style="color:#d1d1d1">jsr add</div>
+			<div class="namespace">
+				<span class="braebo text-gradient">@braebo</span>
+				<span class="slash">/</span>
+				<span class="pocket-shader text-gradient">pocket-shader</span>
+				<br />
+			</div>
+		</code>
+
+		<span class="copy">
+			<Copy
+				text="npx jsr add @braebo/pocket-shader"
+				--bg-active="transparent"
+				--bg-hover="transparent"
+				--blur="0"
+				style="
 					box-sizing: border-box;
 					position: absolute;
 					inset: 0;
@@ -40,9 +43,10 @@
 					width: 100%;
 					height: 100%;
 				"
-		/>
-	</span>
-</div>
+			/>
+		</span>
+	</div>
+</main>
 
 <style lang="scss">
 	.hero-text {
