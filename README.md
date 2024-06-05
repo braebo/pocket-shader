@@ -8,11 +8,11 @@
 
 <br />
 
-- ✅ Fully Typed
-- 👌 Zero Dependencies
 - 📦 Simple API
-- 🌐 ESM Only
 - 🐭 Lightweight - _2.63 kB_
+- ✅ Typesafe
+- 👌 Zero Dependencies
+- 🌐 ESM
 
 <br />
 
