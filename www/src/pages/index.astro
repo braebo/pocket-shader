@@ -1,5 +1,4 @@
 ---
-import Importing from '../components/sections/Importing.svelte'
 import Hero from '../components/Hero.svelte'
 import Layout from '../layouts/Layout.astro'
 import Code from '../components/Code.astro'
@@ -7,7 +6,6 @@ import Code from '../components/Code.astro'
 import MouseSmoothing from '../components/sections/MouseSmoothing.svelte'
 import Playback from '../components/sections/Playback.svelte'
 import Uniforms from '../components/sections/Uniforms.svelte'
-import Shaders from '../components/sections/Shaders.svelte'
 import GridShader from '../components/GridShader.svelte'
 import Speed from '../components/sections/Speed.svelte'
 import Dpr from '../components/sections/Dpr.svelte'
@@ -27,8 +25,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			<Nav client:visible />
 		</span>
 
-			<Hero client:load />
-		
+		<Hero client:load />
 
 		<h2 id="usage"><a href="/#usage">Usage</a></h2>
 
@@ -49,7 +46,7 @@ import bruh from '../shaders/bruh.frag?raw'
             	`}
 			/>
 
-			<Example client:load id='run1' />
+			<Example client:load id="run1" />
 		</section>
 
 		<section>
@@ -70,7 +67,7 @@ import bruh from '../shaders/bruh.frag?raw'
 				automatically.
 			</p>
 
-			<Example client:load id='#codeblock2' />
+			<Example client:load id="#codeblock2" />
 		</section>
 
 		<section>
@@ -82,10 +79,10 @@ import bruh from '../shaders/bruh.frag?raw'
 			</p>
 
 			<!-- <Shaders id="#codeblock3-3" client:visible> -->
-				<Code
-					id="codeblock3"
-					slot="default"
-					code={/*ts*/ `import { PocketShader } from 'pocket-shader'
+			<Code
+				id="codeblock3"
+				slot="default"
+				code={/*ts*/ `import { PocketShader } from 'pocket-shader'
 
                   const ps = new PocketShader('#codeblock3', { // [!code highlight]
                     fragment: ${'`'} // [!code highlight]
@@ -104,14 +101,16 @@ import bruh from '../shaders/bruh.frag?raw'
                     ${'`'} // [!code highlight]
                   })
                 `}
-				/>
+			/>
 			<!-- </Shaders> -->
 			<Example
 				client:load
-				opts={['#codeblock3', {
-					autoStart: true,
-					mousePosition: {x: 0.5, y: 0.1},
-					fragment: /*glsl*/ `#version 300 es
+				opts={[
+					'#codeblock3',
+					{
+						autoStart: true,
+						mousePosition: { x: 0.5, y: 0.1 },
+						fragment: /*glsl*/ `#version 300 es
 						// These 3 uniforms are always available. // [!code highlight]
 						uniform float u_time;
 						uniform vec2 u_mouse;
@@ -127,7 +126,8 @@ import bruh from '../shaders/bruh.frag?raw'
 						color = vec4(c, m.x + 0.5 * c, m.y + 0.5 * c, 1.0);
 						}
 					`,
-				}]}
+					},
+				]}
 			/>
 		</section>
 
@@ -196,13 +196,19 @@ import bruh from '../shaders/bruh.frag?raw'
 			`}
 			/>
 
-			<Example client:load opts={['#codeblock4', {
-				autoStart: true,
-				speed: 1,
-				mouseSmoothing: 0.98,
-				fragment: clouds,
-				maxPixelRatio: 2.5
-			}]} />
+			<Example
+				client:load
+				opts={[
+					'#codeblock4',
+					{
+						autoStart: true,
+						speed: 1,
+						mouseSmoothing: 0.98,
+						fragment: clouds,
+						maxPixelRatio: 2.5,
+					},
+				]}
+			/>
 		</section>
 
 		<h2 id="animation"><a href="/#animation">Animation</a></h2>
@@ -228,11 +234,17 @@ import bruh from '../shaders/bruh.frag?raw'
             `}
 			/>
 
-			<Example client:load opts={['#codeblock5', {
-				fragment: bruh,
-				speed: 2,
-				autoStart: true,
-			}]} />
+			<Example
+				client:load
+				opts={[
+					'#codeblock5',
+					{
+						fragment: bruh,
+						speed: 2,
+						autoStart: true,
+					},
+				]}
+			/>
 		</section>
 
 		<section>
@@ -261,14 +273,20 @@ import bruh from '../shaders/bruh.frag?raw'
             `}
 			/>
 
-			<Example client:load opts={['#codeblock11', {
-				fragment: kirby,
-				speed: 2,
-				autoStart: true,
-				uniforms: {
-					u_jump: { type: 'float', value: 0 },
-				},
-			}]} />
+			<Example
+				client:load
+				opts={[
+					'#codeblock11',
+					{
+						fragment: kirby,
+						speed: 2,
+						autoStart: true,
+						uniforms: {
+							u_jump: { type: 'float', value: 0 },
+						},
+					},
+				]}
+			/>
 		</section>
 
 		<section>
