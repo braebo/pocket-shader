@@ -60,6 +60,14 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	mouseSmoothing?: number
 
 	/**
+	 * Where to listen for mouse events.  By default, the renderer listens for mouse events on the
+	 * canvas element.  You can also listen for mouse events on the container element, or the window
+	 * with this option.
+	 * @defaultValue `'canvas'`
+	 */
+	mouseTarget?: 'canvas' | 'container' | 'window'
+
+	/**
 	 * When true, the instance will automatically initialize itself.  Otherwise, you will need to
 	 * call the {@link PocketShader.init|`init`} method manually.  This is useful for server-side
 	 * rendering, or when you need to perform additional setup before initializing the instance.
@@ -310,6 +318,8 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 
 		this.opts = options ?? {}
+		this.opts.mouseTarget = options?.mouseTarget ?? 'canvas'
+
 		this.speed = options?.speed ?? 1
 		this.mouseSmoothing = options?.mouseSmoothing ?? 0.1
 		this.maxPixelRatio = options?.maxPixelRatio ?? (globalThis.window?.devicePixelRatio || 1)
@@ -693,11 +703,29 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		)
 	}
 
+	getMouseTarget = (): HTMLElement | Window => {
+		switch (this.opts.mouseTarget) {
+			case 'container':
+				return this.container ?? window
+			case 'window':
+				return window
+			case 'canvas':
+			default:
+				return this.canvas
+		}
+	}
+
 	private _setupCanvas(): void {
 		if (!this.container) throw new Error('Container not found.')
 
-		this.canvas.addEventListener('mousemove', this.setMousePosition)
-		this.canvas.addEventListener('touchmove', this.setTouchPosition, { passive: false })
+		this.getMouseTarget().addEventListener('mousemove', this.setMousePosition as EventListener)
+		this.getMouseTarget().addEventListener(
+			'touchmove',
+			this.setTouchPosition as EventListener,
+			{
+				passive: false,
+			},
+		)
 
 		if (!Array.from(this.container.children).includes(this.canvas)) {
 			this.container.appendChild(this.canvas)
