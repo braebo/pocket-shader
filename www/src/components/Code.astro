@@ -49,10 +49,8 @@ const copyId = 'copyId-' + nanoid(8)
 
 		<div class="inner" id={copyId} style=`font-size:${fontSize};line-height:${lineHeight}`>
 			<div class="copy-button-container">
-				<Copy text={() => document.getElementById(copyId)?.innerText} client:load />
+				<Copy id={copyId} client:load />
 			</div>
-
-			<div id={copyId}>
 
 			{codes.length ? (
 					codes.map(({lang, code, trim = false}) => (
@@ -85,7 +83,6 @@ const copyId = 'copyId-' + nanoid(8)
 					/>
 			)
 			}
-			</div>
 		</div>
 		<div class="code-padding"></div>
 	</div>

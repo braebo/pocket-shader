@@ -1,10 +1,9 @@
-<script>
-	// import { nanoid } from '../utils/nanoid'
+<script lang="ts">
 	import { fly } from 'svelte/transition'
 
-	export let text // string
-	// export let id = nanoid()
+	export let text = ''
 	export let style = ''
+	export let id = ''
 
 	/**
 	 * True for 1.25s after the button is clicked.
@@ -16,16 +15,20 @@
 	 */
 	let outro = false
 
-	let cooldown // ReturnType<typeof setTimeout>
-	let outroCooldown // ReturnType<typeof setTimeout>
-	let btn // HTMLButtonElement
-	// let popover // HTMLDivElement
+	let cooldown: ReturnType<typeof setTimeout>
+	let outroCooldown: ReturnType<typeof setTimeout>
+	let btn: HTMLButtonElement
 
 	function copy() {
 		if (typeof navigator === 'undefined') return
 		if (active) return
 
-		navigator.clipboard?.writeText?.(text)
+		// prettier-ignore
+		navigator.clipboard?.writeText?.(
+			id 
+			? document.getElementById(id)?.innerText ?? ''
+			: text
+		)
 
 		clearTimeout(cooldown)
 		clearTimeout(outroCooldown)
@@ -54,15 +57,7 @@
 	transition:fly
 	on:click|preventDefault={copy}
 	bind:this={btn}
-	>
-<!--
-	popvertarget="copy-popover"
-	on:pointeroever={() => popover.showPopover()}
-	on:pointerout={() => popover.hidePopover()}
-	on:blur={() => popover.hidePopover()}
-	
-	<div {id} bind:this={popover} popover="manual">Copy to Clipboard</div>
--->
+>
 	<div class="svg-container">
 		<svg
 			class="icon copy"
@@ -123,19 +118,6 @@
 		&:hover {
 			color: var(--fg-c);
 			background: var(--bg-hover, var(--bg-b));
-
-			// @at-root {
-			// 	:global(:root[theme='light']) & {
-			// 		&:hover {
-			// 			background: var(--bg-e);
-			// 			color: var(--bg-a);
-			// 		}
-			// 		&.active,
-			// 		&.outro {
-			// 			background: transparent;
-			// 		}
-			// 	}
-			// }
 		}
 
 		&:active,
@@ -244,17 +226,4 @@
 		color: var(--fg-c);
 		background: transparent;
 	}
-
-	// [popover] {
-	// 	position: fixed;
-	// 	inset: 0;
-	// 	width: fit-content;
-	// 	height: fit-content;
-	// 	margin: auto;
-	// 	border: solid;
-	// 	padding: 0.25em;
-	// 	overflow: auto;
-	// 	color: CanvasText;
-	// 	background-color: Canvas;
-	// }
 </style>
