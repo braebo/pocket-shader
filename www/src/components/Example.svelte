@@ -2,6 +2,9 @@
 	import { gridColor, gridColors } from '../utils/gridColor'
 	import { PocketShader } from '../../../pocket-shader'
 	import { fadeText } from '../utils/animations'
+	import { createEventDispatcher } from 'svelte'
+
+	const dispatch = createEventDispatcher()
 
 	export let id: string = ''
 	export let opts: ConstructorParameters<typeof PocketShader> = [id]
@@ -18,18 +21,23 @@
 
 		if (active) {
 			fadeText(target, 'Dispose')
-			pocketShader = new PocketShader(...opts)
-			
-			afterRun(pocketShader)
+			if (id !== 'noop') {
+				pocketShader = new PocketShader(...opts)
+				afterRun(pocketShader)
+			}
 		} else {
 			fadeText(target, 'Run')
-			pocketShader?.dispose()
-			pocketShader = null
+			if (id !== 'noop') {
+				pocketShader?.dispose()
+				pocketShader = null
+			}
 		}
 
 		if (hovering) {
 			morph()
 		}
+
+		dispatch('toggle', { active })
 	}
 
 	let colorCooldown: ReturnType<typeof setTimeout>

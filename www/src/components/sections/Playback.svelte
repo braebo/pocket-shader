@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { fadeOutUp, fadeInUp, fadeText } from '../../utils/animations.ts'
 	import { PocketShader } from 'pocket-shader'
+	import Example from '../Example.svelte'
 
 	export let id: string
 
@@ -8,7 +8,6 @@
 	let state = ''
 	let t = ''
 	let stateTextEl: HTMLDivElement
-	let btnEl: HTMLButtonElement
 
 	$: disabled = !state || state === 'disposed' || ps === null
 
@@ -26,11 +25,9 @@
 		ps.start()
 
 		update()
-		fadeText(btnEl, 'Dispose')
 	}
 
 	function dispose() {
-		fadeText(btnEl, 'Run')
 		ps?.dispose()
 		ps = null
 		update()
@@ -53,61 +50,63 @@
 	}
 
 	async function update() {
-		await fadeOutUp(stateTextEl)
 		state = ps?.state ?? ''
-		fadeInUp(stateTextEl)
 	}
 </script>
 
 <span><slot /></span>
 
-<button bind:this={btnEl} class="btn" class:active={!disabled} on:click={run}>Run</button>
+<Example id="noop" on:toggle={run} />
 
-<div class="flex">
-	<button
-		class="code plain"
-		class:gradient-outline={!disabled && state !== 'running'}
-		class:active={state === 'running'}
-		disabled={disabled || state === 'running'}
-		on:click={start}><span class="g-blue">ps</span>.<span class="g-red">start</span>()</button
-	>
-	<button
-		class="code plain"
-		class:gradient-outline={!disabled && state !== 'paused'}
-		class:active={state === 'paused'}
-		disabled={disabled || state !== 'running'}
-		on:click={pause}><span class="g-blue">ps</span>.<span class="g-red">pause</span>()</button
-	>
-	<button
-		class="code plain"
-		class:gradient-outline={!disabled && state !== 'stopped'}
-		class:active={state === 'stopped'}
-		disabled={disabled || state !== 'running'}
-		on:click={stop}><span class="g-blue">ps</span>.<span class="g-red">stop</span>()</button
-	>
-</div>
-
-<div>
-	<div class="kv" class:disabled>
-		<div class="key">
-			<code class="plain">
-				<span class="g-blue">ps</span>
-				.
-				<span class="g-red">state</span>
-			</code>
-		</div>
-		<div class="value" class:disabled bind:this={stateTextEl}>{state}</div>
+<div class="controls">
+	<div class="flex">
+		<button
+			class="code plain"
+			class:gradient-outline={!disabled && state !== 'running'}
+			class:active={state === 'running'}
+			disabled={disabled || state === 'running'}
+			on:click={start}
+			><span class="g-blue">ps</span>.<span class="g-red">start</span>()</button
+		>
+		<button
+			class="code plain"
+			class:gradient-outline={!disabled && state !== 'paused'}
+			class:active={state === 'paused'}
+			disabled={disabled || state !== 'running'}
+			on:click={pause}
+			><span class="g-blue">ps</span>.<span class="g-red">pause</span>()</button
+		>
+		<button
+			class="code plain"
+			class:gradient-outline={!disabled && state !== 'stopped'}
+			class:active={state === 'stopped'}
+			disabled={disabled || state !== 'running'}
+			on:click={stop}><span class="g-blue">ps</span>.<span class="g-red">stop</span>()</button
+		>
 	</div>
 
-	<div class="kv" class:disabled>
-		<div class="key">
-			<code class="plain">
-				<span class="g-blue">ps</span>
-				.
-				<span class="g-red">time</span>
-			</code>
+	<div>
+		<div class="kv" class:disabled>
+			<div class="key">
+				<code class="plain">
+					<span class="g-blue">ps</span>
+					.
+					<span class="">state</span>
+				</code>
+			</div>
+			<div class="value" class:disabled bind:this={stateTextEl}>{state}</div>
 		</div>
-		<div class="value" class:disabled>{t}</div>
+
+		<div class="kv" class:disabled>
+			<div class="key">
+				<code class="plain">
+					<span class="g-blue">ps</span>
+					.
+					<span class="">time</span>
+				</code>
+			</div>
+			<div class="value" class:disabled>{t}</div>
+		</div>
 	</div>
 </div>
 
@@ -145,12 +144,15 @@
 
 		.key,
 		.key code {
-			width: 5.5rem;
+			width: 5rem;
 
 			color: var(--fg-b);
 			background: none;
-			border-radius: 0;
-			outline: none;
+			border-radius: 0.1rem;
+			margin-left: 1px;
+			filter: saturate(0.7);
+			outline-color: var(--bg-c);
+			// outline: none;
 
 			font-variation-settings: 'wght' 100;
 		}
@@ -158,6 +160,22 @@
 		.value {
 			margin: auto;
 		}
+	}
+
+	.controls {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+
+		width: fit-content;
+		margin: 0 auto;
+		margin-top: -0.5rem;
+		padding: 1rem;
+
+		background: color-mix(in lch, var(--bg-b), transparent 70%);
+		backdrop-filter: blur(3px);
+		border-radius: 0.5rem;
+		outline: 1px solid var(--bg-c);
 	}
 
 	.flex {

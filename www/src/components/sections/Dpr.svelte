@@ -1,14 +1,13 @@
 <script lang="ts">
 	import fragment from '../../shaders/dyingUniverse.glsl?raw'
-	import { fadeText } from '../../utils/animations.ts'
 	import { PocketShader } from 'pocket-shader'
+	import Example from '../Example.svelte'
 	import Range from '../Range.svelte'
 
 	export let dpr: number
 	export let id: string
 
 	let ps: PocketShader | null = null
-	let btnEl: HTMLButtonElement
 
 	$: if (dpr && ps) {
 		ps.maxPixelRatio = dpr
@@ -24,22 +23,17 @@
 			maxPixelRatio: dpr,
 			autoStart: true,
 		})
-
-		fadeText(btnEl, 'Dispose')
 	}
 
 	function dispose() {
 		ps?.dispose()
 		ps = null
-		fadeText(btnEl, 'Run')
 	}
 </script>
 
 <span><slot /></span>
 
-<button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>
-	{disabled ? 'Run' : 'Dispose'}
-</button>
+<Example id="noop" on:toggle={run} />
 
 <p><code>{dpr.toFixed(1)}</code></p>
 

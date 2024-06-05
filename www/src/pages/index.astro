@@ -78,7 +78,6 @@ import bruh from '../shaders/bruh.frag?raw'
 				<code>vertex</code> options.
 			</p>
 
-			<!-- <Shaders id="#codeblock3-3" client:visible> -->
 			<Code
 				id="codeblock3"
 				slot="default"
@@ -102,7 +101,7 @@ import bruh from '../shaders/bruh.frag?raw'
                   })
                 `}
 			/>
-			<!-- </Shaders> -->
+
 			<Example
 				client:load
 				opts={[
@@ -301,12 +300,12 @@ import bruh from '../shaders/bruh.frag?raw'
 					slot="default"
 					id="codeblock6"
 					code={/*js*/ `
-                import { PocketShader } from 'pocket-shader'
+                        import { PocketShader } from 'pocket-shader'
 
-                const ps = new PocketShader('#codeblock6')
-              
-                ps.start() // [!code highlight]
-            `}
+                        const ps = new PocketShader('#codeblock6')
+
+                        ps.start() // [!code highlight]
+                    `}
 				/>
 			</Playback>
 		</section>
@@ -319,7 +318,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			<Speed speed={2} id="#codeblock7" client:idle>
 				<Code
 					id="codeblock7"
-					slot="code"
+					slot="default"
 					code={/*js*/ `
                     import { PocketShader } from 'pocket-shader'
 
@@ -463,7 +462,7 @@ import bruh from '../shaders/bruh.frag?raw'
 
 			<Code
 				id="mousePosition"
-				slot="code"
+				slot="default"
 				code={`const ps = new PocketShader({ // [!code highlight]
                   fragment: ${'`'} // [!code highlight]
                   // [!code word:u_resolution:1]
@@ -500,7 +499,6 @@ import bruh from '../shaders/bruh.frag?raw'
 
 			<Code
 				id="mousePosition"
-				slot="code"
 				code={`
                 /**
                  * Always keep the mouse position updated,
@@ -530,7 +528,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			<MouseSmoothing id="#codeblock10" client:idle smoothing={0.95}>
 				<Code
 					id="codeblock10"
-					slot="code"
+					slot="default"
 					code={`const ps = new PocketShader('#codeblock10', {
                   mouseSmoothing: 0.8, // [!code highlight]
                   fragment: ${'`'}...${'`'}
@@ -561,6 +559,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			font-size: var(--font-xs);
 
 			background: rgba(136, 158, 186, 0.05);
+			backdrop-filter: blur(10px);
 			border-radius: var(--radius);
 			outline: 1px solid rgba(136, 148, 186, 0.5);
 			opacity: 0.75;

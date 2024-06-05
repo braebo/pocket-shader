@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { PocketShader } from 'pocket-shader'
+	import Example from '../Example.svelte'
 	import Range from '../Range.svelte'
 
 	export let smoothing = 0.1
 	export let id: string
 
 	let ps: PocketShader | null = null
-	let state = ''
 	let t = ''
 
 	$: if (ps) ps.mouseSmoothing = smoothing
@@ -52,9 +52,9 @@
 	}
 </script>
 
-<slot name="code" />
+<span><slot /></span>
 
-<button class="btn" class:active={!disabled} on:click={run}>{disabled ? 'Run' : 'Dispose'}</button>
+<Example id="noop" on:toggle={run} />
 
 <p><code>{smoothing.toFixed(2)}</code></p>
 

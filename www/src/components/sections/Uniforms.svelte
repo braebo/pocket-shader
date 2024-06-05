@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { fadeText } from '../../utils/animations.ts'
 	import fragment from '../../shaders/glass.frag?raw'
 	import { PocketShader } from 'pocket-shader'
+	import Example from '../Example.svelte'
 	import Range from '../Range.svelte'
 
 	export let id: string
@@ -15,7 +15,6 @@
 	let poly_zoom = 2.0
 
 	let ps: PocketShader | null = null
-	let btnEl: HTMLButtonElement
 
 	$: if (
 		ps &&
@@ -49,22 +48,17 @@
 				poly_zoom: { type: 'float', value: 2.0 },
 			},
 		})
-
-		fadeText(btnEl, 'Dispose')
 	}
 
 	function dispose() {
 		ps?.dispose()
 		ps = null
-		fadeText(btnEl, 'Run')
 	}
 </script>
 
 <span><slot /></span>
 
-<button class="btn" bind:this={btnEl} class:active={!disabled} on:click={run}>
-	{disabled ? 'Run' : 'Dispose'}
-</button>
+<Example id='noop' on:toggle={run} />
 
 <div class:disabled>
 	<div class="left">
