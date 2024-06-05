@@ -873,7 +873,7 @@ function LogMethods(): ClassDecorator {
 			if (key !== 'constructor' && typeof method === 'function') {
 				const color = hexColorHash(key)
 				target.prototype[key] = function (...args: any[]) {
-					if (import.meta.env?.DEV) {
+					if (import.meta.env?.DEV && !key.match(/_setUniform/)) {
 						console.log(`%c${key}%c()`, `color:${color}`, `color:inherit`, {
 							this: this,
 						})
