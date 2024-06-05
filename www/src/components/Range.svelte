@@ -1,16 +1,37 @@
-<script>
+<script lang="ts">
+	import { gridColor, gridColors } from '../utils/gridColor'
+
+	function setColor() {
+		gridColor.set(gridColors.cyan)
+	}
+	function clearColor() {
+		gridColor.set(gridColors.greyscale)
+	}
+
 	export let value = 1
 	export let min = 0
 	export let max = 1
 	export let step = 0.1
+	export let disabled = false
 </script>
 
-<input type="range" {min} {max} {step} bind:value />
+<input
+	type="range"
+	{min}
+	{max}
+	{step}
+	{disabled}
+	bind:value
+	on:focus={setColor}
+	on:blur={clearColor}
+	on:pointerover={setColor}
+	on:pointerout={clearColor}
+/>
 
 <style lang="scss">
 	input:disabled {
 		opacity: 0.5;
-		filter: grayscale(1) brightness(0.5);
+		filter: saturate(0) brightness(0.5);
 		cursor: not-allowed;
 	}
 
