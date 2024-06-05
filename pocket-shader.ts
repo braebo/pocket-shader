@@ -306,8 +306,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	init(): this {
-		if (!import.meta.env?.DEV && !import.meta.hot) return this
-
 		let container: HTMLElement | null
 		let options: PocketShaderOptions<T> | undefined
 
