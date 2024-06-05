@@ -1,5 +1,5 @@
 diff --git a/components/Code.astro b/components/Code.astro
-index f0cb26326516686554a6136da4ab84b6dc70184f..376fb4934fb31e71388089eea2c3d770732a180a 100644
+index f0cb26326516686554a6136da4ab84b6dc70184f..ecbef5633b30265383428eebdb5551b7cd19ebe8 100644
 --- a/components/Code.astro
 +++ b/components/Code.astro
 @@ -6,6 +6,7 @@ import type {
@@ -10,15 +10,20 @@ index f0cb26326516686554a6136da4ab84b6dc70184f..376fb4934fb31e71388089eea2c3d770
  } from 'shiki';
  import { bundledLanguages } from 'shiki/langs';
  import { getCachedHighlighter } from '../dist/core/shiki.js';
-@@ -50,6 +51,7 @@ interface Props extends Omit<HTMLAttributes<'pre'>, 'lang'> {
+@@ -50,6 +51,12 @@ interface Props extends Omit<HTMLAttributes<'pre'>, 'lang'> {
  	 * @default false
  	 */
  	inline?: boolean;
-+	transformers?: ShikiTransformer[];
++	/**
++	 * Transformers to customize the generated HTML by manipulating the hast tree.
++	 * Instructions for loading built-in transformer: https://shiki.style/packages/transformers
++	 * Instructions for custom transformers: https://shiki.style/guide/transformers
++	 */
++	 transformers?: ShikiTransformer[];
  }
  
  const {
-@@ -59,6 +61,7 @@ const {
+@@ -59,6 +66,7 @@ const {
  	themes = {},
  	wrap = false,
  	inline = false,
@@ -26,17 +31,11 @@ index f0cb26326516686554a6136da4ab84b6dc70184f..376fb4934fb31e71388089eea2c3d770
  	...rest
  } = Astro.props;
  
-@@ -85,11 +88,13 @@ const highlighter = await getCachedHighlighter({
+@@ -85,6 +93,7 @@ const highlighter = await getCachedHighlighter({
  	theme,
  	themes,
  	wrap,
-+	transformers
++	transformers,
  });
  
  const html = await highlighter.highlight(code, typeof lang === 'string' ? lang : lang.name, {
- 	inline,
- 	attributes: rest as any,
-+	transformers
- });
- ---
- 

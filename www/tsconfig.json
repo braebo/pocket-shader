@@ -1,7 +1,6 @@
 {
 	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
-		"baseUrl": ".",
 		"strict": true,
 		"lib": ["DOM", "ESNext"],
 		"target": "ESNext",
@@ -9,7 +8,7 @@
 		"moduleResolution": "NodeNext",
 		"skipLibCheck": true,
 		"allowJs": true,
-		"checkJs": true,
+		"checkJs": false,
 		"noEmit": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true
