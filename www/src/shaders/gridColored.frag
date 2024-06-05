@@ -6,8 +6,6 @@ uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse;
 uniform float u_parallax;
-uniform float u_greyscale;
-uniform vec3 u_color;
 
 in vec2 vUv;
 out vec4 fragColor;
@@ -71,7 +69,7 @@ void main() {
     vec2 mouse = u_mouse;
 
     // uv = gl_FragCoord.xy / u_resolution.xy;
-    vec2 uv = vec2(vUv.x * aspect, vUv.y - u_parallax);
+    vec2 uv = vec2(vUv.x * aspect, vUv.y);
     
     //? Zoom out.
     uv *= -10.0;
@@ -129,17 +127,13 @@ void main() {
     vec3 themeA = vec3(0.57, 0.23, 1.);
     vec3 themeB = vec3(0.2, 0.77, 0.96);
     vec3 themeC = vec3(1., 0.23137254901960785, 0.5254901960784314);
-
-    // vec3 grid = themeA * 14.;
-    // vec3 grid = themeA * 14.;
-    vec3 grid = u_color * 14.;
+    
+    vec3 color1 = themeC;
+    vec3 color2 = themeA;
+    
+    vec3 color = themeA * 14.;
    
-    grid *= pow(brightness, 14.1);
-
-    // vec3 greyscale = vec3(pow(brightness, grid.x), pow(brightness, grid.y), pow(brightness, grid.z)) * 2.0
-    vec3 greyscale = vec3(pow(brightness, 0.1), pow(brightness, 0.1), pow(brightness, 1.0)) * 2.0;
-
-    vec3 color = mix(grid, greyscale, u_greyscale);
+    color *= pow(brightness, 14.1);
 
     fragColor = vec4(color, (color.r + color.g + color.b) / 3.0);
 }
