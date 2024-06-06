@@ -1,5 +1,5 @@
 diff --git a/components/Code.astro b/components/Code.astro
-index f0cb26326516686554a6136da4ab84b6dc70184f..ecbef5633b30265383428eebdb5551b7cd19ebe8 100644
+index f0cb26326516686554a6136da4ab84b6dc70184f..309cb6e65f2668b93799fa3a54afb2511cdaaeb0 100644
 --- a/components/Code.astro
 +++ b/components/Code.astro
 @@ -6,6 +6,7 @@ import type {
@@ -15,11 +15,11 @@ index f0cb26326516686554a6136da4ab84b6dc70184f..ecbef5633b30265383428eebdb5551b7
  	 */
  	inline?: boolean;
 +	/**
-+	 * Transformers to customize the generated HTML by manipulating the hast tree.
-+	 * Instructions for loading built-in transformer: https://shiki.style/packages/transformers
++	 * Shiki transformers to customize the generated HTML by manipulating the hast tree.
++	 * Supports all transformers listed here: https://shiki.style/packages/transformers#transformers
 +	 * Instructions for custom transformers: https://shiki.style/guide/transformers
 +	 */
-+	 transformers?: ShikiTransformer[];
++	transformers?: ShikiTransformer[];
  }
  
  const {
