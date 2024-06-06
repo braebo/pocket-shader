@@ -204,10 +204,10 @@ import bruh from '../shaders/bruh.frag?raw'
 					'#codeblock4',
 					{
 						autoStart: true,
-						speed: 1,
 						mouseSmoothing: 0.98,
 						fragment: clouds,
-						maxPixelRatio: 1.75,
+						maxPixelRatio: 1.5,
+						preventScroll: true
 					},
 				]}
 			/>
@@ -244,6 +244,7 @@ import bruh from '../shaders/bruh.frag?raw'
 						fragment: bruh,
 						speed: 2,
 						autoStart: true,
+						preventScroll: true
 					},
 				]}
 			/>
