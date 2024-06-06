@@ -10,37 +10,36 @@ import '../styles/elements.css' // should be last
 <!doctype html>
 <html lang="en">
 	<head>
-		<meta name="darkreader-lock" />
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="darkreader-lock" />
+
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ff463b" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="msapplication-TileColor" content="#ffffff" />
+		<meta name="theme-color" content="#ffffff" />
+
 		<title>Pocket Shader</title>
 		<meta name="title" content="Pocket Shader" />
-		<meta
-			name="description"
-			content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser."
-		/>
+		<meta name="description" content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser." />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://pocket-shader.braebo.dev" />
 		<meta property="og:title" content="Pocket Shader" />
-		<meta
-			property="og:description"
-			content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser."
-		/>
+		<meta property="og:description" content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser." />
 		<meta property="og:image" content="https://pocket-shader.braebo.dev/pocket-shader.png" />
 		<meta property="twitter:card" content="summary_large_image" />
 		<meta property="twitter:url" content="https://pocket-shader.braebo.dev" />
 		<meta property="twitter:title" content="Pocket Shader" />
-		<meta
-			property="twitter:description"
-			content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser."
-		/>
-		<meta
-			property="twitter:image"
-			content="https://pocket-shader.braebo.dev/pocket-shader.png"
-		/>
+		<meta property="twitter:description" content="A javascript / typescript package that makes it easy to render WebGL shaders in the browser." />
+		<meta property="twitter:image" content="https://pocket-shader.braebo.dev/pocket-shader.png" />
+		
+		<style>html,body{background:#0b0d12}</style>
 	</head>
+
 	<body>
 		<Github />
 		<slot />
@@ -60,17 +59,13 @@ import '../styles/elements.css' // should be last
 	</body>
 
 	<style>
-		html, body {
-			background: #0b0d12;
-		}
 		footer {
 			text-align: center;
 			margin-top: 10rem;
 			margin-bottom: 2rem;
 			font-family: var(--font-b);
 		}
-
-		a.made-by {
+		footer a.made-by {
 			color: var(--fg-b);
 
 			font-size: 1rem;
@@ -84,7 +79,7 @@ import '../styles/elements.css' // should be last
 
 			transition: 0.2s;
 		}
-		a.made-by:hover {
+		footer a.made-by:hover {
 			color: var(--fg-a);
 			text-decoration-thickness: 4px;
 			text-decoration-style: dashed;
