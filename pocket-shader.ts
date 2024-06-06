@@ -106,7 +106,7 @@ interface Uniform {
  *
  * @param container The element to append the canvas to.  Can be an HTMLElement or a string selector.
  */
-@LogMethods()
+// @LogMethods()
 export class PocketShader<T extends Record<string, Uniform> = Record<string, Uniform>> {
 	/**
 	 * The container for the canvas element is used to determine the size of the canvas.
@@ -373,25 +373,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.fragment = prepends.concat(parts).join('\n')
 
 		this._uniforms = options?.uniforms ?? ({} as T)
-
-		if (this.container instanceof HTMLBodyElement) {
-			const w = window.innerWidth
-			const h = window.innerHeight
-			this.canvas.style.setProperty('width', `${w}px`)
-			this.canvas.style.setProperty('height', `${h}px`)
-			this.canvas.style.setProperty('position', 'fixed')
-			this.canvas.style.setProperty('inset', '0')
-			this.canvas.style.setProperty('zIndex', '0')
-		} else {
-			this.canvas.style.setProperty('width', `${this.container.clientWidth}px`)
-			this.canvas.style.setProperty('height', `${this.container.clientHeight}px`)
-			this.canvas.style.setProperty('position', 'absolute')
-			this.canvas.style.setProperty('inset', '0')
-			this.canvas.style.setProperty('zIndex', '1')
-			if (this.container.style.position === '') {
-				this.container.style.position = 'relative'
-			}
-		}
 
 		this._setupCanvas()
 
@@ -734,6 +715,27 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	private _setupCanvas(): void {
 		if (!this.container) throw new Error('Container not found.')
 
+		this.canvas.style.setProperty('contain', 'strict')
+
+		if (this.container instanceof HTMLBodyElement) {
+			const w = window.innerWidth
+			const h = window.innerHeight
+			this.canvas.style.setProperty('width', `${w}px`)
+			this.canvas.style.setProperty('height', `${h}px`)
+			this.canvas.style.setProperty('position', 'fixed')
+			this.canvas.style.setProperty('inset', '0')
+			this.canvas.style.setProperty('zIndex', '0')
+		} else {
+			this.canvas.style.setProperty('width', `${this.container.clientWidth}px`)
+			this.canvas.style.setProperty('height', `${this.container.clientHeight}px`)
+			this.canvas.style.setProperty('position', 'absolute')
+			this.canvas.style.setProperty('inset', '0')
+			this.canvas.style.setProperty('zIndex', '1')
+			if (this.container.style.position === '') {
+				this.container.style.position = 'relative'
+			}
+		}
+
 		this.getMouseTarget().addEventListener('mousemove', this.setMousePosition as EventListener)
 		this.getMouseTarget().addEventListener(
 			'touchmove',
@@ -862,7 +864,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this._builtinUniformLocations.clear()
 		this._uniformLocations.clear()
 
-		this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
+		// this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
 		this.ctx = null
 
 		this.canvas?.remove()
@@ -918,7 +920,7 @@ function LogMethods(): ClassDecorator {
 				const color = hexColorHash(key)
 				target.prototype[key] = function (...args: any[]) {
 					if (import.meta.env?.DEV && !key.match(/_setUniform/)) {
-						console.log(`%c${key}%c()`, `color:${color}`, `color:inherit`, {
+						console.log(`%c${'id'} : ${key}%c()`, `color:${color}`, `color:inherit`, {
 							this: this,
 						})
 					}

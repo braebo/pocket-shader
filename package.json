@@ -23,6 +23,7 @@
 	},
 	"scripts": {
 		"dev": "cd www && pnpm dev",
-		"release": "pnpx jsr publish"
+		"release": "pnpx jsr publish",
+		"size": "npx -y esbuild pocket-shader.ts --minify | npx -y brotli-size-cli"
 	}
 }

@@ -10,12 +10,11 @@ import '../styles/elements.css' // should be last
 <!doctype html>
 <html lang="en">
 	<head>
+		<meta name="darkreader-lock" />
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<!-- Disable Dark Reader -->
-		<meta name="darkreader-lock" />
 		<title>Pocket Shader</title>
 		<meta name="title" content="Pocket Shader" />
 		<meta
@@ -61,6 +60,9 @@ import '../styles/elements.css' // should be last
 	</body>
 
 	<style>
+		html, body {
+			background: #0b0d12;
+		}
 		footer {
 			text-align: center;
 			margin-top: 10rem;
