@@ -17,6 +17,7 @@
 		"typescript": "5.4.5"
 	},
 	"devDependencies": {
+		"@astrojs/cloudflare": "^10.2.6",
 		"@shikijs/transformers": "1.6.2",
 		"@vitest/ui": "1.6.0",
 		"picocolors": "1.0.1",
