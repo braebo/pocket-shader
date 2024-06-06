@@ -17,7 +17,13 @@ import kirby from '../shaders/kirby.frag?raw'
 import bruh from '../shaders/bruh.frag?raw'
 ---
 
-<GridShader client:load />
+	import { teleportIntoView } from '../utils/teleportIntoView'
+	const hash = window.location.hash
+    const target = hash ? document.querySelector(hash) : null
+    if (target) teleportIntoView(target, {
+		yAmount: 1,
+		durationIn: 500
+	})
 
 <Layout>
 	<div class="page">
