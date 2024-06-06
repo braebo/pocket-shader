@@ -92,7 +92,7 @@
 <style lang="scss">
 	nav {
 		position: fixed;
-		left: 1rem;
+		left: 0;
 		top: 0;
 		bottom: 0;
 
@@ -102,8 +102,15 @@
 		width: fit-content;
 		height: fit-content;
 		margin: auto 0;
+		padding: 1rem;
 
 		z-index: 10;
+
+		background: color-mix(in lch, var(--bg-b), transparent 90%);
+		backdrop-filter: blur(5px);
+		border-radius: 0 var(--radius) var(--radius) 0;
+
+		contain: layout;
 	}
 
 	nav.mobile {
@@ -113,6 +120,9 @@
 		gap: 0.25rem;
 
 		margin: auto;
+		
+		background-color: transparent;
+		backdrop-filter: blur(0);
 
 		z-index: 25;
 
