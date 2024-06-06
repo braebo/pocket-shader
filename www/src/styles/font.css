@@ -1,0 +1,22 @@
+@font-face {
+	font-family: 'Caveat';
+	src: url('/fonts/Caveat-VariableFont_wght.ttf') format('truetype');
+	font-weight: 100 900;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Fredoka';
+	src: url('/fonts/Fredoka-VariableFont_wdth,wght.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Monaspace';
+	src: url('/fonts/MonaspaceNeon_wght,wdth,slnt.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
