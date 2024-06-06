@@ -116,6 +116,7 @@
 		}
 
 		&::before {
+			inset: unset;
 			animation: none;
 			background-image: linear-gradient(to right, #111, #111, #222, #292929, #111);
 			box-shadow:
