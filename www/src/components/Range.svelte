@@ -17,6 +17,7 @@
 
 <input
 	type="range"
+	role="slider"
 	{min}
 	{max}
 	{step}
@@ -62,7 +63,6 @@
 	}
 
 	@mixin track {
-		width: 100%;
 		height: $height;
 		cursor: pointer;
 		background-color: var(--bg-c);
