@@ -1,7 +1,8 @@
 #version 300 es
+//? Original shadertoy by srtuss - https://www.shadertoy.com/view/4sl3Dr
+
 precision mediump float;
 
-// Original shadertoy by srtuss, 2013
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse;
@@ -11,13 +12,6 @@ uniform float u_yeet;
 
 in vec2 vUv;
 out vec4 fragColor;
-
-const float size = 9.;
-
-// rotate position around axis
-vec2 rotate(vec2 p, float a) {
-    return vec2(p.x * cos(a) - p.y * sin(a), p.x * sin(a) + p.y * cos(a));
-}
 
 // 1D random numbers
 float rand(float n) {
@@ -47,7 +41,7 @@ float voronoi(in vec2 x) {
             vec2 b = vec2(i, j);
             vec2 r = vec2(b) - f + rand2(p + b);
 
-			// chebyshev distance, one of many ways to do this
+            // chebyshev distance, one of many ways to do this
             float d = max(abs(r.x), abs(r.y));
 
             if(d < res.x) {
@@ -83,13 +77,17 @@ void main() {
             -9.5 * length(vUv - u_mouse)
         ) * 1.2;
 
+    float blinkSpeed = 6.5;
+
     //? Subtle, slow blink effect.
-    float blink = 1.8 + sin(time * 6.5) * 0.5;
+    float blink = 1.8 + sin(time * blinkSpeed) * 0.5;
+
+    //? Raise the blink floor.
+    // blink = clamp(blink, 2., 5.);
+    
     brightness *= blink;
 
-    
-
-	//? Add some noise octaves.
+    //? Add some noise octaves.
     float a = 0.25;
     float f = 2.0;
 
@@ -98,9 +96,9 @@ void main() {
         float v1 = voronoi(uv * f + 5.0);
         float v2 = 0.0;
 
-		//? make the moving electrons-effect for higher octaves
+        //? make the moving electrons-effect for higher octaves
         if(i > 0) {
-			//? of course everything based on voronoi
+            //? of course everything based on voronoi
             // v2 = voronoi(uv * f * 0.5 + 50.0 + time);
             v2 = voronoi(uv * f * 0.2 + 50.0 + time);
             // v2 = voronoi(uv * f * 0.4 + (50.0 * sin(time * .01)) + time);
@@ -112,13 +110,13 @@ void main() {
             brightness += a * pow(va * (0.5 + vb), 2.0);
         }
 
-		//? make sharp edges
+        //? make sharp edges
         v1 = 1.0 - smoothstep(0.0, 0.3, v1);
 
-		//? noise is used as intensity map
+        //? noise is used as intensity map
         v2 = a * (noise1(v1 * 5.5 + 0.1));
 
-		//? octave 0's intensity changes a bit
+        //? octave 0's intensity changes a bit
         if(i == 0)
             brightness += v2 * flicker;
         else
@@ -128,26 +126,10 @@ void main() {
         a *= 0.7;
     }
 
-    vec3 themeA = vec3(0.57, 0.23, 1.);
-    vec3 themeB = vec3(0.2, 0.77, 0.96);
-    vec3 themeC = vec3(1., 0.23137254901960785, 0.5254901960784314);
+    vec3 color = (u_color * 14.0) * pow(brightness, 14.1);
 
-    // vec3 grid = themeA * 14.;
-    // vec3 grid = themeA * 14.;
-    vec3 grid = u_color * 14.;
-
-   
-    grid *= pow(brightness, 14.1);
-    
-    grid = clamp(grid, 0., 1.);
+    color = clamp(color, 0., 1.);
     brightness = clamp(brightness, 0., 1.);
-
-    // vec3 greyscale = vec3(pow(brightness, grid.x), pow(brightness, grid.y), pow(brightness, grid.z)) * 2.0
-    vec3 greyscale = vec3(pow(brightness, 0.1), pow(brightness, 0.1), pow(brightness, 1.0)) * 2.0;
-
-    // greyscale = clamp(greyscale, 0., 1.);
-
-    vec3 color = grid;
 
     fragColor = vec4(color, (color.r + color.g + color.b) / 3.0);
 }
