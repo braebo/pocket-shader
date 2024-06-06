@@ -47,6 +47,9 @@
 			},
 		})
 
+		ps.canvas.style.setProperty('pointer-events', 'none')
+		ps.canvas.style.setProperty('contain', 'strict')
+
 		return () => {
 			ps.stop().dispose()
 			for (const unsub of subs) {
