@@ -50,9 +50,10 @@
 
 <style lang="scss">
 	.hero-text {
-		margin: 0 auto;
-		font-size: 5.5rem;
+		margin: 2rem auto 0 auto;
 		padding: 0 1rem;
+		
+		font-size: clamp(4.5rem, 11vw, 5.5rem);
 		letter-spacing: -3px;
 	}
 
