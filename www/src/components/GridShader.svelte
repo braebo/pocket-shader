@@ -4,7 +4,7 @@
  -->
 
 <script lang="ts">
-	import { gridColor, gridYeet } from '../utils/gridColor'
+	import { gridColor, gridColors, gridYeet } from '../utils/gridColor'
 	import { PocketShader } from 'pocket-shader'
 	import grid from '../shaders/grid.frag?raw'
 	import { quadIn } from 'svelte/easing'
@@ -55,6 +55,7 @@
 		}
 	})
 
+	let clickCooldown: ReturnType<typeof setTimeout>
 	let yeetCooldown: ReturnType<typeof setTimeout>
 	const yeet = async () => {
 		gridYeet.set(1.75, { duration: 50 })
@@ -63,6 +64,10 @@
 		yeetCooldown = setTimeout(() => {
 			gridYeet.set(1, { duration: 1000, easing: quadIn })
 		}, 50)
+		clearTimeout(clickCooldown)
+		clickCooldown = setTimeout(() => {
+			gridColor.set(gridColors.greyscale, { duration: 1000, easing: quadIn })
+		}, 1000)
 	}
 
 	const setYeet = (e: KeyboardEvent) => {
@@ -73,10 +78,6 @@
 				gridYeet.set(1 + num * 0.2, { duration: 50 })
 			}
 		} catch (e) {}
-		console.log(e.key)
-		if (e.key === ' ') {
-			gridYeet.set(1.75, { duration: 50 })
-		}
 	}
 </script>
 
