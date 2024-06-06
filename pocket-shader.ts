@@ -647,7 +647,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	setTouchPosition = (e: TouchEvent): void => {
-		e.preventDefault()
+		if (this.opts.preventScroll === true) {
+			e.preventDefault()
+		}
 		this.setMousePosition(e.touches[0])
 	}
 

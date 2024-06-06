@@ -109,6 +109,7 @@ import bruh from '../shaders/bruh.frag?raw'
 				opts={[
 					'#codeblock3',
 					{
+						preventScroll: true,
 						autoStart: true,
 						mousePosition: { x: 0.5, y: 0.1 },
 						fragment: /*glsl*/ `#version 300 es
@@ -206,7 +207,7 @@ import bruh from '../shaders/bruh.frag?raw'
 						speed: 1,
 						mouseSmoothing: 0.98,
 						fragment: clouds,
-						maxPixelRatio: 2.5,
+						maxPixelRatio: 1.75,
 					},
 				]}
 			/>
@@ -589,12 +590,6 @@ import bruh from '../shaders/bruh.frag?raw'
 			}
 			&:not(:last-of-type) {
 				margin-bottom: 0;
-			}
-		}
-
-		@media (max-width: 900px) {
-			.nav {
-				display: none;
 			}
 		}
 	</style>
