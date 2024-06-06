@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config'
 import svelte from '@astrojs/svelte'
 
 export default defineConfig({
-	output: 'hybrid',
+	output: 'server',
 	adapter: cloudflare(),
 	integrations: [svelte()],
 })
