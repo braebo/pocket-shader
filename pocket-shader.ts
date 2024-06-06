@@ -106,7 +106,7 @@ interface Uniform {
  *
  * @param container The element to append the canvas to.  Can be an HTMLElement or a string selector.
  */
-// @LogMethods()
+@LogMethods()
 export class PocketShader<T extends Record<string, Uniform> = Record<string, Uniform>> {
 	/**
 	 * The container for the canvas element is used to determine the size of the canvas.
@@ -264,7 +264,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		if (init) {
 			if (typeof globalThis.window === 'undefined') {
-				if (import.meta.env?.DEV) {
+				if (__DEV__) {
 					console.warn(
 						'PocketShader is not running in a browser environment.  Aborting automatic initialization.',
 					)
@@ -392,10 +392,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			this._resize()
 		}
 
-		if (
-			import.meta.env?.DEV &&
-			(this.container.clientWidth === 0 || this.container.clientHeight === 0)
-		) {
+		if (__DEV__ && (this.container.clientWidth === 0 || this.container.clientHeight === 0)) {
 			console.error(
 				`PocketShader container has a width or height of 0px.  The canvas will not be visible until the container has a non-zero size size.`,
 				{
@@ -863,11 +860,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this._builtinUniformLocations.clear()
 		this._uniformLocations.clear()
-
-		// this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
-		this.ctx = null
-
+		
 		this.canvas?.remove()
+
+		this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
+		this.ctx = null
 	}
 }
 
@@ -919,7 +916,7 @@ function LogMethods(): ClassDecorator {
 			if (key !== 'constructor' && typeof method === 'function') {
 				const color = hexColorHash(key)
 				target.prototype[key] = function (...args: any[]) {
-					if (import.meta.env?.DEV && !key.match(/_setUniform/)) {
+					if (__DEV__ && !key.match(/_setUniform/)) {
 						console.log(`%c${'id'} : ${key}%c()`, `color:${color}`, `color:inherit`, {
 							this: this,
 						})
