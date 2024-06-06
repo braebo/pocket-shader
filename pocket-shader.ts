@@ -80,6 +80,14 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 	 * @defaultValue `true`
 	 */
 	autoInit?: boolean
+
+	/**
+	 * When `true`, touching the canvas on mobile devices will  call preventDefault when capturing
+	 * touch event {@link PocketShader.mouse|mouse} positions for the
+	 * {@link PocketShader.builtinUniforms|u_mouse} uniform.
+	 * @defaultValue `false`
+	 */
+	preventScroll?: boolean
 }
 
 const DEFAULT_UNIFORMS = {
