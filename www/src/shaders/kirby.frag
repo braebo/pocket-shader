@@ -1,3 +1,6 @@
+#version 300 es
+precision highp float;
+
 uniform float u_jump;
 uniform float u_time;
 uniform vec2 u_resolution;
@@ -5,10 +8,11 @@ uniform vec2 u_resolution;
 in vec2 vUv;
 out vec4 fragColor;
 
+const float jumpAmount = 0.25;
+
 // polynomial smooth min (from IQ)
 float smin(float a, float b, float k) {
-    // float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
-    float h = clamp(u_jump + 0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+    float h = clamp((u_jump * jumpAmount) + 0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
     return mix(b, a, h) - k * h * (1.0 - h);
 }
 
@@ -24,9 +28,7 @@ float shoesDist(vec3 p) {
     vec3 op = p;
     float d = 1e4;
 
-    // p.y -= 1.5;
-    // p.y -= 1.5 + u_jump;
-    p.y -= 1.25 + u_jump;
+    p.y -= 1.25 + u_jump * jumpAmount;
 
     // right shoe
     op = p;
@@ -47,11 +49,13 @@ float shoesDist(vec3 p) {
 }
 
 float sceneDist(vec3 p) {
+    float jump = u_jump * jumpAmount;
     vec3 op = p;
     float d = shoesDist(p);
 
+
     d = min(d, p.y);
-    p.y -= 1.5;
+    p.y -= 1.5 + jump * 0.5;
 
     // torso
     d = min(d, length(p) - 1.);
@@ -65,12 +69,12 @@ float sceneDist(vec3 p) {
 
     // right arm
     op = p;
-    p -= vec3(-.75, 0.2, 0);
+     p -= vec3(-.75, 0.2 + jump * 0.5, 0);
     d = smin(d, (length(p * vec3(1, 1.5, 1)) - .54), .03);
     p = op;
 
     // mouth
-    p.y -= .11;
+     p.y -= .11 + -jump * 0.5;
     float md = smax(p.z + .84, smax(smax(p.x - .2, p.y - .075, .2), dot(p, vec3(.7071, -.7071, 0)) - .1, .08), .04);
     p.x = -p.x;
     md = smax(md, smax(p.z + .84, smax(smax(p.x - .2, p.y - .075, .2), dot(p, vec3(.7071, -.7071, 0)) - .1, .08), .01), .13);
@@ -117,8 +121,7 @@ float starShape(vec2 p) {
 }
 
 void main() {
-    // Normalized pixel coordinates (from 0 to 1)
-    // vec2 uv = vUv / u_resolution.xy;
+    float jump = u_jump * jumpAmount;
     vec2 uv = vUv;
 
     float an = cos(u_time) * .1;
@@ -150,15 +153,15 @@ void main() {
     vec3 rp = ro + rd * t;
     vec3 n = sceneNorm(rp);
     float st = 5e-3;
-    vec3 ld = normalize(vec3(2, 4, -4));
-    //for(int i = 0; i < 20; ++i) {
+    // vec3 ld = normalize(vec3(2, 4, -4));
+    // for(int i = 0; i < 20; ++i) {
     //    d = sceneDist(rp + ld * st);
     //    if(d < 1e-5)
     //        break;
     //    if(st > 5.)
     //        break;
     //    st += d * 2.;
-    //}
+    // }
 
     // Set color if an intersection is found
     if (t < 10.0) {
@@ -190,26 +193,26 @@ void main() {
 
     // skin
     diff *= vec3(1.15, .3, .41) * 1.4;
-    diff += .4 * mix(1., 0., smoothstep(0., 1., length(rp.xy - vec2(0., 1.9))));
-    diff += .5 * mix(1., 0., smoothstep(0., .5, length(rp.xy - vec2(.7, 2.5))));
-    diff += .36 * mix(1., 0., smoothstep(0., .5, length(rp.xy - vec2(-1.1, 1.8))));
+    diff += .4 * mix(1., 0., smoothstep(0., 1., length(rp.xy - vec2(0., 1.9 + jump * 0.5))));
+    diff += .5 * mix(1., 0., smoothstep(0., .5, length(rp.xy - vec2(.7, 2.5 + jump * 0.5))));
+    diff += .36 * mix(1., 0., smoothstep(0., .5, length(rp.xy - vec2(-1.1, 1.8 + jump * 0.5))));
 
     if(rp.y < 1e-3)
         diff = vec3(.6, 1, .6);
 
     // mouth
-    diff *= mix(vec3(1, .3, .2), vec3(1), smoothstep(.97, .99, length(rp - vec3(0, 1.5, 0))));
+    diff *= mix(vec3(1, .3, .2), vec3(1), smoothstep(.97, .99, length(rp - vec3(0, 1.5 + jump * 0.5, 0))));
 
     // shoes
     diff = mix(vec3(1., .05, .1), diff, smoothstep(0., 0.01, shoesDist(rp)));
-    diff += .2 * mix(1., 0., smoothstep(0., .2, length(rp.xy - vec2(-0.5, 1.4))));
-    diff += .12 * mix(1., 0., smoothstep(0., .25, length(rp.xy - vec2(0.57, .3))));
+    diff += .2 * mix(1., 0., smoothstep(0., .2, length(rp.xy - vec2(-0.5, 1.4 + jump * 0.5))));
+    diff += .12 * mix(1., 0., smoothstep(0., .25, length(rp.xy - vec2(0.57, .3 + jump * 0.5))));
 
     // bounce light from the floor
     diff += vec3(.25, 1., .25) * smoothstep(-.3, 1.7, -rp.y + 1.) * max(0., -n.y) * .7;
 
     vec3 orp = rp;
-    rp.y -= 1.5;
+    rp.y -= 1.6 + (jump * 0.19);
     rp.x = abs(rp.x);
 
     // blushes

@@ -80,6 +80,7 @@
 </script>
 
 <button
+	id="btn-{id}"
 	class="btn"
 	class:active
 	on:click={toggle}

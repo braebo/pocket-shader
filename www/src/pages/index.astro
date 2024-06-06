@@ -13,17 +13,52 @@ import Example from '../components/Example.svelte'
 import Nav from '../components/Nav.svelte'
 
 import clouds from '../shaders/clouds.frag?raw'
-import kirby from '../shaders/kirby.frag?raw'
 import bruh from '../shaders/bruh.frag?raw'
 ---
 
+<script>
 	import { teleportIntoView } from '../utils/teleportIntoView'
+	import { PocketShader } from "../../../pocket-shader"
+	import { fadeText } from "../utils/animations"
+	import kirby from '../shaders/kirby.frag?raw'
+
 	const hash = window.location.hash
     const target = hash ? document.querySelector(hash) : null
     if (target) teleportIntoView(target, {
 		yAmount: 1,
 		durationIn: 500
 	})
+
+	let ps11: PocketShader | null = null
+	document.querySelector('#run11')?.addEventListener('click', e => {
+		const target = e.target as HTMLButtonElement
+		if (target.textContent === 'Run') {
+			target.classList.add('active')
+			fadeText(target, 'Dispose')
+			ps11 = new PocketShader('#codeblock11', {
+				speed: 2,
+				autoStart: true,
+				uniforms: {
+					u_jump: { type: 'float', value: 0 },
+				},
+				fragment: kirby,
+			})
+
+			ps11.on('render', ({ time }) => {
+				if (ps11 && ps11.state !== 'disposed') {
+					ps11.uniforms.u_jump.value = Math.sin(time)
+				}
+			})
+		} else {
+			target.classList.remove('active')
+			ps11?.dispose()
+			ps11 = null
+			target.textContent = 'Run'
+		}
+	})
+</script>
+
+<GridShader client:load />
 
 <Layout>
 	<span class="nav">
@@ -282,20 +317,7 @@ import bruh from '../shaders/bruh.frag?raw'
             `}
 			/>
 
-			<Example
-				client:load
-				opts={[
-					'#codeblock11',
-					{
-						fragment: kirby,
-						speed: 2,
-						autoStart: true,
-						uniforms: {
-							u_jump: { type: 'float', value: 0 },
-						},
-					},
-				]}
-			/>
+			<button class="btn" id="run11">Run</button>
 		</section>
 
 		<section>
