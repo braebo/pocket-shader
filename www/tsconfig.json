@@ -1,6 +1,7 @@
 {
 	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
+		"baseUrl": ".",
 		"strict": true,
 		"lib": ["DOM", "ESNext"],
 		"skipLibCheck": true,

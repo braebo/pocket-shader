@@ -1,15 +1,33 @@
 {
 	"compilerOptions": {
-		"strict": true,
 		"lib": ["ESNext", "DOM"],
 		"target": "ESNext",
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
-		"skipLibCheck": true,
-		"allowJs": false,
+		"module": "ESNext",
+		"moduleDetection": "force",
+		
+		// Bundler mode
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
 		"noEmit": true,
+		
+		// Best practices
+		"strict": true,
+		"allowJs": false,
+		"skipLibCheck": true,
+		"noFallthroughCasesInSwitch": true,
+
+		// Some stricter flags
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noPropertyAccessFromIndexSignature": true,
+
+		// JSR
 		"noImplicitReturns": true,
+
+		// Decorators
 		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
-	}
+		"emitDecoratorMetadata": true,
+	},
+	"exclude": ["www"]
 }

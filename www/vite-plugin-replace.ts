@@ -1,4 +1,6 @@
+import type MagicString from 'magic-string'
 import type { Plugin } from 'vite'
+import ms from 'magic-string'
 
 export default (
 	options: {
@@ -11,13 +13,17 @@ export default (
 		name: 'vite-plugin-string-replace',
 		enforce: 'pre',
 		async transform(code: string, id: string) {
+			let str: MagicString
 			for (const option of options) {
 				if (option.filename && !id.match(option.filename)) {
 					continue
 				}
-				code = code.replace(option.search, option.replace)
+				const { search, replace } = option
+				str = new ms(code)
+				str.replace(search, replace)
+				return { code: str.toString(), map: str.generateMap() }
 			}
-			return { code, map: null }
+			return null
 		},
 	}
 }
