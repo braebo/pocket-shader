@@ -526,7 +526,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * A throttled, debounced {@link _resize}.  Resizes the canvas to fill the container.
 	 */
-	resize = throttledDebounce(this._resize)
+	resize: (() => void) = throttledDebounce(this._resize)
 
 	/**
 	 * Performs a single render to the canvas.  This method is called automatically when the
