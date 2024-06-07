@@ -1,3 +1,5 @@
+// @ts-ignore
+
 import type MagicString from 'magic-string'
 import type { Plugin } from 'vite'
 import ms from 'magic-string'
