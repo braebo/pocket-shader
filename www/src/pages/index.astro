@@ -58,15 +58,15 @@ import bruh from '../shaders/bruh.frag?raw'
 	})
 </script>
 
-<GridShader client:load />
-
 <Layout>
+	<GridShader client:load />
+
 	<span class="nav">
-		<Nav client:load />
+		<Nav client:visible />
 	</span>
 	
 	<div class="page">
-		<Hero client:load />
+		<Hero client:visible />
 
 		<h2 id="usage"><a href="/#usage">Usage</a></h2>
 
@@ -87,7 +87,7 @@ import bruh from '../shaders/bruh.frag?raw'
             	`}
 			/>
 
-			<Example client:load id="run1" />
+			<Example client:visible id="run1" />
 		</section>
 
 		<section>
@@ -108,7 +108,7 @@ import bruh from '../shaders/bruh.frag?raw'
 				automatically.
 			</p>
 
-			<Example client:load opts={["#codeblock2", {
+			<Example client:visible opts={["#codeblock2", {
 				preventScroll: true,
 			}]} />
 		</section>
@@ -146,7 +146,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			/>
 
 			<Example
-				client:load
+				client:visible
 				opts={[
 					'#codeblock3',
 					{
@@ -240,7 +240,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			/>
 
 			<Example
-				client:load
+				client:visible
 				opts={[
 					'#codeblock4',
 					{
@@ -278,7 +278,7 @@ import bruh from '../shaders/bruh.frag?raw'
 			/>
 
 			<Example
-				client:load
+				client:visible
 				opts={[
 					'#codeblock5',
 					{
@@ -327,7 +327,7 @@ import bruh from '../shaders/bruh.frag?raw'
 				<code class="g-red">start<span class="grey">()</span></code>
 				and <code class="g-red">stop<span class="grey">()</span></code>.
 			</p>
-			<Playback client:load id="#codeblock6">
+			<Playback client:visible id="#codeblock6">
 				<Code
 					slot="default"
 					id="codeblock6"

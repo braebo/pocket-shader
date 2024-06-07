@@ -34,6 +34,7 @@
 				--bg-active="transparent"
 				--bg-hover="transparent"
 				--blur="0"
+				--width="1.5rem"
 				style="
 					box-sizing: border-box;
 					position: absolute;
@@ -50,55 +51,73 @@
 
 <style lang="scss">
 	.hero-text {
+		contain: strict;
+
+		width: 30rem;
+		max-width: 100%;
+		height: 5rem;
+
 		margin: 2rem auto 0 auto;
-		padding: 0 1rem;
-		
-		font-size: clamp(4.5rem, 11vw, 5.5rem);
+		padding: 0;
+
+		flex-wrap: nowrap;
+		white-space: nowrap;
+
+		font-size: clamp(4rem, 12vw, 5.5rem);
 		letter-spacing: -3px;
 	}
 
 	.description {
+		contain: strict;
+
 		position: relative;
 
 		box-sizing: border-box;
-		padding: 1rem;
 		padding-top: 1.25rem;
-		padding-bottom: 2.25rem;
 		max-width: 27rem;
+		height: 6rem;
 
-		// background: var(--bg-b);
 		border-radius: var(--radius);
-
-		text-wrap: balance;
 
 		font-size: 1.15rem;
 		font-variation-settings: 'wght' 200;
 		letter-spacing: 0.3px;
 		word-spacing: 2px;
+		text-wrap: balance;
 	}
 
+	$width: 24rem;
+	$height: 1.1rem;
+
 	.install-wrapper {
+		contain: strict;
+
 		position: relative;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 
-		width: fit-content;
-		height: fit-content;
+		width: 26rem;
+		height: 5rem;
+		max-width: 100%;
 		margin: auto;
 
-		background: var(--bg-b);
 		border-radius: 0.2rem;
 
 		transform: translate3d(0, -1rem, -1rem);
 	}
 
 	code.install {
+		contain: size style;
+
 		position: relative;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 
+		width: 21rem;
+		height: 1.1rem;
+		max-width: 100%;
 		padding: 0.75rem 1.5rem;
 		margin: auto;
 
@@ -157,11 +176,14 @@
 	}
 
 	.copy {
+		contain: strict;
+
 		position: absolute;
 		inset: 0;
 
-		width: 100%;
-		height: 100%;
+		height: 2rem;
+		width: 22rem;
+		margin: auto;
 
 		color: var(--fg-a);
 		background: transparent;
