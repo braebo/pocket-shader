@@ -234,6 +234,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		 * @defaultValue `document.body`
 		 */
 		container: HTMLElement | string,
+		/**
+		 * @see {@link PocketShaderOptions}
+		 */
 		options?: PocketShaderOptions<T>,
 	)
 	constructor(
@@ -295,6 +298,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this.builtinUniforms.u_time = value
 	}
 
+	/**
+	 * The current canvas width and height.
+	 */
 	get resolution(): { width: number; height: number } {
 		return {
 			width: this.canvas?.width,
@@ -302,6 +308,14 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 	}
 
+	/**
+	 * Initializes the instance, creating the canvas element and WebGL context, and compiling the
+	 * shaders.  This method is called automatically when the instance is created, unless the
+	 * {@link autoInit|`autoInit`} option is set to `false`.
+	 *
+	 * All references to {@link Window} and {@link Document} are contained within this method
+	 * instead of the constructor.
+	 */
 	init(): this {
 		let container: HTMLElement | null
 		let options: PocketShaderOptions<T> | undefined
@@ -475,7 +489,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	/**
 	 * Resizes the canvas to fill the container.
 	 */
-	_resize = (): this => {
+	private _resize = (): this => {
 		const width =
 			this.container instanceof HTMLBodyElement
 				? window.innerWidth
@@ -514,6 +528,16 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	 */
 	resize = throttledDebounce(this._resize)
 
+	/**
+	 * Performs a single render to the canvas.  This method is called automatically when the
+	 * instance is created, unless the {@link autoStart|`autoStart`} option is set to `false`.
+	 *
+	 * This method is also called automatically when the window is resized, or when the
+	 * {@link uniforms} are updated.  If the {@link state} is `running`, this method will be called
+	 * recursively to update the time uniform and re-render the shader each frame.
+	 *
+	 * If the {@link state} is `disposed`, this method does nothing.
+	 */
 	render(): this {
 		let then = 0
 
@@ -603,11 +627,11 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	/**
-	 * This method runs in the `mousemove` event listener on the canvas element, and:
+	 * This method runs in the `mousemove` event listener and does the following:
 	 * 1. Calculates the mouse position relative to the canvas.
-	 * 1. Normalizes it to the range `[0, 1]`.
-	 * 1. Applies the {@link mouseSmoothing|`mouseSmoothing`} factor.
-	 * 1. Updates the `u_mouse` uniform.
+	 * 2. Normalizes it to the range `[0, 1]`.
+	 * 3. Applies the {@link mouseSmoothing|`mouseSmoothing`} factor.
+	 * 4. Updates the `u_mouse` uniform.
 	 */
 	setMousePosition = (e: MouseEvent | Touch): void => {
 		this.mouse.x = (e.clientX - this._canvasRectCache.left) / this._canvasRectCache.width
@@ -616,6 +640,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			this._canvasRectCache.height
 	}
 
+	/**
+	 * Just forwards the first touch event to {@link setMousePosition} on `touchmove`.
+	 * @todo - Can we just use`onpointermove` and get rid of this?
+	 */
 	setTouchPosition = (e: TouchEvent): void => {
 		if (this.opts.preventScroll === true) {
 			e.preventDefault()
@@ -633,6 +661,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return this
 	}
 
+	/**
+	 * Dispatches the `render` event to all listeners.
+	 */
 	private _emit = (time: number, delta: number): void => {
 		for (const [event, listener] of this._listeners) {
 			switch (event) {
@@ -643,6 +674,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 	}
 
+	/**
+	 * Compiles the shaders and creates the WebGL program.
+	 */
 	compile() {
 		this.ctx = this.canvas.getContext('webgl2')
 		if (!this.ctx) throw new Error('WebGL2 context not found.')
@@ -689,6 +723,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		)
 	}
 
+	/**
+	 * Returns the target element to listen for mouse events on based on the
+	 * {@link PocketShaderOptions.mouseTarget|mouseTarget} option.
+	 */
 	getMouseTarget = (): HTMLElement | Window => {
 		switch (this.opts.mouseTarget) {
 			case 'container':
@@ -742,10 +780,16 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		window.addEventListener('scroll', this._updateRectCache)
 	}
 
+	/**
+	 * Updates the cached bounding rect of the canvas element.
+	 */
 	private _updateRectCache = throttledDebounce((): void => {
 		this._canvasRectCache = this.canvas.getBoundingClientRect()
 	})
 
+	/**
+	 * Creates a WebGL program from the provided vertex and fragment shaders.
+	 */
 	private _createProgram(
 		gl: WebGL2RenderingContext,
 		vertex: WebGLShader,
@@ -766,6 +810,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return false
 	}
 
+	/**
+	 * Creates a WebGL shader from the provided source code.
+	 */
 	private _createShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
 		const shader = gl.createShader(type)!
 		gl.shaderSource(shader, source)
@@ -783,7 +830,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return false
 	}
 
-	test = 0
+	/**
+	 * Updates a uniform value on the shader program.
+	 */
 	private _setUniform(
 		ctx: WebGL2RenderingContext,
 		location: WebGLUniformLocation | null,
@@ -814,6 +863,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		}
 	}
 
+	/**
+	 * Parses all of the uniforms in the fragment shader string and verifies that they exist in the
+	 * current {@link uniforms} object, throwing an error
+	 */
 	private _validateUniforms(source: string): { [key: string]: any } {
 		const uniformRegex = /uniform\s+(\w+)\s+(\w+)\s*;/g
 
@@ -837,6 +890,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		return this
 	}
 
+	/**
+	 * Cleans up all event listeners and WebGL resources.
+	 */
 	private _cleanupListeners(): void {
 		this.canvas.removeEventListener('mousemove', this.setMousePosition)
 		this.canvas.removeEventListener('touchmove', this.setTouchPosition)
@@ -846,6 +902,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this._listeners.clear()
 	}
 
+	/**
+	 * Disposes of all resources and event listeners, the WebGL context, and removes the canvas
+	 * element from the DOM.
+	 */
 	dispose() {
 		this.state = 'disposed'
 
@@ -853,7 +913,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		this._builtinUniformLocations.clear()
 		this._uniformLocations.clear()
-		
+
 		this.canvas?.remove()
 
 		this.ctx?.getExtension('WEBGL_lose_context')?.loseContext()
@@ -865,8 +925,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
  * Creates a throttled, debounced version of a function.
  * @param fn - The function to throttle and debounce.
  * @param throttleMs - The time in milliseconds to wait in between calls.
- * @param debounceMs - The time in milliseconds to wait before running the function after the last call.
- * @returns A new function that will only run once every `throttleMs` milliseconds, and will wait `debounceMs` milliseconds after the last call before running.
+ * @param debounceMs - The time in milliseconds to wait before running the function after the
+ * last call.
+ * @returns A new function that will only run once every `throttleMs` milliseconds, and will wait
+ * `debounceMs` milliseconds after the last call before running.
  */
 function throttledDebounce(
 	/**
