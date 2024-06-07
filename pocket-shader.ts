@@ -1,10 +1,3 @@
-const hexColorHash = (name: string): string =>
-	'#' +
-	(0x1000000 + (name.split('').reduce((acc, c) => acc + c.charCodeAt(0) * 42, 0) & 0xffffff))
-		.toString(16)
-		.slice(1)
-		.replace(/^./, 'F')
-
 /**
  * A simple webgl shader renderer.
  * @module
@@ -106,7 +99,7 @@ interface Uniform {
  *
  * @param container The element to append the canvas to.  Can be an HTMLElement or a string selector.
  */
-@LogMethods()
+// @LogMethods() //- local dev only
 export class PocketShader<T extends Record<string, Uniform> = Record<string, Uniform>> {
 	/**
 	 * The container for the canvas element is used to determine the size of the canvas.
@@ -250,10 +243,6 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		this._arg1 = arg1 as ConstructorParameters<typeof PocketShader>[0]
 		this._arg2 = arg2
 
-		// this.resolution = this.resolution.bind(this)
-		// Cannot assign to 'resolution' because it is a read-only property.ts(2540)
-		// Property 'bind' does not exist on type '{ width: number; height: number; }'.ts(2339)
-
 		let init = true
 		if (typeof arg1 === 'object' && 'autoInit' in arg1 && arg1.autoInit === false) {
 			init = false
@@ -264,7 +253,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		if (init) {
 			if (typeof globalThis.window === 'undefined') {
-				if (__DEV__) {
+				if (import.meta.env['DEV']) {
 					console.warn(
 						'PocketShader is not running in a browser environment.  Aborting automatic initialization.',
 					)
@@ -392,7 +381,10 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			this._resize()
 		}
 
-		if (__DEV__ && (this.container.clientWidth === 0 || this.container.clientHeight === 0)) {
+		if (
+			import.meta.env['DEV'] &&
+			(this.container.clientWidth === 0 || this.container.clientHeight === 0)
+		) {
 			console.error(
 				`PocketShader container has a width or height of 0px.  The canvas will not be visible until the container has a non-zero size size.`,
 				{
@@ -834,11 +826,12 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 					k => k === name,
 				)
 			) {
-				// console.log('%cUniform found:', 'color:lightgreen', name)
 				continue
 			}
 
-			throw new Error(`Uniform not found: ${name}`)
+			throw new Error(
+				`Uniform "${name}" is referenced in the shader, but no value was provided in PocketShaderOptions.uniforms.`,
+			)
 		}
 
 		return this
@@ -909,21 +902,28 @@ function throttledDebounce(
 	}
 }
 
-function LogMethods(): ClassDecorator {
-	return function (target: Function) {
-		for (const key of Object.getOwnPropertyNames(target.prototype)) {
-			const method = target.prototype[key]
-			if (key !== 'constructor' && typeof method === 'function') {
-				const color = hexColorHash(key)
-				target.prototype[key] = function (...args: any[]) {
-					if (__DEV__ && !key.match(/_setUniform/)) {
-						console.log(`%c${'id'} : ${key}%c()`, `color:${color}`, `color:inherit`, {
-							this: this,
-						})
-					}
-					return method.apply(this, args)
-				}
-			}
-		}
-	}
-}
+//- local dev only
+// const hexColorHash = (name: string): string =>
+// 	'#' +
+// 	(0x1000000 + (name.split('').reduce((acc, c) => acc + c.charCodeAt(0) * 42, 0) & 0xffffff))
+// 		.toString(16)
+// 		.slice(1)
+// 		.replace(/^./, 'F')
+// function LogMethods(): ClassDecorator {
+// 	return function (target: Function) {
+// 		for (const key of Object.getOwnPropertyNames(target.prototype)) {
+// 			const method = target.prototype[key]
+// 			if (key !== 'constructor' && typeof method === 'function') {
+// 				const color = hexColorHash(key)
+// 				target.prototype[key] = function (...args: any[]) {
+// 					if (__DEV__ && !key.match(/_setUniform/)) {
+// 						console.log(`%c${'id'} : ${key}%c()`, `color:${color}`, `color:inherit`, {
+// 							this: this,
+// 						})
+// 					}
+// 					return method.apply(this, args)
+// 				}
+// 			}
+// 		}
+// 	}
+// }
