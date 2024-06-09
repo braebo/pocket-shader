@@ -2,6 +2,7 @@
 	"name": "pocket-shader",
 	"version": "0.2.0",
 	"description": "A typescript package that makes it easy to render WebGL shaders in the browser.",
+	"homepage": "https://pocket-shader.braebo.dev",
 	"keywords": [
 		"webgl",
 		"shaders",
@@ -14,16 +15,29 @@
 	"license": "MIT",
 	"author": "braebo",
 	"type": "module",
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
 	"exports": {
+		"./package.json": "./package.json",
 		".": {
-			"types": "./pocket-shader.ts",
-			"default": "./pocket-shader.ts"
-		},
-		"./package.json": "./package.json"
+			"types": "./dist/pocket-shader.d.ts",
+			"default": "./dist/pocket-shader.js"
+		}
 	},
 	"scripts": {
 		"dev": "cd www && pnpm dev",
-		"release": "pnpx jsr publish",
-		"size": "npx -y esbuild pocket-shader.ts --minify | npx -y brotli-size-cli"
+		"build": "pnpm tsup",
+		"build:site": "cd www && pnpm build",
+		"size": "cat dist/pocket-shader.min.js | npx -y brotli-size-cli"
+	},
+	"devDependencies": {
+		"@svitejs/changesets-changelog-github-compact": "^1.1.0",
+		"@types/bun": "^1.1.3",
+		"@types/node": "^20.14.2",
+		"tsup": "^8.1.0",
+		"typescript": "^5.4.5"
 	}
 }

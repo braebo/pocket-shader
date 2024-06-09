@@ -1,20 +1,21 @@
-name: Release Package
+name: Release
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
-  publish:
+  release:
+    if: github.repository == 'braebo/pocket-shader'
+    name: Release
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
 
       - name: Setup Node 20
         uses: actions/setup-node@v4
@@ -22,5 +23,29 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
 
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3.0.0
+        with:
+            version: 8.15.7
+
+      - name: Install
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Release or Create Release Pull Request or Do Nothing
+        uses: changesets/action@v1
+        with:
+          publish: pnpm changeset puplish
+          version: |
+            pnpm changeset version
+            NEW_VERSION=$(jq -r '.version' package.json)
+            jq --arg new_version "$NEW_VERSION" '.version = $new_version' jsr.json > tmp.json && mv tmp.json jsr.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish to jsr
-        run: npx -y jsr publish
+        if: steps.changesets.outputs.published == 'true'
+        run: pnpx -y jsr publish

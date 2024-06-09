@@ -1,13 +1,21 @@
-import { readFile, writeFile } from 'node:fs/promises'
 import { defineConfig } from 'tsup'
 
-export default defineConfig({
-	entry: ['./pocket-shader.ts'],
-	format: ['esm'],
-	clean: true,
-	dts: true,
-	async onSuccess() {
-		const data = await readFile('./dist/pocket-shader.js', 'utf-8');
-		await writeFile('./dist/pocket-shader.js', `// @ts-self-types="./pocket-shader.d.ts"\n${data}`, 'utf-8')
+export default defineConfig([
+	{
+		entry: {
+			'pocket-shader.min': 'src/pocket-shader.ts',
+		},
+		minify: !0,
+		name: 'standard',
+		format: ['esm'],
+		clean: true,
+		dts: !!0,
 	},
-})
+	{
+		entry: ['src/pocket-shader.ts'],
+		name: 'standard',
+		format: ['esm'],
+		clean: true,
+		dts: true,
+	},
+])
