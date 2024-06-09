@@ -33,8 +33,8 @@
 		"build": "tsup",
 		"build:site": "cd www && pnpm build",
 		"release": "pnpm changeset",
-		"size": "cat dist/pocket-shader.min.js | npx -y brotli-size-cli",
-		"sync-version": "jq --arg new_version \"$(jq -r '.version' package.json)\" '.version = $new_version' jsr.json > tmp.json && mv tmp.json jsr.json && changeset version",
+		"size": "cat dist/pocket-shader.min.js | pnpx brotli-size-cli",
+		"sync-version": "changeset version && pnpx sync-version jsr.json",
 		"lint": "publint"
 	},
 	"devDependencies": {
