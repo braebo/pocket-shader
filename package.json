@@ -29,14 +29,17 @@
 	},
 	"scripts": {
 		"dev": "cd www && pnpm dev",
-		"build": "pnpm tsup",
+		"build": "tsup",
 		"build:site": "cd www && pnpm build",
+		"release": "pnpm changeset",
 		"size": "cat dist/pocket-shader.min.js | npx -y brotli-size-cli"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.27.5",
 		"@svitejs/changesets-changelog-github-compact": "^1.1.0",
 		"@types/bun": "^1.1.3",
 		"@types/node": "^20.14.2",
+		"changeset": "^0.2.6",
 		"tsup": "^8.1.0",
 		"typescript": "^5.4.5"
 	}

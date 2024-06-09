@@ -41,3 +41,11 @@ npx jsr add @braebo/pocket-shader
 - [ ] Texture Support
 - [ ] WebGPU
 - [ ] Auto Pause/Resume _(Intersection Observer)_
+
+## Contributing
+
+Just remember to include a changeset with your pr:
+
+```bash
+pnpm changeset
+```
