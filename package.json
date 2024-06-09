@@ -20,6 +20,7 @@
 		"README.md",
 		"LICENSE"
 	],
+	"types": "./dist/pocket-shader.d.ts",
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
@@ -33,7 +34,8 @@
 		"build:site": "cd www && pnpm build",
 		"release": "pnpm changeset",
 		"size": "cat dist/pocket-shader.min.js | npx -y brotli-size-cli",
-		"sync-version": "jq --arg new_version \"$(jq -r '.version' package.json)\" '.version = $new_version' jsr.json > tmp.json && mv tmp.json jsr.json && changeset version"
+		"sync-version": "jq --arg new_version \"$(jq -r '.version' package.json)\" '.version = $new_version' jsr.json > tmp.json && mv tmp.json jsr.json && changeset version",
+		"lint": "publint"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.5",
@@ -41,6 +43,7 @@
 		"@types/bun": "^1.1.3",
 		"@types/node": "^20.14.2",
 		"changeset": "^0.2.6",
+		"publint": "^0.2.8",
 		"tsup": "^8.1.0",
 		"typescript": "^5.4.5"
 	}
