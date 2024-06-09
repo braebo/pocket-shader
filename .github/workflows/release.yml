@@ -40,7 +40,6 @@ jobs:
       - name: Release or Create Release Pull Request or Do Nothing
         uses: changesets/action@v1
         with:
-          publish: pnpm changeset puplish
           version: |
             pnpm changeset version
             NEW_VERSION=$(jq -r '.version' package.json)
