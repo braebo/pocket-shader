@@ -39,6 +39,7 @@ jobs:
 
 
       - name: Release or Create Release Pull Request or Do Nothing
+        id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm sync-version
