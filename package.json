@@ -32,7 +32,8 @@
 		"build": "tsup",
 		"build:site": "cd www && pnpm build",
 		"release": "pnpm changeset",
-		"size": "cat dist/pocket-shader.min.js | npx -y brotli-size-cli"
+		"size": "cat dist/pocket-shader.min.js | npx -y brotli-size-cli",
+		"version": "jq --arg new_version \"$(jq -r '.version' package.json)\" '.version = $new_version' jsr.json > tmp.json && mv tmp.json jsr.json && changeset version"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.5",

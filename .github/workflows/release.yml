@@ -38,14 +38,11 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Sync Version
-        run: |
-          pnpm changeset version
-          NEW_VERSION=$(jq -r '.version' package.json)
-          jq --arg new_version "$NEW_VERSION" '.version = $new_version' jsr.json > tmp.json && mv tmp.json jsr.json
 
       - name: Release or Create Release Pull Request or Do Nothing
         uses: changesets/action@v1
+        with:
+          version: pnpm version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
