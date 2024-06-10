@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { gridColor, gridColors } from '../utils/gridColor'
-	import { PocketShader } from '../../../pocket-shader'
 	import { fadeText } from '../utils/animations'
 	import { createEventDispatcher } from 'svelte'
+	import { PocketShader } from 'pocket-shader'
 
 	const dispatch = createEventDispatcher()
 

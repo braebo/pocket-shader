@@ -18,9 +18,9 @@ import bruh from '../shaders/bruh.frag?raw'
 
 <script>
 	import { teleportIntoView } from '../utils/teleportIntoView'
-	import { PocketShader } from "../../../pocket-shader"
-	import { fadeText } from "../utils/animations"
+	import { fadeText } from '../utils/animations'
 	import kirby from '../shaders/kirby.frag?raw'
+	import { PocketShader } from 'pocket-shader'
 
 	const hash = window.location.hash
     const target = hash ? document.querySelector(hash) : null
