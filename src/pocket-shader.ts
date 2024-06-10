@@ -249,7 +249,7 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 
 		if (init) {
 			if (typeof globalThis.window === 'undefined') {
-				if (import.meta.env?.['DEV']) {
+				if (import.meta?.env?.DEV) {
 					console.warn(
 						'PocketShader is not running in a browser environment.  Aborting automatic initialization.',
 					)
@@ -954,6 +954,14 @@ function throttledDebounce(
 		debounceTimeout = setTimeout(() => {
 			fn(...args)
 		}, debounceMs)
+	}
+}
+
+declare global {
+	interface ImportMeta {
+		env?: {
+			DEV?: boolean;
+		}
 	}
 }
 
