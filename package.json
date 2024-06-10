@@ -1,6 +1,6 @@
 {
 	"name": "pocket-shader",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"description": "A typescript package that makes it easy to render WebGL shaders in the browser.",
 	"homepage": "https://pocket-shader.braebo.dev",
 	"keywords": [
