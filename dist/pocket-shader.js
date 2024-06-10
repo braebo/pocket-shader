@@ -117,7 +117,7 @@ var PocketShader = class {
     }
     if (init) {
       if (typeof globalThis.window === "undefined") {
-        if (import.meta.env?.["DEV"]) {
+        if (!!import.meta?.env?.DEV) {
           console.warn(
             "PocketShader is not running in a browser environment.  Aborting automatic initialization."
           );
@@ -227,7 +227,7 @@ precision mediump float;uniform float u_time;in vec2 vUv;out vec4 color;void mai
     } else {
       this._resize();
     }
-    if (import.meta.env?.["DEV"] && (this.container.clientWidth === 0 || this.container.clientHeight === 0)) {
+    if (this.container.clientWidth === 0 || this.container.clientHeight === 0) {
       console.error(
         `PocketShader container has a width or height of 0px.  The canvas will not be visible until the container has a non-zero size size.`,
         {
