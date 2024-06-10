@@ -1,5 +1,11 @@
 # pocket-shader
 
+## 0.3.1
+
+### Patch Changes
+
+- fix: import.meta types ([`9306ab80628d49356346c994e6b34b7cb6848b35`](https://github.com/braebo/pocket-shader/commit/9306ab80628d49356346c994e6b34b7cb6848b35))
+
 ## 0.3.0
 
 ### Minor Changes
