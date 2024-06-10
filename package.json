@@ -34,7 +34,7 @@
 		"build:site": "cd www && pnpm build",
 		"release": "pnpm changeset",
 		"size": "cat dist/pocket-shader.min.js | pnpx brotli-size-cli",
-		"a-sync-version": "changeset version && pnpx sync-version jsr.json",
+		"sync-version": "changeset version && pnpx sync-version jsr.json",
 		"lint": "publint"
 	},
 	"devDependencies": {
