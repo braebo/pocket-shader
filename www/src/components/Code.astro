@@ -1,6 +1,6 @@
 ---
+import { createCssVariablesTheme, type BuiltinLanguage } from 'shiki'
 import { Code as AstroCode } from 'astro:components'
-import { createCssVariablesTheme } from 'shiki'
 import { dedent } from '../utils/dedent.ts'
 import { nanoid } from '../utils/nanoid'
 import Copy from './Copy.svelte'
@@ -54,9 +54,8 @@ const copyId = 'copyId-' + nanoid(8)
 
 			{codes.length ? (
 					codes.map(({lang, code, trim = false}) => (
-						<!-- @ts-ignore -->
 						<AstroCode
-							lang={lang}
+							lang={lang as BuiltinLanguage}
 							theme={theme}
 							transformers={[
 								transformerNotationFocus(),
@@ -68,9 +67,8 @@ const copyId = 'copyId-' + nanoid(8)
 						/>
 					))
 			) : (
-					<!-- @ts-ignore -->
 					<AstroCode
-						lang={lang}
+						lang={lang as BuiltinLanguage}
 						theme={theme}
 						transformers={[
 							transformerNotationFocus(),

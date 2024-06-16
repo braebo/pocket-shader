@@ -139,8 +139,8 @@
 		align-items: center;
 		justify-content: center;
 
-		width: var(--width, 100%);
-		height: var(--width, 100%);
+		width: 100%;
+		height: 100%;
 
 		grid-area: 1/1;
 		aspect-ratio: 1/1;
