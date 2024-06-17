@@ -22,10 +22,6 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 
-		// https://github.com/microsoft/TypeScript/issues/14619#issuecomment-1971477006
-		"removeComments": false,
-		"declaration": false,
-
 		"outDir": "dist"
 	},
 	"include": ["src/pocket-shader.ts"]
