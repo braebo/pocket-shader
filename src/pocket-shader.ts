@@ -83,7 +83,7 @@ export interface PocketShaderOptions<T extends Record<string, any> = Record<stri
 }
 
 interface Uniform {
-	type: 'int' | 'float' | 'vec2' | 'vec3' | 'vec4'
+	type: 'int' | 'float' | 'floatArray' | 'vec2' | 'vec3' | 'vec4'
 	value: number | number[]
 }
 
@@ -564,26 +564,35 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 			// Tell it to use our program (pair of shaders).
 			this.ctx.useProgram(this.program)
 
+			// // Turn on the attribute.
+			// this.ctx.enableVertexAttribArray(positionAttributeLocation as number)
+
+			// // Bind the position buffer.
+			// this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this._positionBuffer)
+
+			// this.ctx.vertexAttribPointer(
+			// 	positionAttributeLocation as number,
+			// 	2, // 2 components per iteration
+			// 	this.ctx.FLOAT, // the data is 32bit floats
+			// 	false, // don't normalize the data
+			// 	0, // 0 = move forward size * sizeof(type) each iteration to get the next position
+			// 	0, // start at the beginning of the buffer
+			// )
+
 			const positionAttributeLocation = this._builtinUniformLocations.get('a_position')!
+			this._createVertexBuffer({
+				ctx: this.ctx,
+				location: positionAttributeLocation,
+				size: 2,
+				type: this.ctx.FLOAT,
+				normalize: false,
+				stride: 0,
+				offset: 0,
+			})
+
 			const resolutionLocation = this._builtinUniformLocations.get('u_resolution')!
 			const mouseLocation = this._builtinUniformLocations.get('u_mouse')!
 			const timeLocation = this._builtinUniformLocations.get('u_time')!
-
-			// Turn on the attribute.
-			this.ctx.enableVertexAttribArray(positionAttributeLocation as number)
-
-			// Bind the position buffer.
-			this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this._positionBuffer)
-
-			// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER).
-			this.ctx.vertexAttribPointer(
-				positionAttributeLocation as number,
-				2, // 2 components per iteration
-				this.ctx.FLOAT, // the data is 32bit floats
-				false, // don't normalize the data
-				0, // 0 = move forward size * sizeof(type) each iteration to get the next position
-				0, // start at the beginning of the buffer
-			)
 
 			this.ctx.uniform2f(
 				resolutionLocation,
@@ -615,6 +624,100 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		requestAnimationFrame(_render)
 
 		return this
+	}
+
+	_createTexture = (gl: WebGL2RenderingContext, options?: Partial<TextureImage2dOptions>) => {
+		const texture = gl.createTexture()
+		gl.bindTexture(gl.TEXTURE_2D, texture)
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			options?.level ?? 0,
+			options?.internalFormat ?? gl.RGBA,
+			options?.width ?? 256,
+			options?.height ?? 256,
+			options?.border ?? 0,
+			options?.format ?? gl.RGBA,
+			options?.type ?? gl.UNSIGNED_BYTE,
+			options?.pixels ?? null,
+		)
+
+		const frameBuffer = gl.createFramebuffer()
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
+
+		const attachmentPoint = gl.COLOR_ATTACHMENT0
+		gl.framebufferTexture2D(
+			gl.FRAMEBUFFER,
+			attachmentPoint,
+			gl.TEXTURE_2D,
+			texture,
+			options?.level ?? 0,
+		)
+	}
+
+	_createAudioTexture = (
+		gl: WebGL2RenderingContext,
+		/**
+		 * Half of the analyser's FFT size.
+		 */
+		resolution: 32 | 64 | 128 | 256 | 512 | 1024,
+	) => {
+		const data = new Uint8Array(resolution)
+		const texture = gl.createTexture()
+		gl.bindTexture(gl.TEXTURE_2D, texture)
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.LUMINANCE,
+			resolution,
+			1,
+			0,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			data,
+		)
+
+		const frameBuffer = gl.createFramebuffer()
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
+
+		const attachmentPoint = gl.COLOR_ATTACHMENT0
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, texture, 0)
+
+		// Disable mipmaps
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	}
+
+	_renderAudioTexture = (
+		gl: WebGL2RenderingContext,
+		options: {
+			texture: WebGLTexture
+			resolution: number
+			data: Uint8Array
+		},
+	) => {
+		// upload the audio data to the texture
+		gl.bindTexture(gl.TEXTURE_2D, options.texture)
+		gl.texSubImage2D(
+			gl.TEXTURE_2D,
+			0, // level
+			0, // x
+			0, // y
+			options.resolution, // width
+			1, // height
+			gl.LUMINANCE, // format
+			gl.UNSIGNED_BYTE, // type
+			options.data, // data
+		)
+
+		//! Now what?
+
+		// gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+		// gl.enableVertexAttribArray(a_positionLocation);
+		// gl.vertexAttribPointer(a_positionLocation, 3, gl.FLOAT, false, 0, 0);
+		// gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+		// gl.enableVertexAttribArray(a_texcoordLocation);
+		// gl.vertexAttribPointer(a_texcoordLocation, 4, gl.FLOAT, false, 0, 0);
 	}
 
 	/**
@@ -822,6 +925,43 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 	}
 
 	/**
+	 * Creates a vertex buffer and sets up the necessary WebGL state for vertex attribute pulling.
+	 *
+	 * @param ctx - The WebGL2 rendering context.
+	 * @param location - The location of the vertex attribute to be set up.
+	 * @param size - The number of components per vertex attribute. For example, if each vertex attribute is a 2D point, size would be 2.
+	 * @param type - The data type of each component in the array. This should be one of the WebGL constants like ctx.FLOAT, ctx.INT, etc.
+	 * @param normalize - Whether non-integer data types should be normalized to a range between 0 and 1. Default is false.
+	 * @param stride - The number of bytes between the beginning of consecutive vertex attributes. This can be used to pack multiple attributes into a single buffer. Default is 0, which means that attributes are tightly packed.
+	 * @param offset - The offset in bytes where the vertex attribute data begins in the buffer. This allows for different vertex attributes to be interspersed in a single buffer.
+	 */
+	private _createVertexBuffer = (opts: {
+		ctx: WebGL2RenderingContext
+		location: WebGLUniformLocation
+		size: number
+		type: number
+		normalize: boolean
+		stride: number
+		offset: number
+	}): void => {
+		// Turn on the attribute.
+		opts.ctx.enableVertexAttribArray(opts.location as number)
+
+		// Bind the position buffer.
+		opts.ctx.bindBuffer(opts.ctx.ARRAY_BUFFER, this._positionBuffer)
+
+		// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER).
+		opts.ctx.vertexAttribPointer(
+			opts.location as number,
+			opts.size, // 2 components per iteration
+			opts.type, // the data is 32bit floats
+			opts.normalize, // don't normalize the data
+			opts.stride, // 0 = move forward size * sizeof(type) each iteration to get the next position
+			opts.offset, // start at the beginning of the buffer
+		)
+	}
+
+	/**
 	 * Updates a uniform value on the shader program.
 	 */
 	private _setUniform(
@@ -836,6 +976,9 @@ export class PocketShader<T extends Record<string, Uniform> = Record<string, Uni
 		switch (type) {
 			case 'float':
 				ctx.uniform1f(location, value as number)
+				break
+			case 'floatArray':
+				ctx.uniform1fv(location, value as any as Float32Array)
 				break
 			case 'vec2':
 				ctx.uniform2fv(location, value as any as Float32Array)
@@ -953,6 +1096,52 @@ function throttledDebounce(
 			fn(...args)
 		}, debounceMs)
 	}
+}
+
+/**
+ * Options when creating a two-dimensional texture image via
+ * {@link WebGL2RenderingContext.texImage2D|`texImage2D`}.
+ * @see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D)
+ */
+interface TextureImage2dOptions {
+	/**
+	 * A GLint specifying the level of detail. Level 0 is the base image level. Level n is the nth
+	 * mipmap reduction level.
+	 */
+	level?: Parameters<WebGL2RenderingContext['texImage2D']>[1]
+	/**
+	 * A {@link GLEnum} specifying the color components in the texture.
+	 */
+	internalFormat?: Parameters<WebGL2RenderingContext['texImage2D']>[2]
+	/**
+	 * A GLsizei specifying the width of the texture.
+	 */
+	width?: Parameters<WebGL2RenderingContext['texImage2D']>[3]
+	/**
+	 * A GLsizei specifying the height of the texture.
+	 */
+	height?: Parameters<WebGL2RenderingContext['texImage2D']>[4]
+	/**
+	 * A GLint specifying the width of the border. Should be 0.
+	 */
+	border?: Parameters<WebGL2RenderingContext['texImage2D']>[5]
+	/**
+	 * A {@link GLEnum} specifying the format of the texel data.
+	 * @see https://registry.khronos.org/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
+	 */
+	format?: Parameters<WebGL2RenderingContext['texImage2D']>[6]
+	/**
+	 * A {@link GLEnum} specifying the data type of the texel data.
+	 */
+	type?: Parameters<WebGL2RenderingContext['texImage2D']>[7]
+	/**
+	 * The texel data.
+	 */
+	pixels?: Parameters<WebGL2RenderingContext['texImage2D']>[8]
+	/**
+	 * A {@link GLEnum} specifying the wrap parameter for the s coordinate.
+	 */
+	offset: Parameters<WebGL2RenderingContext['texImage2D']>[9]
 }
 
 //- local dev only

@@ -1,15 +1,19 @@
-<script>
+<script lang="ts">
 	import { PocketShader } from 'pocket-shader'
 	import { onMount } from 'svelte'
 
 	import fractalPyramid from '../shaders/fractalPyramid.frag?raw'
-	import retro from '../shaders/retro.frag?raw'
+	// import retro from '../shaders/retro.frag?raw'
 	import bruh from '../shaders/bruh.frag?raw'
 	import grid from '../shaders/grid.frag?raw'
 
-	let ps
+	let ps: PocketShader
 
 	const shaders = [
+		{
+			name: 'Bruh',
+			fragment: bruh,
+		},
 		{
 			name: 'Grid',
 			fragment: grid,
@@ -17,10 +21,6 @@
 		{
 			name: 'Pyramid',
 			fragment: fractalPyramid,
-		},
-		{
-			name: 'Bruh',
-			fragment: bruh,
 		},
 		// {
 		// 	name: 'Retro',
