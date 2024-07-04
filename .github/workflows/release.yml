@@ -1,53 +1,51 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 jobs:
-  release:
-    if: github.repository == 'braebo/pocket-shader'
-    name: Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # to create release (changesets/action)
-      pull-requests: write # to create pull request (changesets/action)
-      id-token: write # required for JSR
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
-          fetch-depth: 0
+    release:
+        if: github.repository == 'TODO'
+        name: Release
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write # to create release (changesets/action)
+            pull-requests: write # to create pull request (changesets/action)
+            id-token: write # required for JSR
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+                  fetch-depth: 0
 
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+            - name: Setup Node 20
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v3.0.0
-        with:
-            version: 8.15.7
+            - name: Setup PNPM
+              uses: pnpm/action-setup@v3.0.0
+              with:
+                  version: 8.15.7
 
-      - name: Install
-        run: pnpm install
+            - name: Install
+              run: pnpm install
 
-      - name: Build
-        run: pnpm build
+            - name: Build
+              run: pnpm build
 
-
-      - name: Release or Create Release Pull Request or Do Nothing
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: pnpm sync-version
-          publish: pnpm changeset publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to jsr
-        if: steps.changesets.outputs.published == 'true'
-        run: npx -y jsr publish --allow-dirty
+            - name: Release or Create Release Pull Request or Do Nothing
+              id: changesets
+              uses: changesets/action@v1
+              with:
+                  version: pnpm sync-version
+                  publish: pnpm changeset publish
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - name: Publish to jsr
+              if: steps.changesets.outputs.published == 'true'
+              run: npx -y jsr publish --allow-dirty
