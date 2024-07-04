@@ -6,7 +6,7 @@ export default defineConfig([
 			'pocket-shader.min': 'src/pocket-shader.ts',
 		},
 		minify: !0,
-		name: 'standard',
+		name: 'minified',
 		format: ['esm'],
 		clean: true,
 		dts: !!0,
